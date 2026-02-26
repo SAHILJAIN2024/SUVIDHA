@@ -17,7 +17,7 @@ const GeoJSON = dynamic(
   { ssr: false }
 );
 
-export default function StateMap() {
+export default function StateMap({ stateSlug = "assam" }) {
   const [geoData, setGeoData] = useState(null);
   const router = useRouter();
 
@@ -65,13 +65,18 @@ export default function StateMap() {
     });
 
     layer.on({
-      click: () => {
-        const slug = districtName.toLowerCase().replace(/\s+/g, "-");
-        router.push(
-          `/state/${stateSlug}/district/${districtSlug}/ward`
-        );
-      },
-    });
+  click: () => {
+    const districtSlug = districtName
+      .toLowerCase()
+      .replace(/\s+/g, "-");
+
+    const stateSlug = "assam"; // since you are loading assam.json
+
+    router.push(
+  `/state/${stateSlug}/${districtSlug}/ward`
+);
+  },
+});
   };
 
   return (
@@ -99,7 +104,7 @@ export default function StateMap() {
       {/* Label Styling */}
       <style jsx global>{`
         .district-label {
-          font-size: 12px;
+          font-size: 10px;
           font-weight: bold;
           color: black;
           background: transparent;
