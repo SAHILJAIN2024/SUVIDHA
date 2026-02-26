@@ -1,0 +1,10 @@
+const express = require('express');
+const router = express.Router();
+const { protect } = require('../middleware/auth');
+const { serviceRequestValidation } = require('../middleware/validate');
+const ctrl = require('../controllers/wasteController');
+router.get('/dashboard', protect, ctrl.getDashboard);
+router.post('/requests', protect, serviceRequestValidation, ctrl.createRequest);
+router.get('/requests', protect, ctrl.getRequests);
+router.get('/schedule', protect, ctrl.getSchedule);
+module.exports = router;

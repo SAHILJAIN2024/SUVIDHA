@@ -1,0 +1,12 @@
+const express = require('express');
+const router = express.Router();
+const { protect } = require('../middleware/auth');
+const { serviceRequestValidation } = require('../middleware/validate');
+const ctrl = require('../controllers/waterController');
+router.get('/dashboard', protect, ctrl.getDashboard);
+router.post('/requests', protect, serviceRequestValidation, ctrl.createRequest);
+router.get('/requests', protect, ctrl.getRequests);
+router.get('/authorities', protect, ctrl.getAuthorities);
+router.get('/actions-pending', protect, ctrl.getActionsPending);
+router.get('/supply-status', protect, ctrl.getSupplyStatus);
+module.exports = router;
