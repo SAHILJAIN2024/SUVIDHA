@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import { Zap, Droplets, Route, Recycle, ArrowRight, FileText, CreditCard, Phone, HelpCircle, Plug, ShieldCheck, AlertCircle } from "lucide-react";
 import { Card, CardContent, Button } from "@/components/ui";
 import { getDepartments, getQuickActions, DepartmentInfo, QuickAction } from "@/services/ward.service";
+import { useGSAP } from "@/hooks/useGSAP";
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
     Zap, Droplets, Route, Recycle, FileText, CreditCard, Phone, HelpCircle, Plug, ShieldCheck,
@@ -22,6 +23,7 @@ export default function ServicesPage() {
             .then(([depts, actions]) => { setDepartments(depts); setQuickActions(actions); setLoading(false); })
             .catch(() => { setError("Failed to load services"); setLoading(false); });
     }, []);
+        const gsapRef = useGSAP<HTMLDivElement>(".gsap-item", { y: 16, stagger: 0.05 });
 
     if (loading) {
         return (
@@ -46,7 +48,7 @@ export default function ServicesPage() {
     }
 
     return (
-        <div className="space-y-8">
+        <div ref={gsapRef} className="space-y-8">
             <div>
                 <h1 className="text-2xl font-bold text-fg">Services</h1>
                 <p className="text-fg-secondary mt-1">Browse and access civic services by department</p>

@@ -11,6 +11,7 @@ import {
     getNotifications, markNotificationRead, markAllNotificationsRead,
     deleteNotification as deleteNotif, NotificationItem,
 } from "@/services/notification.service";
+import { useGSAP } from "@/hooks/useGSAP";
 
 const typeConfig: Record<string, { icon: React.ReactNode; color: string; bg: string }> = {
     success: { icon: <CheckCircle className="h-5 w-5" />, color: "text-success-500", bg: "bg-success-50 dark:bg-success-500/10" },
@@ -37,6 +38,7 @@ export default function NotificationsPage() {
             .then((data) => { setNotifications(data); setLoading(false); })
             .catch(() => { setError("Failed to load notifications"); setLoading(false); });
     }, []);
+        const gsapRef = useGSAP<HTMLDivElement>(".gsap-item", { y: 14, stagger: 0.04 });
 
     const markRead = async (id: string) => {
         await markNotificationRead(id);
@@ -86,7 +88,7 @@ export default function NotificationsPage() {
     }
 
     return (
-        <div className="max-w-2xl mx-auto space-y-6">
+        <div ref={gsapRef} className="max-w-2xl mx-auto space-y-6">
             <div className="flex items-center justify-between">
                 <div>
                     <h1 className="text-2xl font-bold text-fg">Notifications</h1>

@@ -10,6 +10,7 @@ import {
 import { Button, Card, CardContent, Badge, StatusBadge, Input } from "@/components/ui";
 import { Complaint, Department } from "@/types";
 import { getComplaints, voteComplaint } from "@/services/complaint.service";
+import { useGSAP } from "@/hooks/useGSAP";
 
 const deptLabels: Record<Department, string> = {
     electricity: "Electricity",
@@ -58,9 +59,10 @@ export default function PublicComplaintsPage() {
             if (sortBy === "votes") return b.votes - a.votes;
             return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
         });
+    const gsapRef = useGSAP<HTMLDivElement>(".gsap-item", { y: 14, stagger: 0.04 });
 
     return (
-        <div className="min-h-screen bg-bg">
+        <div ref={gsapRef} className="min-h-screen bg-bg">
             {/* Header */}
             <header className="sticky top-0 z-30 bg-surface/80 backdrop-blur-xl border-b border-border">
                 <div className="max-w-4xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">

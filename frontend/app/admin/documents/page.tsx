@@ -9,6 +9,7 @@ import {
 import { Card, CardContent, Button, Badge, StatusBadge, Input, Modal } from "@/components/ui";
 import { CitizenDocument } from "@/types";
 import { getAdminDocuments, verifyDocument, rejectDocument } from "@/services/document.service";
+import { useGSAP } from "@/hooks/useGSAP";
 
 const typeLabels: Record<string, string> = {
     aadhaar: "Aadhaar Card",
@@ -34,6 +35,7 @@ export default function AdminDocumentsPage() {
             .then((data) => { setDocuments(data); setLoading(false); })
             .catch(() => { setError("Failed to load documents"); setLoading(false); });
     }, []);
+        const gsapRef = useGSAP<HTMLDivElement>(".gsap-item", { y: 14, stagger: 0.04 });
 
     const filtered = documents.filter((doc) => {
         const matchesFilter = filter === "all" || doc.status === filter;
@@ -111,7 +113,7 @@ export default function AdminDocumentsPage() {
     }
 
     return (
-        <div className="space-y-6">
+        <div ref={gsapRef} className="space-y-6">
             <div>
                 <h1 className="text-2xl font-bold text-fg">Document Verification</h1>
                 <p className="text-fg-secondary mt-1">Review and verify citizen-uploaded documents</p>

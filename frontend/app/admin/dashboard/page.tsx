@@ -17,6 +17,7 @@ import {
 import { Card, CardContent, Button, Badge } from "@/components/ui";
 import { getKPIs, getChartData } from "@/services/admin.service";
 import { KPIData } from "@/types";
+import { useGSAP } from "@/hooks/useGSAP";
 
 // Lazy load Recharts
 const LazyBarChart = dynamic(
@@ -115,6 +116,7 @@ export default function AdminDashboard() {
         }
         load();
     }, []);
+        const gsapRef = useGSAP<HTMLDivElement>(".gsap-card", { y: 16, stagger: 0.06 });
 
     if (loading) {
         return (
@@ -138,7 +140,7 @@ export default function AdminDashboard() {
     }
 
     return (
-        <div className="space-y-6">
+        <div ref={gsapRef} className="space-y-6">
             <div className="flex items-center justify-between">
                 <div>
                     <h1 className="text-2xl font-bold text-fg">Admin Dashboard</h1>
@@ -185,7 +187,7 @@ export default function AdminDashboard() {
             {/* Charts */}
             <div className="grid lg:grid-cols-3 gap-6">
                 {/* Bar Chart */}
-                <div className="lg:col-span-2">
+                <div className="lg:col-span-2 gsap-card">
                     <Card>
                         <CardContent>
                             <h2 className="text-lg font-semibold text-fg mb-4">Complaints Over Time</h2>
@@ -216,7 +218,7 @@ export default function AdminDashboard() {
             </div>
 
             {/* Resolution by Ward */}
-            <Card>
+            <Card className="gsap-card">
                 <CardContent>
                     <h2 className="text-lg font-semibold text-fg mb-4">Resolution Rate by Ward</h2>
                     <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">

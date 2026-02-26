@@ -21,6 +21,7 @@ import { Card, CardContent, Button, Badge, StatusBadge, Input, Select } from "@/
 import { getComplaints, voteComplaint } from "@/services/complaint.service";
 import { Complaint } from "@/types";
 import { AlertCircle } from "lucide-react";
+import { useGSAP } from "@/hooks/useGSAP";
 
 const deptIcons: Record<string, React.ReactNode> = {
     electricity: <Zap className="h-4 w-4" />,
@@ -59,6 +60,7 @@ export default function GlobalComplaintsPage() {
             .then((data) => { setComplaints(data); setLoading(false); })
             .catch(() => { setError("Failed to load complaints"); setLoading(false); });
     }, []);
+        const gsapRef = useGSAP<HTMLDivElement>(".gsap-item", { y: 14, stagger: 0.04 });
 
     const handleVote = async (id: string, direction: "up" | "down") => {
         if (direction === "up") {
@@ -104,7 +106,7 @@ export default function GlobalComplaintsPage() {
     }
 
     return (
-        <div className="max-w-3xl mx-auto space-y-6">
+        <div ref={gsapRef} className="max-w-3xl mx-auto space-y-6">
             {/* Header */}
             <div>
                 <h1 className="text-2xl font-bold text-fg">Global Complaints Feed</h1>

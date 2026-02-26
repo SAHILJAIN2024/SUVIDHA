@@ -6,6 +6,7 @@ import { Upload, FileText, CheckCircle, XCircle, Clock, Shield, Eye, Trash2, Ale
 import { Card, CardContent, Button, Badge } from "@/components/ui";
 import { useAuthStore } from "@/store/auth.store";
 import { getCitizenDocuments, uploadDocument, deleteDocument, CDocumentItem } from "@/services/document.service";
+import { useGSAP } from "@/hooks/useGSAP";
 
 const statusConfig: Record<string, { icon: React.ReactNode; label: string; variant: "success" | "warning" | "danger" }> = {
     verified: { icon: <CheckCircle className="h-3 w-3" />, label: "Verified", variant: "success" },
@@ -25,6 +26,7 @@ export default function DocumentVerificationPage() {
             .then((data) => { setDocuments(data); setLoading(false); })
             .catch(() => { setError("Failed to load documents"); setLoading(false); });
     }, []);
+        const gsapRef = useGSAP<HTMLDivElement>(".gsap-item", { y: 14, stagger: 0.04 });
 
     const handleUpload = async () => {
         setUploading(true);
@@ -75,7 +77,7 @@ export default function DocumentVerificationPage() {
     }
 
     return (
-        <div className="max-w-2xl mx-auto space-y-6">
+        <div ref={gsapRef} className="max-w-2xl mx-auto space-y-6">
             <div>
                 <h1 className="text-2xl font-bold text-fg">Document Verification</h1>
                 <p className="text-fg-secondary mt-1">Upload and manage your identity & address documents</p>

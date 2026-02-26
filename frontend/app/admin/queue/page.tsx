@@ -20,6 +20,7 @@ import { getActionQueue, updateComplaintStatus } from "@/services/admin.service"
 import { getComplaintById } from "@/services/complaint.service";
 import { AdminAction, Complaint, Department } from "@/types";
 import { useAuthStore } from "@/store/auth.store";
+import { useGSAP } from "@/hooks/useGSAP";
 
 const deptIcons: Record<string, React.ReactNode> = {
     electricity: <Zap className="h-4 w-4" />,
@@ -86,6 +87,8 @@ export default function ActionQueuePage() {
         }
     };
 
+    const gsapRef = useGSAP<HTMLDivElement>(".gsap-item", { y: 14, stagger: 0.04 });
+
     if (loading) {
         return (
             <div className="space-y-4">
@@ -107,7 +110,7 @@ export default function ActionQueuePage() {
     }
 
     return (
-        <div className="space-y-6">
+        <div ref={gsapRef} className="space-y-6">
             <div className="flex items-center justify-between">
                 <div>
                     <h1 className="text-2xl font-bold text-fg">Action Queue</h1>

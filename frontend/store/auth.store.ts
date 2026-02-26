@@ -20,11 +20,17 @@ export const useAuthStore = create<AuthState>((set) => ({
     isAuthenticated: false,
     isLoading: false,
 
-    login: (user, token) =>
-        set({ user, token, isAuthenticated: true, isLoading: false }),
+    login: (user, token) => {
+        // Set cookie for middleware route protection
+        document.cookie = `suvidha-auth-token=${token}; path=/; max-age=${60 * 60 * 24 * 7}; SameSite=Lax`;
+        set({ user, token, isAuthenticated: true, isLoading: false });
+    },
 
-    logout: () =>
-        set({ user: null, token: null, isAuthenticated: false }),
+    logout: () => {
+        // Remove auth cookie
+        document.cookie = "suvidha-auth-token=; path=/; max-age=0";
+        set({ user: null, token: null, isAuthenticated: false });
+    },
 
     switchRole: (role) => {
         const matchedUser = mockUsers.find((u) => u.role === role);

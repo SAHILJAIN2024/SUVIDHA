@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { MapPin, Layers, Eye, Phone, Mail, User, AlertCircle } from "lucide-react";
 import { Card, CardContent, Button, Badge } from "@/components/ui";
 import { getWardData, getWardContacts, getWardMapMarkers, WardData, WardContact, WardMapMarker } from "@/services/ward.service";
+import { useGSAP } from "@/hooks/useGSAP";
 
 export default function AdminMapPage() {
     const [wards, setWards] = useState<WardData[]>([]);
@@ -17,6 +18,7 @@ export default function AdminMapPage() {
             .then(([w, c, m]) => { setWards(w); setContacts(c); setMarkers(m); setLoading(false); })
             .catch(() => { setError("Failed to load ward data"); setLoading(false); });
     }, []);
+        const gsapRef = useGSAP<HTMLDivElement>(".gsap-item", { y: 14, stagger: 0.04 });
 
     if (loading) {
         return (
@@ -41,7 +43,7 @@ export default function AdminMapPage() {
     }
 
     return (
-        <div className="space-y-6">
+        <div ref={gsapRef} className="space-y-6">
             <div className="flex items-center justify-between">
                 <div>
                     <h1 className="text-2xl font-bold text-fg">Ward Map</h1>

@@ -18,6 +18,7 @@ import { Card, CardContent, Button, Badge } from "@/components/ui";
 import { Modal } from "@/components/ui";
 import { getBills, payBill } from "@/services/bill.service";
 import { Bill } from "@/types";
+import { useGSAP } from "@/hooks/useGSAP";
 
 const billIcons: Record<string, React.ReactNode> = {
     electricity: <Zap className="h-5 w-5" />,
@@ -46,6 +47,7 @@ export default function BillsPage() {
             .then((data) => { setBills(data); setLoading(false); })
             .catch(() => { setError("Failed to load bills"); setLoading(false); });
     }, []);
+        const gsapRef = useGSAP<HTMLDivElement>(".gsap-item", { y: 14, stagger: 0.04 });
 
     const handlePay = async (bill: Bill) => {
         setPaying(true);
@@ -82,7 +84,7 @@ export default function BillsPage() {
     }
 
     return (
-        <div className="space-y-6">
+        <div ref={gsapRef} className="space-y-6">
             <h1 className="text-2xl font-bold text-fg">Bill Payments</h1>
 
             {/* Total Due Banner */}

@@ -7,6 +7,7 @@ import { Download, AlertCircle } from "lucide-react";
 import { Card, CardContent, Button, Select } from "@/components/ui";
 import { getChartData } from "@/services/admin.service";
 import { getReportSummary, ReportSummary } from "@/services/ward.service";
+import { useGSAP } from "@/hooks/useGSAP";
 
 const LazyBarChart = dynamic(
     () => import("recharts").then((mod) => {
@@ -68,6 +69,7 @@ export default function ReportsPage() {
             })
             .catch(() => { setError("Failed to load reports"); setLoading(false); });
     }, []);
+        const gsapRef = useGSAP<HTMLDivElement>(".gsap-item", { y: 14, stagger: 0.05 });
 
     if (loading) {
         return (
@@ -93,7 +95,7 @@ export default function ReportsPage() {
     }
 
     return (
-        <div className="space-y-6">
+        <div ref={gsapRef} className="space-y-6">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
                     <h1 className="text-2xl font-bold text-fg">Reports & Analytics</h1>

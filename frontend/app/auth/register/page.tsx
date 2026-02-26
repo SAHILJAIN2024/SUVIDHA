@@ -6,11 +6,12 @@ import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import {
     User, Mail, Phone, Lock, Eye, EyeOff, ArrowRight, ArrowLeft, Shield,
-    Calendar, MapPin, Hash, Flame, PhoneCall,
+    Calendar, MapPin, Hash, Flame, PhoneCall, Navigation, Loader2, CheckCircle, AlertCircle,
 } from "lucide-react";
 import { Button, Input } from "@/components/ui";
 import { useAuthStore } from "@/store/auth.store";
 import { register as mockRegister } from "@/services/auth.service";
+import { fetchUserLocation, GeoStatus } from "@/services/geolocation.service";
 
 const genderOptions = [
     { value: "", label: "Select Gender" },
@@ -47,6 +48,7 @@ export default function RegisterPage() {
         city: "",
         area: "",
         pinCode: "",
+        ward: "",
         aadhaarNo: "",
         gasNo: "",
         ivrsNo: "",
@@ -55,6 +57,9 @@ export default function RegisterPage() {
     const [isLoading, setIsLoading] = useState(false);
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [step, setStep] = useState(1);
+    const [geoStatus, setGeoStatus] = useState<GeoStatus>("idle");
+    const [wardAutoDetected, setWardAutoDetected] = useState(false);
+    const [wardDisplay, setWardDisplay] = useState("");
 
     const totalSteps = 3;
 
@@ -240,6 +245,72 @@ export default function RegisterPage() {
                         {/* ── Step 2: Address & IDs ── */}
                         {step === 2 && (
                             <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-4">
+                                {/* Ward auto-detect */}
+                                <div className="p-4 rounded-xl border border-border bg-surface">
+                                    <div className="flex items-center justify-between mb-2">
+                                        <div>
+                                            <p className="text-sm font-medium text-fg">Ward Number</p>
+                                            <p className="text-xs text-fg-muted">Auto-detect using your location</p>
+                                        </div>
+                                        <Button
+                                            type="button"
+                                            variant={geoStatus === "success" ? "outline" : "primary"}
+                                            size="sm"
+                                            onClick={async () => {
+                                                setGeoStatus("requesting");
+                                                const res = await fetchUserLocation();
+                                                setGeoStatus(res.status);
+                                                if (res.status === "success" && res.result) {
+                                                    updateField("ward", res.result.wardNumber);
+                                                    setWardDisplay(`${res.result.wardNumber} — ${res.result.wardName}`);
+                                                    setWardAutoDetected(true);
+                                                } else {
+                                                    setErrors((prev) => ({ ...prev, ward: res.error || "Location failed" }));
+                                                }
+                                            }}
+                                            disabled={geoStatus === "requesting" || geoStatus === "fetching"}
+                                            leftIcon={
+                                                geoStatus === "requesting" || geoStatus === "fetching"
+                                                    ? <Loader2 className="h-4 w-4 animate-spin" />
+                                                    : geoStatus === "success"
+                                                        ? <CheckCircle className="h-4 w-4" />
+                                                        : <Navigation className="h-4 w-4" />
+                                            }
+                                        >
+                                            {geoStatus === "requesting" ? "Detecting..." : geoStatus === "success" ? "Detected" : "Detect Location"}
+                                        </Button>
+                                    </div>
+                                    {geoStatus === "success" && wardDisplay && (
+                                        <div className="flex items-center gap-2 p-2 rounded-lg bg-success-50 dark:bg-success-500/10 text-sm">
+                                            <CheckCircle className="h-4 w-4 text-success-500 shrink-0" />
+                                            <span className="text-success-700 dark:text-success-400">{wardDisplay}</span>
+                                        </div>
+                                    )}
+                                    {(geoStatus === "denied" || geoStatus === "unavailable" || geoStatus === "error") && (
+                                        <div className="flex items-center gap-2 p-2 rounded-lg bg-warning-50 dark:bg-warning-500/10 text-sm">
+                                            <AlertCircle className="h-4 w-4 text-warning-500 shrink-0" />
+                                            <span className="text-warning-700 dark:text-warning-400">{errors.ward || "Could not detect. Enter manually below."}</span>
+                                        </div>
+                                    )}
+                                    {!wardAutoDetected && (
+                                        <div className="mt-2">
+                                            <select
+                                                value={formData.ward || ""}
+                                                onChange={(e) => { updateField("ward", e.target.value); setWardAutoDetected(false); }}
+                                                className="w-full h-10 px-3 bg-surface border border-border rounded-lg text-sm text-fg focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all"
+                                            >
+                                                <option value="">Select Ward Manually</option>
+                                                <option value="Ward 1">Ward 1</option>
+                                                <option value="Ward 3">Ward 3</option>
+                                                <option value="Ward 5">Ward 5</option>
+                                                <option value="Ward 8">Ward 8</option>
+                                                <option value="Ward 12">Ward 12</option>
+                                                <option value="Ward 15">Ward 15</option>
+                                            </select>
+                                        </div>
+                                    )}
+                                </div>
+
                                 <div className="w-full">
                                     <label className="block text-sm font-medium text-fg mb-1.5">State</label>
                                     <select

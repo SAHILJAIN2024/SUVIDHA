@@ -6,6 +6,7 @@ import { Search, Zap, Droplets, Route, Recycle, ArrowUpRight, ChevronUp, AlertCi
 import { Card, CardContent, Button, Badge, StatusBadge, Input, Select } from "@/components/ui";
 import { getComplaints } from "@/services/complaint.service";
 import { Complaint, Department } from "@/types";
+import { useGSAP } from "@/hooks/useGSAP";
 import { useAuthStore } from "@/store/auth.store";
 
 const deptIcons: Record<string, React.ReactNode> = {
@@ -40,6 +41,7 @@ export default function AdminComplaintsPage() {
             .then((data) => { setComplaints(data); setLoading(false); })
             .catch(() => { setError("Failed to load complaints"); setLoading(false); });
     }, []);
+        const gsapRef = useGSAP<HTMLDivElement>(".gsap-item", { y: 14, stagger: 0.04 });
 
     const filtered = complaints.filter((c) => {
         const matchSearch = c.title.toLowerCase().includes(search.toLowerCase()) || c.id.toLowerCase().includes(search.toLowerCase());
@@ -61,7 +63,7 @@ export default function AdminComplaintsPage() {
     }
 
     return (
-        <div className="space-y-6">
+        <div ref={gsapRef} className="space-y-6">
             <h1 className="text-2xl font-bold text-fg">All Complaints</h1>
             <Card padding="sm">
                 <CardContent>

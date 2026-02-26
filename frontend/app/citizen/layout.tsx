@@ -54,7 +54,7 @@ export default function CitizenLayout({ children }: { children: React.ReactNode 
 
     return (
         <AuthGuard allowedRoles={["citizen"]}>
-            <div className="min-h-screen bg-bg flex">
+            <div className="min-h-screen bg-bg flex overflow-hidden">
                 {/* ── Desktop Sidebar (sticky, in-flow) ────────── */}
                 <aside
                     className={cn(
@@ -225,8 +225,8 @@ export default function CitizenLayout({ children }: { children: React.ReactNode 
                     </header>
 
                     {/* Page Content */}
-                    <main className="flex-1 p-4 sm:p-6 lg:p-8">
-                        <div className="max-w-6xl mx-auto">
+                    <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-x-hidden overflow-y-auto">
+                        <div className="max-w-6xl mx-auto w-full">
                             {children}
                         </div>
                     </main>

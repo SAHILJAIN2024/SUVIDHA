@@ -24,6 +24,7 @@ import { useAuthStore } from "@/store/auth.store";
 import { getComplaints } from "@/services/complaint.service";
 import { getBills } from "@/services/bill.service";
 import { Complaint, Bill } from "@/types";
+import { useGSAP } from "@/hooks/useGSAP";
 
 const deptIcons: Record<string, React.ReactNode> = {
     electricity: <Zap className="h-4 w-4" />,
@@ -68,6 +69,7 @@ export default function CitizenDashboard() {
     const resolvedCount = complaints.filter((c) => c.status === "resolved").length;
     const unpaidBills = bills.filter((b) => b.status !== "paid");
     const totalDue = unpaidBills.reduce((sum, b) => sum + b.amount, 0);
+    const gsapRef = useGSAP<HTMLDivElement>(".gsap-card", { y: 20, stagger: 0.05 });
 
     const summaryCards = [
         { label: "Total Complaints", value: complaints.length, icon: FileText, color: "text-primary-600", bg: "bg-primary-50 dark:bg-primary-900/20" },
@@ -100,7 +102,7 @@ export default function CitizenDashboard() {
     }
 
     return (
-        <div className="space-y-6">
+        <div ref={gsapRef} className="space-y-6">
             {/* Welcome */}
             <div>
                 <h1 className="text-2xl font-bold text-fg">
@@ -150,7 +152,7 @@ export default function CitizenDashboard() {
 
             <div className="grid lg:grid-cols-3 gap-6">
                 {/* Recent Complaints */}
-                <div className="lg:col-span-2">
+                <div className="lg:col-span-2 gsap-card">
                     <Card>
                         <CardContent>
                             <div className="flex items-center justify-between mb-4">
@@ -192,7 +194,7 @@ export default function CitizenDashboard() {
 
                 {/* Bills Summary */}
                 <div>
-                    <Card>
+                    <Card className="gsap-card">
                         <CardContent>
                             <div className="flex items-center justify-between mb-4">
                                 <h2 className="text-lg font-semibold text-fg">Bills Due</h2>
