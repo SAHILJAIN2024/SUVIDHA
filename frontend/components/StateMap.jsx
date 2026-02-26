@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 
@@ -19,6 +19,7 @@ const GeoJSON = dynamic(
 
 export default function StateMap({ stateSlug = "assam" }) {
   const [geoData, setGeoData] = useState(null);
+  const geoJsonRef = useRef(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -27,29 +28,37 @@ export default function StateMap({ stateSlug = "assam" }) {
       .then((data) => setGeoData(data));
   }, []);
 
-  // 🎨 Styling
-  const style = () => ({
-    color: "black",        // Border color
-    weight: 3,             // Bold boundary
-    fillColor: "#FF5733",  // District fill
-    fillOpacity: 0.6,
-  });
+  // 🎨 Default Style
+  const defaultStyle = {
+    color: "#000",
+    weight: 2,
+    fillColor: "#FF5733",
+    fillOpacity: 0.4,
+  };
 
-  // 🔥 Highlight on hover
+  // 🔥 Hover Highlight (Enlarge Effect)
   const highlightFeature = (e) => {
     const layer = e.target;
+
     layer.setStyle({
-      weight: 4,
-      color: "#000",
-      fillOpacity: 0.8,
+      weight: 6,               // thicker border
+      color: "#111",
+      fillColor: "#FF8A65",    // lighter orange
+      fillOpacity: 0.9,
     });
+
+    layer.bringToFront();
+    layer.openTooltip();
   };
 
   const resetHighlight = (e) => {
-    e.target.setStyle(style());
+    if (geoJsonRef.current) {
+      geoJsonRef.current.resetStyle(e.target);
+    }
+    e.target.closeTooltip();
   };
 
-  // 🏷 Show district name
+  // 🏷 Per District Logic
   const onEachFeature = (feature, layer) => {
     const districtName =
       feature.properties.district ||
@@ -57,33 +66,31 @@ export default function StateMap({ stateSlug = "assam" }) {
       feature.properties.AC_NAME ||
       "Unknown District";
 
-    // Permanent label on map
+    // Tooltip (Hidden by default, shown on hover)
     layer.bindTooltip(districtName, {
-      permanent: true,
+      permanent: false,
       direction: "center",
       className: "district-label",
     });
 
     layer.on({
-  click: () => {
-    const districtSlug = districtName
-      .toLowerCase()
-      .replace(/\s+/g, "-");
+      mouseover: highlightFeature,
+      mouseout: resetHighlight,
+      click: () => {
+        const districtSlug = districtName
+          .toLowerCase()
+          .replace(/\s+/g, "-");
 
-    const stateSlug = "assam"; // since you are loading assam.json
-
-    router.push(
-  `/state/${stateSlug}/${districtSlug}/ward`
-);
-  },
-});
+        router.push(`/state/${stateSlug}/${districtSlug}/ward`);
+      },
+    });
   };
 
   return (
     <div style={{ height: "100vh", width: "100%" }}>
       <MapContainer
-        center={[26.2, 92.9]} // Assam center
-        zoom={8}
+        center={[26.2, 92.9]}
+        zoom={9}
         scrollWheelZoom={true}
         style={{ height: "100%", width: "100%" }}
       >
@@ -94,21 +101,25 @@ export default function StateMap({ stateSlug = "assam" }) {
 
         {geoData && (
           <GeoJSON
+            ref={geoJsonRef}
             data={geoData}
-            style={style}
+            style={() => defaultStyle}
             onEachFeature={onEachFeature}
           />
         )}
       </MapContainer>
 
-      {/* Label Styling */}
+      {/* ✨ Clean Modern Label */}
       <style jsx global>{`
         .district-label {
-          font-size: 10px;
-          font-weight: bold;
-          color: black;
-          background: transparent;
-          border: none;
+          font-size: 14px;
+          font-weight: 700;
+          color: #000;
+          background: rgba(255, 255, 255, 0.95);
+          padding: 4px 10px;
+          border-radius: 6px;
+          border: 1px solid #ccc;
+          box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
         }
       `}</style>
     </div>

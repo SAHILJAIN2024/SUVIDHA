@@ -2,7 +2,6 @@
 
 import { useRef, useEffect, useState } from "react";
 import dynamic from "next/dynamic";
-import { useRouter } from "next/navigation";
 
 const MapContainer = dynamic(
   () => import("react-leaflet").then((mod) => mod.MapContainer),
@@ -17,12 +16,10 @@ const GeoJSON = dynamic(
   { ssr: false }
 );
 
-export default function WardMap({ stateSlug, districtSlug }) {
+export default function WardMap({ stateSlug, districtSlug, onWardHover }) {
   const [geoData, setGeoData] = useState(null);
-  const [selectedLayer, setSelectedLayer] = useState(null);
   const geoJsonRef = useRef(null);
   const mapRef = useRef(null);
-  const router = useRouter();
 
   // Fetch GeoJSON
   useEffect(() => {
@@ -32,7 +29,7 @@ export default function WardMap({ stateSlug, districtSlug }) {
       .catch((err) => console.error("GeoJSON Load Error:", err));
   }, []);
 
-  // Auto fit
+  // Auto fit bounds
   useEffect(() => {
     if (geoData && geoJsonRef.current && mapRef.current) {
       const bounds = geoJsonRef.current.getBounds();
@@ -40,21 +37,41 @@ export default function WardMap({ stateSlug, districtSlug }) {
     }
   }, [geoData]);
 
-  // Default style
+  // 🎨 Default Style
   const defaultStyle = {
     color: "#1E3A8A",
-    weight: 3,
+    weight: 2,
     opacity: 1,
-    fillColor: "#E3F2FD",   // very light blue
+    fillColor: "#E3F2FD",
     fillOpacity: 0.4,
   };
 
-  // Highlight style (selected)
-  const selectedStyle = {
+  // 🔥 Hover Style (Enlarged Look)
+  const hoverStyle = {
     color: "#0D47A1",
-    weight: 6,
-    fillColor: "#BBDEFB",  // light background
-    fillOpacity: 0.8,
+    weight: 6,                 // thicker border
+    fillColor: "#90CAF9",      // brighter blue
+    fillOpacity: 0.9,
+  };
+
+  const highlightFeature = (e, name) => {
+    const layer = e.target;
+
+    layer.setStyle(hoverStyle);
+    layer.bringToFront();
+    layer.openTooltip();
+
+    // Send ward name to parent (right panel)
+    if (onWardHover) {
+      onWardHover(name);
+    }
+  };
+
+  const resetHighlight = (e) => {
+    if (geoJsonRef.current) {
+      geoJsonRef.current.resetStyle(e.target);
+    }
+    e.target.closeTooltip();
   };
 
   const onEachFeature = (feature, layer) => {
@@ -64,33 +81,16 @@ export default function WardMap({ stateSlug, districtSlug }) {
       feature.properties?.GROUP ||
       "Group";
 
-    // Center label (hidden by default)
+    // Tooltip (hidden until hover)
     layer.bindTooltip(name, {
       permanent: false,
       direction: "center",
-      className: "district-label",
+      className: "ward-label",
     });
 
     layer.on({
-      click: () => {
-        // Reset previous selected
-        if (selectedLayer) {
-          selectedLayer.setStyle(defaultStyle);
-          selectedLayer.closeTooltip();
-        }
-
-        // Set new selected
-        layer.setStyle(selectedStyle);
-        layer.openTooltip();
-        layer.bringToFront();
-        setSelectedLayer(layer);
-
-        // Optional: navigate
-        const slug = name.toLowerCase().replace(/\s+/g, "-");
-        router.push(
-          `/state/${stateSlug}/district/${districtSlug}/ward/${slug}`
-        );
-      },
+      mouseover: (e) => highlightFeature(e, name),
+      mouseout: resetHighlight,
     });
   };
 
@@ -118,15 +118,17 @@ export default function WardMap({ stateSlug, districtSlug }) {
         )}
       </MapContainer>
 
+      {/* Enhanced Tooltip Styling */}
       <style jsx global>{`
-        .district-label {
-          font-size: 12px;
-          font-weight: bold;
+        .ward-label {
+          font-size: 14px;
+          font-weight: 700;
           color: #0d47a1;
-          background: rgba(255, 255, 255, 0.8);
-          padding: 2px 6px;
-          border-radius: 4px;
-          border: none;
+          background: rgba(255, 255, 255, 0.95);
+          padding: 4px 10px;
+          border-radius: 6px;
+          border: 1px solid #ccc;
+          box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);
         }
       `}</style>
     </div>
