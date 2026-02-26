@@ -185,9 +185,9 @@ export default function CitizenLayout({ children }: { children: React.ReactNode 
             </AnimatePresence>
 
             {/* ── Main Content ──────────────────────── */}
-            <div className={cn("flex-1 flex flex-col transition-all duration-300", sidebarCollapsed ? "lg:ml-[72px]" : "lg:ml-64")}>
+            <div className={cn("flex-1 flex flex-col min-w-0 overflow-x-hidden transition-all duration-300", sidebarCollapsed ? "lg:ml-[72px]" : "lg:ml-64")}>
                 {/* Top Bar */}
-                <header className="sticky top-0 z-30 h-16 bg-surface/80 backdrop-blur-xl border-b border-border flex items-center justify-between px-4 sm:px-6">
+                <header className="sticky top-0 z-30 h-16 bg-surface/80 backdrop-blur-xl border-b border-border flex items-center justify-between px-4 sm:px-6 lg:px-8">
                     <div className="flex items-center gap-3">
                         <button
                             onClick={() => setMobileOpen(true)}
@@ -224,7 +224,9 @@ export default function CitizenLayout({ children }: { children: React.ReactNode 
 
                 {/* Page Content */}
                 <main className="flex-1 p-4 sm:p-6 lg:p-8">
-                    {children}
+                    <div className="max-w-6xl mx-auto">
+                        {children}
+                    </div>
                 </main>
             </div>
         </div>
