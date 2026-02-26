@@ -1,7 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
-import "leaflet/dist/leaflet.css";
 
 const inter = Inter({
   variable: "--font-inter",
