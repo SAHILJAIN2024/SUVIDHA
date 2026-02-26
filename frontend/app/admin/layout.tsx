@@ -26,15 +26,24 @@ import {
 import { cn } from "@/utils/cn";
 import { useAuthStore } from "@/store/auth.store";
 import { useUIStore } from "@/store/ui.store";
+import { useI18nStore } from "@/store/i18n.store";
+import { LanguageSelector } from "@/components/LanguageSelector";
 import { Badge } from "@/components/ui";
 
-const navItems = [
-    { href: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
-    { href: "/admin/queue", label: "Action Queue", icon: ListChecks, badge: "3" },
-    { href: "/admin/complaints", label: "All Complaints", icon: FileText },
-    { href: "/admin/documents", label: "Doc Verification", icon: FolderCheck },
-    { href: "/admin/reports", label: "Reports", icon: BarChart3 },
-    { href: "/admin/map", label: "Ward Map", icon: Map },
+interface NavItem {
+    href: string;
+    id: string;
+    icon: any;
+    badge?: string;
+}
+
+const navItems: NavItem[] = [
+    { href: "/admin/dashboard", id: "admin.dashboard", icon: LayoutDashboard },
+    { href: "/admin/queue", id: "admin.actionQueue", icon: ListChecks, badge: "3" },
+    { href: "/admin/complaints", id: "admin.allComplaints", icon: FileText },
+    { href: "/admin/documents", id: "admin.docVerification", icon: FolderCheck },
+    { href: "/admin/reports", id: "admin.reports", icon: BarChart3 },
+    { href: "/admin/map", id: "admin.wardMap", icon: Map },
 ];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -42,6 +51,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     const router = useRouter();
     const { user, logout } = useAuthStore();
     const { sidebarCollapsed, toggleSidebarCollapse, theme, setTheme } = useUIStore();
+    const { t } = useI18nStore();
     const [mobileOpen, setMobileOpen] = useState(false);
 
     const handleLogout = () => {
@@ -92,12 +102,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                                             ? "bg-primary-50 text-primary-700 dark:bg-primary-900/20 dark:text-primary-300"
                                             : "text-fg-secondary hover:text-fg hover:bg-surface-muted"
                                     )}
-                                    title={sidebarCollapsed ? item.label : undefined}
+                                    title={sidebarCollapsed ? t(item.id as any) : undefined}
                                 >
                                     <item.icon className={cn("h-5 w-5 shrink-0", isActive && "text-primary-600")} />
                                     {!sidebarCollapsed && (
                                         <>
-                                            <span className="flex-1">{item.label}</span>
+                                            <span className="flex-1">{t(item.id as any)}</span>
                                             {item.badge && (
                                                 <Badge variant="danger" size="sm">{item.badge}</Badge>
                                             )}
@@ -109,19 +119,20 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                     </nav>
 
                     <div className="border-t border-border p-3 space-y-1 shrink-0">
+                        <LanguageSelector collapsed={sidebarCollapsed} />
                         <button
                             onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
                             className="flex items-center gap-3 w-full px-3 py-2.5 rounded-xl text-sm text-fg-secondary hover:text-fg hover:bg-surface-muted transition-colors whitespace-nowrap"
                         >
                             {theme === "dark" ? <Sun className="h-5 w-5 shrink-0" /> : <Moon className="h-5 w-5 shrink-0" />}
-                            {!sidebarCollapsed && (theme === "dark" ? "Light Mode" : "Dark Mode")}
+                            {!sidebarCollapsed && t(theme === "dark" ? "nav.lightMode" : "nav.darkMode")}
                         </button>
                         <button
                             onClick={handleLogout}
                             className="flex items-center gap-3 w-full px-3 py-2.5 rounded-xl text-sm text-danger-500 hover:bg-danger-50 dark:hover:bg-danger-500/10 transition-colors whitespace-nowrap"
                         >
                             <LogOut className="h-5 w-5 shrink-0" />
-                            {!sidebarCollapsed && "Sign Out"}
+                            {!sidebarCollapsed && t("nav.signOut")}
                         </button>
                     </div>
                 </aside>
@@ -153,15 +164,23 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                                                 )}
                                             >
                                                 <item.icon className="h-5 w-5" />
-                                                <span className="flex-1">{item.label}</span>
+                                                <span className="flex-1">{t(item.id as any)}</span>
                                                 {item.badge && <Badge variant="danger" size="sm">{item.badge}</Badge>}
                                             </Link>
                                         );
                                     })}
                                 </nav>
-                                <div className="border-t border-border p-3 shrink-0">
-                                    <button onClick={handleLogout} className="flex items-center gap-3 w-full px-3 py-2.5 rounded-xl text-sm text-danger-500 hover:bg-danger-50 transition-colors">
-                                        <LogOut className="h-5 w-5" /> Sign Out
+                                <div className="border-t border-border p-3 space-y-1 shrink-0">
+                                    <LanguageSelector />
+                                    <button
+                                        onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                                        className="flex items-center gap-3 w-full px-3 py-2.5 rounded-xl text-sm text-fg-secondary hover:text-fg hover:bg-surface-muted transition-colors whitespace-nowrap"
+                                    >
+                                        {theme === "dark" ? <Sun className="h-5 w-5 shrink-0" /> : <Moon className="h-5 w-5 shrink-0" />}
+                                        {t(theme === "dark" ? "nav.lightMode" : "nav.darkMode")}
+                                    </button>
+                                    <button onClick={handleLogout} className="flex items-center gap-3 w-full px-3 py-2.5 rounded-xl text-sm text-danger-500 hover:bg-danger-50 dark:hover:bg-danger-500/10 transition-colors whitespace-nowrap">
+                                        <LogOut className="h-5 w-5 shrink-0" /> {t("nav.signOut")}
                                     </button>
                                 </div>
                             </motion.aside>

@@ -18,6 +18,13 @@ import { Card, CardContent, Button, Badge } from "@/components/ui";
 import { getKPIs, getChartData } from "@/services/admin.service";
 import { KPIData } from "@/types";
 import { useGSAP } from "@/hooks/useGSAP";
+import { useI18nStore } from "@/store/i18n.store";
+import Link from "next/link";
+
+const InteractiveMap = dynamic(() => import("@/components/InteractiveMap"), {
+    ssr: false,
+    loading: () => <div className="h-full w-full bg-surface-muted flex items-center justify-center animate-pulse" />
+});
 
 // Lazy load Recharts
 const LazyBarChart = dynamic(
@@ -101,6 +108,7 @@ export default function AdminDashboard() {
     } | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const { t } = useI18nStore();
 
     useEffect(() => {
         async function load() {
@@ -116,7 +124,7 @@ export default function AdminDashboard() {
         }
         load();
     }, []);
-        const gsapRef = useGSAP<HTMLDivElement>(".gsap-card", { y: 16, stagger: 0.06 });
+    const gsapRef = useGSAP<HTMLDivElement>(".gsap-card", { y: 16, stagger: 0.06 });
 
     if (loading) {
         return (
@@ -143,11 +151,11 @@ export default function AdminDashboard() {
         <div ref={gsapRef} className="space-y-6">
             <div className="flex items-center justify-between">
                 <div>
-                    <h1 className="text-2xl font-bold text-fg">Admin Dashboard</h1>
-                    <p className="text-fg-secondary mt-1">Overview of department performance and complaints</p>
+                    <h1 className="text-2xl font-bold text-fg">{t("admin.dashboard")}</h1>
+                    <p className="text-fg-secondary mt-1">{t("dashboard.overview")}</p>
                 </div>
                 <Button variant="outline" size="sm" rightIcon={<ArrowRight className="h-4 w-4" />}>
-                    Export Report
+                    {t("admin.exportReport")}
                 </Button>
             </div>
 
@@ -184,13 +192,46 @@ export default function AdminDashboard() {
                 ))}
             </motion.div>
 
+            {/* Live Ward Map Widget */}
+            <div className="gsap-card">
+                <Card padding="none" className="overflow-hidden">
+                    <CardContent className="p-4 border-b border-border flex items-center justify-between">
+                        <h2 className="text-lg font-semibold text-fg">{t("admin.wardMap")} (Live)</h2>
+                        <Link href="/admin/map">
+                            <Button variant="ghost" size="sm" rightIcon={<ArrowRight className="h-4 w-4" />}>
+                                {t("common.viewAll")}
+                            </Button>
+                        </Link>
+                    </CardContent>
+                    <div className="h-[300px] relative">
+                        <InteractiveMap
+                            center={[28.6139, 77.2090]}
+                            markers={chartData?.resolutionByWard.map((w, i) => {
+                                // Map minimal ward data to markers
+                                const mockCoords = [
+                                    [28.6328, 77.2197], [28.6139, 77.2090], [28.5932, 77.2215],
+                                    [28.5623, 77.1852], [28.4595, 77.0266], [28.7041, 77.1025]
+                                ];
+                                return {
+                                    lat: mockCoords[i % 6][0],
+                                    lng: mockCoords[i % 6][1],
+                                    label: w.ward,
+                                    complaints: Math.floor(Math.random() * 50),
+                                    status: w.rate < 80 ? 'high' : w.rate < 90 ? 'medium' : 'low'
+                                };
+                            }) || []}
+                        />
+                    </div>
+                </Card>
+            </div>
+
             {/* Charts */}
             <div className="grid lg:grid-cols-3 gap-6">
                 {/* Bar Chart */}
                 <div className="lg:col-span-2 gsap-card">
                     <Card>
                         <CardContent>
-                            <h2 className="text-lg font-semibold text-fg mb-4">Complaints Over Time</h2>
+                            <h2 className="text-lg font-semibold text-fg mb-4">{t("admin.complaintsOverTime")}</h2>
                             {chartData && <LazyBarChart data={chartData.complaintsOverTime} />}
                         </CardContent>
                     </Card>
@@ -199,7 +240,7 @@ export default function AdminDashboard() {
                 {/* Pie Chart */}
                 <Card>
                     <CardContent>
-                        <h2 className="text-lg font-semibold text-fg mb-4">By Department</h2>
+                        <h2 className="text-lg font-semibold text-fg mb-4">{t("admin.byDepartment")}</h2>
                         {chartData && <LazyPieChart data={chartData.byDepartment} />}
                         {/* Legend */}
                         <div className="space-y-2 mt-4">
@@ -220,7 +261,7 @@ export default function AdminDashboard() {
             {/* Resolution by Ward */}
             <Card className="gsap-card">
                 <CardContent>
-                    <h2 className="text-lg font-semibold text-fg mb-4">Resolution Rate by Ward</h2>
+                    <h2 className="text-lg font-semibold text-fg mb-4">{t("admin.resolutionByWard")}</h2>
                     <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
                         {chartData?.resolutionByWard.map((ward) => (
                             <div key={ward.ward} className="text-center p-4 rounded-xl bg-surface-muted">

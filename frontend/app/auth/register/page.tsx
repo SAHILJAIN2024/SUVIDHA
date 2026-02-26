@@ -261,8 +261,19 @@ export default function RegisterPage() {
                                                 const res = await fetchUserLocation();
                                                 setGeoStatus(res.status);
                                                 if (res.status === "success" && res.result) {
-                                                    updateField("ward", res.result.wardNumber);
-                                                    setWardDisplay(`${res.result.wardNumber} — ${res.result.wardName}`);
+                                                    const { wardNumber, wardName, city, state, pinCode, area } = res.result;
+
+                                                    // Auto-fill all address fields
+                                                    setFormData(prev => ({
+                                                        ...prev,
+                                                        ward: wardNumber,
+                                                        city: city || prev.city,
+                                                        state: state || prev.state,
+                                                        pinCode: pinCode || prev.pinCode,
+                                                        area: area || prev.area
+                                                    }));
+
+                                                    setWardDisplay(`${wardNumber} — ${wardName}`);
                                                     setWardAutoDetected(true);
                                                 } else {
                                                     setErrors((prev) => ({ ...prev, ward: res.error || "Location failed" }));
@@ -281,9 +292,14 @@ export default function RegisterPage() {
                                         </Button>
                                     </div>
                                     {geoStatus === "success" && wardDisplay && (
-                                        <div className="flex items-center gap-2 p-2 rounded-lg bg-success-50 dark:bg-success-500/10 text-sm">
-                                            <CheckCircle className="h-4 w-4 text-success-500 shrink-0" />
-                                            <span className="text-success-700 dark:text-success-400">{wardDisplay}</span>
+                                        <div className="flex flex-col gap-1 p-3 rounded-lg bg-success-50 dark:bg-success-500/10 text-sm border border-success-500/20 animate-in fade-in slide-in-from-top-1">
+                                            <div className="flex items-center gap-2">
+                                                <CheckCircle className="h-4 w-4 text-success-500 shrink-0" />
+                                                <span className="text-success-700 dark:text-success-400 font-medium">Location Detected!</span>
+                                            </div>
+                                            <p className="text-xs text-success-600 dark:text-success-400/80 ml-6">
+                                                Assigned to <span className="font-bold">{wardDisplay}</span>. Address fields have been auto-filled.
+                                            </p>
                                         </div>
                                     )}
                                     {(geoStatus === "denied" || geoStatus === "unavailable" || geoStatus === "error") && (

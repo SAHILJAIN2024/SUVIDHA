@@ -5,6 +5,15 @@ import { MapPin, Layers, Eye, Phone, Mail, User, AlertCircle } from "lucide-reac
 import { Card, CardContent, Button, Badge } from "@/components/ui";
 import { getWardData, getWardContacts, getWardMapMarkers, WardData, WardContact, WardMapMarker } from "@/services/ward.service";
 import { useGSAP } from "@/hooks/useGSAP";
+import { useI18nStore } from "@/store/i18n.store";
+import dynamic from "next/dynamic";
+
+const InteractiveMap = dynamic(() => import("@/components/InteractiveMap"), {
+    ssr: false,
+    loading: () => <div className="h-full w-full bg-surface-muted flex items-center justify-center">Loading map...</div>
+});
+
+import { cn } from "@/utils/cn";
 
 export default function AdminMapPage() {
     const [wards, setWards] = useState<WardData[]>([]);
@@ -12,13 +21,15 @@ export default function AdminMapPage() {
     const [markers, setMarkers] = useState<WardMapMarker[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [selectedWard, setSelectedWard] = useState<string | null>(null);
+    const { t } = useI18nStore();
 
     useEffect(() => {
         Promise.all([getWardData(), getWardContacts(), getWardMapMarkers()])
             .then(([w, c, m]) => { setWards(w); setContacts(c); setMarkers(m); setLoading(false); })
             .catch(() => { setError("Failed to load ward data"); setLoading(false); });
     }, []);
-        const gsapRef = useGSAP<HTMLDivElement>(".gsap-item", { y: 14, stagger: 0.04 });
+    const gsapRef = useGSAP<HTMLDivElement>(".gsap-item", { y: 14, stagger: 0.04 });
 
     if (loading) {
         return (
@@ -55,41 +66,44 @@ export default function AdminMapPage() {
                 </div>
             </div>
 
-            {/* Map Placeholder */}
-            <Card padding="none">
-                <div className="aspect-[16/9] rounded-2xl bg-gradient-to-br from-surface-muted to-surface flex items-center justify-center relative overflow-hidden">
-                    <div className="absolute inset-0 opacity-10" style={{
-                        backgroundImage: "linear-gradient(var(--color-border) 1px, transparent 1px), linear-gradient(90deg, var(--color-border) 1px, transparent 1px)",
-                        backgroundSize: "40px 40px",
-                    }} />
-                    {markers.map((ward) => (
-                        <div key={ward.label} className={`absolute ${ward.color} rounded-2xl border border-border/50 p-3 cursor-pointer hover:bg-primary-500/20 transition-colors group`} style={{ left: ward.left, top: ward.top, width: "120px", height: "80px" }}>
-                            <p className="text-xs font-bold text-fg">{ward.label}</p>
-                            <p className="text-[10px] text-fg-muted">{ward.complaints} complaints</p>
-                            <div className="absolute -bottom-1 -right-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                <Badge variant="primary" size="sm">View</Badge>
-                            </div>
-                        </div>
-                    ))}
-                    <div className="relative z-10 text-center">
-                        <MapPin className="h-12 w-12 text-primary-500 mx-auto mb-2 animate-bounce" />
-                        <p className="text-sm font-medium text-fg">Interactive Leaflet Map</p>
-                        <p className="text-xs text-fg-muted mt-1">Lazy-loaded in production</p>
-                    </div>
+            {/* Map Section */}
+            <Card padding="none" className="overflow-hidden">
+                <div className="aspect-[16/9] sm:aspect-[21/9] lg:aspect-[25/9] rounded-2xl relative">
+                    <InteractiveMap
+                        center={[28.6139, 77.2090]} // Default center (Delhi)
+                        markers={markers.map(m => ({
+                            lat: m.lat,
+                            lng: m.lng,
+                            label: m.label,
+                            complaints: m.complaints,
+                            status: m.status
+                        }))}
+                        onMarkerClick={(label) => setSelectedWard(label)}
+                    />
                 </div>
             </Card>
 
-            {/* Ward Summary */}
+            {/* Ward Summary - Highlight Selected */}
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-                {wards.map((ward) => (
-                    <Card key={ward.ward}>
-                        <CardContent>
-                            <p className="text-sm font-bold text-fg">{ward.ward}</p>
-                            <p className="text-xl font-bold text-primary-600 mt-1">{ward.rate}</p>
-                            <p className="text-xs text-fg-muted">{ward.resolved}/{ward.total} resolved</p>
-                        </CardContent>
-                    </Card>
-                ))}
+                {wards.map((ward) => {
+                    const isSelected = selectedWard === ward.ward;
+                    return (
+                        <Card
+                            key={ward.ward}
+                            className={cn(
+                                "transition-all duration-300",
+                                isSelected ? "ring-2 ring-primary-500 shadow-lg scale-105 z-10" : "opacity-90 hover:opacity-100"
+                            )}
+                            onClick={() => setSelectedWard(ward.ward)}
+                        >
+                            <CardContent>
+                                <p className="text-sm font-bold text-fg">{ward.ward}</p>
+                                <p className="text-xl font-bold text-primary-600 mt-1">{ward.rate}</p>
+                                <p className="text-xs text-fg-muted">{ward.resolved}/{ward.total} resolved</p>
+                            </CardContent>
+                        </Card>
+                    );
+                })}
             </div>
 
             {/* Ward Contact Details */}

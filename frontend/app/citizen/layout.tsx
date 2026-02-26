@@ -25,17 +25,19 @@ import {
 import { cn } from "@/utils/cn";
 import { useAuthStore } from "@/store/auth.store";
 import { useUIStore } from "@/store/ui.store";
+import { useI18nStore } from "@/store/i18n.store";
+import { LanguageSelector } from "@/components/LanguageSelector";
 
 const navItems = [
-    { href: "/citizen/dashboard", label: "Dashboard", icon: LayoutDashboard },
-    { href: "/citizen/complaints", label: "Complaints", icon: FileText },
-    { href: "/citizen/complaints/global", label: "Global Feed", icon: Globe },
-    { href: "/citizen/bills", label: "Bill Payments", icon: CreditCard },
-    { href: "/citizen/services", label: "Services", icon: Briefcase },
-    { href: "/citizen/documents", label: "Documents", icon: ShieldCheck },
-    { href: "/citizen/notifications", label: "Notifications", icon: Bell },
-    { href: "/citizen/profile", label: "Profile", icon: User },
-];
+    { href: "/citizen/dashboard", id: "nav.dashboard", icon: LayoutDashboard },
+    { href: "/citizen/complaints", id: "nav.complaints", icon: FileText },
+    { href: "/citizen/complaints/global", id: "nav.globalFeed", icon: Globe },
+    { href: "/citizen/bills", id: "nav.billPayments", icon: CreditCard },
+    { href: "/citizen/services", id: "nav.services", icon: Briefcase },
+    { href: "/citizen/documents", id: "nav.documents", icon: ShieldCheck },
+    { href: "/citizen/notifications", id: "nav.notifications", icon: Bell },
+    { href: "/citizen/profile", id: "nav.profile", icon: User },
+] as const;
 
 export default function CitizenLayout({ children }: { children: React.ReactNode }) {
     const pathname = usePathname();
@@ -43,6 +45,7 @@ export default function CitizenLayout({ children }: { children: React.ReactNode 
     const { user, logout } = useAuthStore();
     const { sidebarCollapsed, toggleSidebarCollapse, theme, setTheme } = useUIStore();
     const [mobileOpen, setMobileOpen] = useState(false);
+    const { t } = useI18nStore();
 
     const handleLogout = () => {
         logout();
@@ -94,10 +97,10 @@ export default function CitizenLayout({ children }: { children: React.ReactNode 
                                             ? "bg-primary-50 text-primary-700 dark:bg-primary-900/20 dark:text-primary-300"
                                             : "text-fg-secondary hover:text-fg hover:bg-surface-muted"
                                     )}
-                                    title={sidebarCollapsed ? item.label : undefined}
+                                    title={sidebarCollapsed ? t(item.id) : undefined}
                                 >
                                     <item.icon className={cn("h-5 w-5 shrink-0", isActive && "text-primary-600")} />
-                                    {!sidebarCollapsed && <span>{item.label}</span>}
+                                    {!sidebarCollapsed && <span>{t(item.id)}</span>}
                                 </Link>
                             );
                         })}
@@ -105,19 +108,20 @@ export default function CitizenLayout({ children }: { children: React.ReactNode 
 
                     {/* Bottom */}
                     <div className="border-t border-border p-3 space-y-1 shrink-0">
+                        <LanguageSelector collapsed={sidebarCollapsed} />
                         <button
                             onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
                             className="flex items-center gap-3 w-full px-3 py-2.5 rounded-xl text-sm text-fg-secondary hover:text-fg hover:bg-surface-muted transition-colors whitespace-nowrap"
                         >
                             {theme === "dark" ? <Sun className="h-5 w-5 shrink-0" /> : <Moon className="h-5 w-5 shrink-0" />}
-                            {!sidebarCollapsed && (theme === "dark" ? "Light Mode" : "Dark Mode")}
+                            {!sidebarCollapsed && t(theme === "dark" ? "nav.lightMode" : "nav.darkMode")}
                         </button>
                         <button
                             onClick={handleLogout}
                             className="flex items-center gap-3 w-full px-3 py-2.5 rounded-xl text-sm text-danger-500 hover:bg-danger-50 dark:hover:bg-danger-500/10 transition-colors whitespace-nowrap"
                         >
                             <LogOut className="h-5 w-5 shrink-0" />
-                            {!sidebarCollapsed && "Sign Out"}
+                            {!sidebarCollapsed && t("nav.signOut")}
                         </button>
                     </div>
                 </aside>
@@ -162,23 +166,31 @@ export default function CitizenLayout({ children }: { children: React.ReactNode 
                                                 className={cn(
                                                     "flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors",
                                                     isActive
-                                                        ? "bg-primary-50 text-primary-700"
+                                                        ? "bg-primary-50 text-primary-700 dark:bg-primary-900/20"
                                                         : "text-fg-secondary hover:text-fg hover:bg-surface-muted"
                                                 )}
                                             >
                                                 <item.icon className="h-5 w-5" />
-                                                {item.label}
+                                                <span>{t(item.id)}</span>
                                             </Link>
                                         );
                                     })}
                                 </nav>
-                                <div className="border-t border-border p-3 shrink-0">
+                                <div className="border-t border-border p-3 space-y-1 shrink-0">
+                                    <LanguageSelector />
+                                    <button
+                                        onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                                        className="flex items-center gap-3 w-full px-3 py-2.5 rounded-xl text-sm text-fg-secondary hover:text-fg hover:bg-surface-muted transition-colors whitespace-nowrap"
+                                    >
+                                        {theme === "dark" ? <Sun className="h-5 w-5 shrink-0" /> : <Moon className="h-5 w-5 shrink-0" />}
+                                        {t(theme === "dark" ? "nav.lightMode" : "nav.darkMode")}
+                                    </button>
                                     <button
                                         onClick={handleLogout}
-                                        className="flex items-center gap-3 w-full px-3 py-2.5 rounded-xl text-sm text-danger-500 hover:bg-danger-50 transition-colors"
+                                        className="flex items-center gap-3 w-full px-3 py-2.5 rounded-xl text-sm text-danger-500 hover:bg-danger-50 dark:hover:bg-danger-500/10 transition-colors whitespace-nowrap"
                                     >
-                                        <LogOut className="h-5 w-5" />
-                                        Sign Out
+                                        <LogOut className="h-5 w-5 shrink-0" />
+                                        {t("nav.signOut")}
                                     </button>
                                 </div>
                             </motion.aside>

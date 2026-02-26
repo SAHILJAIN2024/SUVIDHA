@@ -51,7 +51,17 @@ type TranslationKeys = {
     "complaints.all": string;
     "complaints.newComplaint": string;
     "complaints.noComplaints": string;
+    "complaints.status.pending": string;
+    "complaints.status.inProgress": string;
+    "complaints.status.resolved": string;
+    "complaints.fileNew": string;
+    // Bills
+    "bills.billsDue": string;
+    "bills.allBills": string;
+    "bills.payBills": string;
+    "bills.totalDue": string;
     // Common
+    "common.viewAll": string;
     "common.loading": string;
     "common.error": string;
     "common.retry": string;
@@ -69,6 +79,10 @@ type TranslationKeys = {
     "admin.docVerification": string;
     "admin.reports": string;
     "admin.wardMap": string;
+    "admin.complaintsOverTime": string;
+    "admin.byDepartment": string;
+    "admin.resolutionByWard": string;
+    "admin.exportReport": string;
     // Departments
     "dept.electricity": string;
     "dept.water": string;
@@ -108,6 +122,15 @@ const translations: Record<Language, TranslationKeys> = {
         "complaints.all": "All",
         "complaints.newComplaint": "New Complaint",
         "complaints.noComplaints": "No complaints found",
+        "complaints.status.pending": "Pending",
+        "complaints.status.inProgress": "In Progress",
+        "complaints.status.resolved": "Resolved",
+        "complaints.fileNew": "File New Complaint",
+        "bills.billsDue": "Bills Due",
+        "bills.allBills": "All Bills",
+        "bills.payBills": "Pay Bills",
+        "bills.totalDue": "Total Amount Due",
+        "common.viewAll": "View All",
         "common.loading": "Loading...",
         "common.error": "Something went wrong",
         "common.retry": "Retry",
@@ -124,6 +147,10 @@ const translations: Record<Language, TranslationKeys> = {
         "admin.docVerification": "Doc Verification",
         "admin.reports": "Reports",
         "admin.wardMap": "Ward Map",
+        "admin.complaintsOverTime": "Complaints Over Time",
+        "admin.byDepartment": "By Department",
+        "admin.resolutionByWard": "Resolution Rate by Ward",
+        "admin.exportReport": "Export Report",
         "dept.electricity": "Electricity",
         "dept.water": "Water Supply",
         "dept.roads": "Roads",
@@ -160,6 +187,15 @@ const translations: Record<Language, TranslationKeys> = {
         "complaints.all": "सभी",
         "complaints.newComplaint": "नई शिकायत",
         "complaints.noComplaints": "कोई शिकायत नहीं मिली",
+        "complaints.status.pending": "लंबित",
+        "complaints.status.inProgress": "प्रगति में",
+        "complaints.status.resolved": "हल किया गया",
+        "complaints.fileNew": "नई शिकायत दर्ज करें",
+        "bills.billsDue": "बकाया बिल",
+        "bills.allBills": "सभी बिल",
+        "bills.payBills": "बिल भुगतान",
+        "bills.totalDue": "कुल बकाया राशि",
+        "common.viewAll": "सभी देखें",
         "common.loading": "लोड हो रहा है...",
         "common.error": "कुछ गलत हो गया",
         "common.retry": "पुनः प्रयास करें",
@@ -176,6 +212,10 @@ const translations: Record<Language, TranslationKeys> = {
         "admin.docVerification": "दस्तावेज़ सत्यापन",
         "admin.reports": "रिपोर्ट",
         "admin.wardMap": "वार्ड मानचित्र",
+        "admin.complaintsOverTime": "समय के साथ शिकायतें",
+        "admin.byDepartment": "विभाग के अनुसार",
+        "admin.resolutionByWard": "वार्ड के अनुसार समाधान दर",
+        "admin.exportReport": "रिपोर्ट निर्यात करें",
         "dept.electricity": "बिजली",
         "dept.water": "जल आपूर्ति",
         "dept.roads": "सड़कें",
@@ -212,6 +252,15 @@ const translations: Record<Language, TranslationKeys> = {
         "complaints.all": "সব",
         "complaints.newComplaint": "নতুন অভিযোগ",
         "complaints.noComplaints": "কোনো অভিযোগ পাওয়া যায়নি",
+        "complaints.status.pending": "মুলতুবি",
+        "complaints.status.inProgress": "চলমান",
+        "complaints.status.resolved": "সমাধান হয়েছে",
+        "complaints.fileNew": "নতুন অভিযোগ",
+        "bills.billsDue": "বকেয়া বিল",
+        "bills.allBills": "সব বিল",
+        "bills.payBills": "বিল পরিশোধ",
+        "bills.totalDue": "মোট বকেয়া পরিমাণ",
+        "common.viewAll": "সব দেখুন",
         "common.loading": "লোড হচ্ছে...",
         "common.error": "কিছু ভুল হয়েছে",
         "common.retry": "পুনরায় চেষ্টা",
@@ -228,6 +277,10 @@ const translations: Record<Language, TranslationKeys> = {
         "admin.docVerification": "নথি যাচাই",
         "admin.reports": "প্রতিবেদন",
         "admin.wardMap": "ওয়ার্ড মানচিত্র",
+        "admin.complaintsOverTime": "সময়ের সাথে সাথে অভিযোগ",
+        "admin.byDepartment": "বিভাগ অনুসারে",
+        "admin.resolutionByWard": "ওয়ার্ড অনুসারে সমাধানের হার",
+        "admin.exportReport": "রিপোর্ট এক্সপোর্ট",
         "dept.electricity": "বিদ্যুৎ",
         "dept.water": "জল সরবরাহ",
         "dept.roads": "সড়ক",
@@ -264,6 +317,15 @@ const translations: Record<Language, TranslationKeys> = {
         "complaints.all": "அனைத்தும்",
         "complaints.newComplaint": "புதிய புகார்",
         "complaints.noComplaints": "புகார்கள் இல்லை",
+        "complaints.status.pending": "நிலுவை",
+        "complaints.status.inProgress": "நடந்துகொண்டிருக்கிறது",
+        "complaints.status.resolved": "தீர்க்கப்பட்டது",
+        "complaints.fileNew": "புதிய புகார்",
+        "bills.billsDue": "நிலுவை பில்கள்",
+        "bills.allBills": "அனைத்து பில்கள்",
+        "bills.payBills": "பில் செலுத்து",
+        "bills.totalDue": "மொத்த நிலுவை தொகை",
+        "common.viewAll": "அனைத்தையும் காண்",
         "common.loading": "ஏற்றுகிறது...",
         "common.error": "பிழை ஏற்பட்டது",
         "common.retry": "மீண்டும் முயற்சிக்கவும்",
@@ -280,6 +342,10 @@ const translations: Record<Language, TranslationKeys> = {
         "admin.docVerification": "ஆவண சரிபார்ப்பு",
         "admin.reports": "அறிக்கைகள்",
         "admin.wardMap": "வார்டு வரைபடம்",
+        "admin.complaintsOverTime": "காலப்போக்கில் புகார்கள்",
+        "admin.byDepartment": "துறை வாரியாக",
+        "admin.resolutionByWard": "வார்டு வாரியாக தீர்வு விகிதம்",
+        "admin.exportReport": "அறிக்கையை ஏற்றுமதி செய்",
         "dept.electricity": "மின்சாரம்",
         "dept.water": "நீர் வழங்கல்",
         "dept.roads": "சாலைகள்",
@@ -316,6 +382,15 @@ const translations: Record<Language, TranslationKeys> = {
         "complaints.all": "सर्व",
         "complaints.newComplaint": "नवीन तक्रार",
         "complaints.noComplaints": "तक्रारी आढळल्या नाहीत",
+        "complaints.status.pending": "प्रलंबित",
+        "complaints.status.inProgress": "प्रगतीत",
+        "complaints.status.resolved": "निराकरण",
+        "complaints.fileNew": "नवीन तक्रार",
+        "bills.billsDue": "देय बिले",
+        "bills.allBills": "सर्व बिले",
+        "bills.payBills": "बिल भरा",
+        "bills.totalDue": "एकूण थकीत रक्कम",
+        "common.viewAll": "सर्व पहा",
         "common.loading": "लोड होत आहे...",
         "common.error": "काहीतरी चूक झाली",
         "common.retry": "पुन्हा प्रयत्न करा",
@@ -332,6 +407,10 @@ const translations: Record<Language, TranslationKeys> = {
         "admin.docVerification": "कागदपत्र पडताळणी",
         "admin.reports": "अहवाल",
         "admin.wardMap": "प्रभाग नकाशा",
+        "admin.complaintsOverTime": "वेळेनुसार तक्रारी",
+        "admin.byDepartment": "विभागानुसार",
+        "admin.resolutionByWard": "प्रभागानुसार निवारण दर",
+        "admin.exportReport": "अहवाल निर्यात करा",
         "dept.electricity": "वीज",
         "dept.water": "पाणी पुरवठा",
         "dept.roads": "रस्ते",

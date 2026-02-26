@@ -26,6 +26,8 @@ import { getBills } from "@/services/bill.service";
 import { Complaint, Bill } from "@/types";
 import { useGSAP } from "@/hooks/useGSAP";
 
+import { useI18nStore } from "@/store/i18n.store";
+
 const deptIcons: Record<string, React.ReactNode> = {
     electricity: <Zap className="h-4 w-4" />,
     water: <Droplets className="h-4 w-4" />,
@@ -44,6 +46,7 @@ const fadeUp = {
 
 export default function CitizenDashboard() {
     const { user } = useAuthStore();
+    const { t } = useI18nStore();
     const [complaints, setComplaints] = useState<Complaint[]>([]);
     const [bills, setBills] = useState<Bill[]>([]);
     const [loading, setLoading] = useState(true);
@@ -72,10 +75,10 @@ export default function CitizenDashboard() {
     const gsapRef = useGSAP<HTMLDivElement>(".gsap-card", { y: 20, stagger: 0.05 });
 
     const summaryCards = [
-        { label: "Total Complaints", value: complaints.length, icon: FileText, color: "text-primary-600", bg: "bg-primary-50 dark:bg-primary-900/20" },
-        { label: "Pending", value: pendingCount, icon: Clock, color: "text-warning-500", bg: "bg-warning-50 dark:bg-warning-500/10" },
-        { label: "In Progress", value: inProgressCount, icon: TrendingUp, color: "text-blue-500", bg: "bg-blue-50 dark:bg-blue-500/10" },
-        { label: "Resolved", value: resolvedCount, icon: CheckCircle, color: "text-success-500", bg: "bg-success-50 dark:bg-success-500/10" },
+        { label: t("dashboard.totalComplaints"), value: complaints.length, icon: FileText, color: "text-primary-600", bg: "bg-primary-50 dark:bg-primary-900/20" },
+        { label: t("complaints.status.pending"), value: pendingCount, icon: Clock, color: "text-warning-500", bg: "bg-warning-50 dark:bg-warning-500/10" },
+        { label: t("complaints.status.inProgress"), value: inProgressCount, icon: TrendingUp, color: "text-blue-500", bg: "bg-blue-50 dark:bg-blue-500/10" },
+        { label: t("complaints.status.resolved"), value: resolvedCount, icon: CheckCircle, color: "text-success-500", bg: "bg-success-50 dark:bg-success-500/10" },
     ];
 
     if (loading) {
@@ -106,10 +109,10 @@ export default function CitizenDashboard() {
             {/* Welcome */}
             <div>
                 <h1 className="text-2xl font-bold text-fg">
-                    Welcome back, {user?.name?.split(" ")[0] || "Citizen"} 👋
+                    {t("dashboard.welcome")}, {user?.name?.split(" ")[0] || "Citizen"} 👋
                 </h1>
                 <p className="text-fg-secondary mt-1">
-                    Here&apos;s an overview of your civic services activity
+                    {t("dashboard.overview")}
                 </p>
             </div>
 
@@ -141,11 +144,13 @@ export default function CitizenDashboard() {
             {/* Quick Actions */}
             <div className="flex flex-wrap gap-3">
                 <Link href="/citizen/complaints/new">
-                    <Button leftIcon={<Plus className="h-4 w-4" />}>File New Complaint</Button>
+                    <Button leftIcon={<Plus className="h-4 w-4" />}>
+                        {t("complaints.fileNew")}
+                    </Button>
                 </Link>
                 <Link href="/citizen/bills">
                     <Button variant="outline" leftIcon={<CreditCard className="h-4 w-4" />}>
-                        Pay Bills ({unpaidBills.length})
+                        {t("bills.payBills")} ({unpaidBills.length})
                     </Button>
                 </Link>
             </div>
@@ -156,10 +161,10 @@ export default function CitizenDashboard() {
                     <Card>
                         <CardContent>
                             <div className="flex items-center justify-between mb-4">
-                                <h2 className="text-lg font-semibold text-fg">Recent Complaints</h2>
+                                <h2 className="text-lg font-semibold text-fg">{t("dashboard.recentComplaints")}</h2>
                                 <Link href="/citizen/complaints">
                                     <Button variant="ghost" size="sm" rightIcon={<ArrowRight className="h-4 w-4" />}>
-                                        View All
+                                        {t("common.viewAll")}
                                     </Button>
                                 </Link>
                             </div>
@@ -197,17 +202,17 @@ export default function CitizenDashboard() {
                     <Card className="gsap-card">
                         <CardContent>
                             <div className="flex items-center justify-between mb-4">
-                                <h2 className="text-lg font-semibold text-fg">Bills Due</h2>
+                                <h2 className="text-lg font-semibold text-fg">{t("bills.billsDue")}</h2>
                                 <Link href="/citizen/bills">
                                     <Button variant="ghost" size="sm" rightIcon={<ArrowRight className="h-4 w-4" />}>
-                                        All Bills
+                                        {t("bills.allBills")}
                                     </Button>
                                 </Link>
                             </div>
 
                             {/* Total Due */}
                             <div className="p-4 rounded-xl bg-gradient-to-br from-accent-50 to-accent-100 dark:from-accent-900/20 dark:to-accent-900/10 mb-4">
-                                <p className="text-sm text-accent-700 dark:text-accent-400">Total Amount Due</p>
+                                <p className="text-sm text-accent-700 dark:text-accent-400">{t("bills.totalDue")}</p>
                                 <p className="text-2xl font-bold text-accent-700 dark:text-accent-300 mt-0.5">
                                     ₹{totalDue.toLocaleString()}
                                 </p>

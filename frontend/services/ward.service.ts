@@ -21,9 +21,12 @@ export interface WardContact {
 export interface WardMapMarker {
     left: string;
     top: string;
+    lat: number;
+    lng: number;
     label: string;
     complaints: number;
     color: string;
+    status: 'low' | 'medium' | 'high';
 }
 
 const wardDataStore: WardData[] = [
@@ -45,12 +48,12 @@ const wardContactsStore: WardContact[] = [
 ];
 
 const wardMarkersStore: WardMapMarker[] = [
-    { left: "20%", top: "25%", label: "W-1", complaints: 12, color: "bg-success-500/20" },
-    { left: "45%", top: "15%", label: "W-3", complaints: 8, color: "bg-success-500/20" },
-    { left: "65%", top: "30%", label: "W-5", complaints: 23, color: "bg-warning-500/20" },
-    { left: "30%", top: "55%", label: "W-8", complaints: 31, color: "bg-danger-500/20" },
-    { left: "55%", top: "60%", label: "W-12", complaints: 15, color: "bg-primary-500/20" },
-    { left: "75%", top: "50%", label: "W-15", complaints: 19, color: "bg-warning-500/20" },
+    { left: "20%", top: "25%", lat: 28.6328, lng: 77.2197, label: "W-1", complaints: 12, color: "bg-success-500/20", status: 'low' },
+    { left: "45%", top: "15%", lat: 28.6139, lng: 77.2090, label: "W-3", complaints: 8, color: "bg-success-500/20", status: 'low' },
+    { left: "65%", top: "30%", lat: 28.5932, lng: 77.2215, label: "W-5", complaints: 23, color: "bg-warning-500/20", status: 'medium' },
+    { left: "30%", top: "55%", lat: 28.5623, lng: 77.1852, label: "W-8", complaints: 31, color: "bg-danger-500/20", status: 'high' },
+    { left: "55%", top: "60%", lat: 28.4595, lng: 77.0266, label: "W-12", complaints: 15, color: "bg-primary-500/20", status: 'medium' },
+    { left: "75%", top: "50%", lat: 28.7041, lng: 77.1025, label: "W-15", complaints: 19, color: "bg-warning-500/20", status: 'medium' },
 ];
 
 export async function getWardData(): Promise<WardData[]> {
