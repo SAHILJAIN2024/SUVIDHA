@@ -1,0 +1,15 @@
+const express = require('express');
+const router = express.Router();
+const { protect } = require('../middleware/auth');
+const { serviceRequestValidation, gasLeakAlertValidation } = require('../middleware/validate');
+const { createUploader } = require('../middleware/fileUpload');
+const ctrl = require('../controllers/gasController');
+router.get('/dashboard', protect, ctrl.getDashboard);
+router.post('/requests', protect, serviceRequestValidation, ctrl.createRequest);
+router.get('/requests', protect, ctrl.getRequests);
+router.get('/authorities', protect, ctrl.getAuthorities);
+router.get('/actions-pending', protect, ctrl.getActionsPending);
+router.post('/documents', protect, createUploader('document').single('file'), ctrl.uploadDocument);
+router.get('/leak-alerts', protect, ctrl.getLeakAlerts);
+router.post('/leak-alerts', protect, gasLeakAlertValidation, ctrl.createLeakAlert);
+module.exports = router;

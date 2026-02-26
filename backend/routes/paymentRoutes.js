@@ -1,0 +1,11 @@
+const express = require('express');
+const router = express.Router();
+const { protect } = require('../middleware/auth');
+const { paymentValidation, idParamValidation } = require('../middleware/validate');
+const { paymentLimiter } = require('../middleware/rateLimiter');
+const ctrl = require('../controllers/paymentController');
+router.post('/create-order', protect, paymentLimiter, paymentValidation, ctrl.createOrder);
+router.post('/verify', protect, paymentLimiter, ctrl.verifyPayment);
+router.get('/history', protect, ctrl.getPaymentHistory);
+router.get('/receipt/:id', protect, idParamValidation, ctrl.getReceipt);
+module.exports = router;
