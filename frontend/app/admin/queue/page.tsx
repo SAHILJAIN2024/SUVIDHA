@@ -13,11 +13,13 @@ import {
     Route,
     Recycle,
     ArrowUpDown,
+    AlertCircle,
 } from "lucide-react";
 import { Card, CardContent, Button, Badge, StatusBadge, Modal } from "@/components/ui";
 import { getActionQueue, updateComplaintStatus } from "@/services/admin.service";
 import { getComplaintById } from "@/services/complaint.service";
-import { AdminAction, Complaint } from "@/types";
+import { AdminAction, Complaint, Department } from "@/types";
+import { useAuthStore } from "@/store/auth.store";
 
 const deptIcons: Record<string, React.ReactNode> = {
     electricity: <Zap className="h-4 w-4" />,
@@ -33,19 +35,34 @@ const priorityColors: Record<string, string> = {
     low: "text-fg-muted",
 };
 
+const roleToDept: Record<string, Department | null> = {
+    "admin-electricity": "electricity",
+    "admin-water": "water",
+    "admin-roads": "roads",
+    "admin-sanitation": "sanitation",
+    "super-admin": null,
+};
+
 export default function ActionQueuePage() {
+    const { user } = useAuthStore();
+    const adminDept = user?.role ? roleToDept[user.role] ?? null : null;
+
     const [actions, setActions] = useState<AdminAction[]>([]);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
     const [previewComplaint, setPreviewComplaint] = useState<Complaint | null>(null);
     const [previewOpen, setPreviewOpen] = useState(false);
     const [processing, setProcessing] = useState<string | null>(null);
 
     useEffect(() => {
-        getActionQueue().then((data) => {
-            setActions(data);
-            setLoading(false);
-        });
-    }, []);
+        getActionQueue()
+            .then((data) => {
+                const filtered = adminDept ? data.filter((a) => a.department === adminDept) : data;
+                setActions(filtered);
+                setLoading(false);
+            })
+            .catch(() => { setError("Failed to load action queue"); setLoading(false); });
+    }, [adminDept]);
 
     const handleAccept = async (action: AdminAction) => {
         setProcessing(action.id);
@@ -75,6 +92,16 @@ export default function ActionQueuePage() {
                 {[...Array(3)].map((_, i) => (
                     <div key={i} className="h-24 rounded-2xl bg-surface border border-border animate-pulse" />
                 ))}
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="text-center py-16">
+                <AlertCircle className="h-10 w-10 text-danger-500 mx-auto mb-3" />
+                <p className="text-fg-secondary">{error}</p>
+                <Button variant="outline" size="sm" className="mt-4" onClick={() => window.location.reload()}>Retry</Button>
             </div>
         );
     }

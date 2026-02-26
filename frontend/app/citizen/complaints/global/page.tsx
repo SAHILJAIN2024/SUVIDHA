@@ -20,6 +20,7 @@ import {
 import { Card, CardContent, Button, Badge, StatusBadge, Input, Select } from "@/components/ui";
 import { getComplaints, voteComplaint } from "@/services/complaint.service";
 import { Complaint } from "@/types";
+import { AlertCircle } from "lucide-react";
 
 const deptIcons: Record<string, React.ReactNode> = {
     electricity: <Zap className="h-4 w-4" />,
@@ -48,15 +49,15 @@ const mockComments: Record<string, number> = {
 export default function GlobalComplaintsPage() {
     const [complaints, setComplaints] = useState<Complaint[]>([]);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
     const [search, setSearch] = useState("");
     const [sortBy, setSortBy] = useState<"votes" | "recent">("votes");
     const [deptFilter, setDeptFilter] = useState("all");
 
     useEffect(() => {
-        getComplaints().then((data) => {
-            setComplaints(data);
-            setLoading(false);
-        });
+        getComplaints()
+            .then((data) => { setComplaints(data); setLoading(false); })
+            .catch(() => { setError("Failed to load complaints"); setLoading(false); });
     }, []);
 
     const handleVote = async (id: string, direction: "up" | "down") => {
@@ -88,6 +89,16 @@ export default function GlobalComplaintsPage() {
                 {[...Array(4)].map((_, i) => (
                     <div key={i} className="h-32 rounded-2xl bg-surface border border-border animate-pulse" />
                 ))}
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="max-w-3xl mx-auto text-center py-16">
+                <AlertCircle className="h-10 w-10 text-danger-500 mx-auto mb-3" />
+                <p className="text-fg-secondary">{error}</p>
+                <Button variant="outline" size="sm" className="mt-4" onClick={() => window.location.reload()}>Retry</Button>
             </div>
         );
     }

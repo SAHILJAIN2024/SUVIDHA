@@ -17,6 +17,7 @@ import {
     Droplets,
     Route,
     Recycle,
+    AlertCircle as AlertCircleIcon,
 } from "lucide-react";
 import { Card, CardContent, Button, Badge, StatusBadge } from "@/components/ui";
 import { useAuthStore } from "@/store/auth.store";
@@ -45,13 +46,19 @@ export default function CitizenDashboard() {
     const [complaints, setComplaints] = useState<Complaint[]>([]);
     const [bills, setBills] = useState<Bill[]>([]);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
         async function load() {
-            const [c, b] = await Promise.all([getComplaints(), getBills()]);
-            setComplaints(c);
-            setBills(b);
-            setLoading(false);
+            try {
+                const [c, b] = await Promise.all([getComplaints(), getBills()]);
+                setComplaints(c);
+                setBills(b);
+            } catch {
+                setError("Failed to load dashboard data");
+            } finally {
+                setLoading(false);
+            }
         }
         load();
     }, []);
@@ -78,6 +85,16 @@ export default function CitizenDashboard() {
                     ))}
                 </div>
                 <div className="h-64 rounded-2xl bg-surface border border-border animate-pulse" />
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="text-center py-16">
+                <AlertCircleIcon className="h-10 w-10 text-danger-500 mx-auto mb-3" />
+                <p className="text-fg-secondary">{error}</p>
+                <Button variant="outline" size="sm" className="mt-4" onClick={() => window.location.reload()}>Retry</Button>
             </div>
         );
     }

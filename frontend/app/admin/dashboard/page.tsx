@@ -12,6 +12,7 @@ import {
     TrendingDown,
     Minus,
     ArrowRight,
+    AlertCircle as AlertCircleIcon,
 } from "lucide-react";
 import { Card, CardContent, Button, Badge } from "@/components/ui";
 import { getKPIs, getChartData } from "@/services/admin.service";
@@ -98,13 +99,19 @@ export default function AdminDashboard() {
         resolutionByWard: { ward: string; rate: number }[];
     } | null>(null);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
         async function load() {
-            const [k, c] = await Promise.all([getKPIs(), getChartData()]);
-            setKpis(k);
-            setChartData(c);
-            setLoading(false);
+            try {
+                const [k, c] = await Promise.all([getKPIs(), getChartData()]);
+                setKpis(k);
+                setChartData(c);
+            } catch {
+                setError("Failed to load dashboard data");
+            } finally {
+                setLoading(false);
+            }
         }
         load();
     }, []);
@@ -116,6 +123,16 @@ export default function AdminDashboard() {
                     {[...Array(4)].map((_, i) => (<div key={i} className="h-28 rounded-2xl bg-surface border border-border animate-pulse" />))}
                 </div>
                 <div className="h-80 rounded-2xl bg-surface border border-border animate-pulse" />
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="text-center py-16">
+                <AlertCircleIcon className="h-10 w-10 text-danger-500 mx-auto mb-3" />
+                <p className="text-fg-secondary">{error}</p>
+                <Button variant="outline" size="sm" className="mt-4" onClick={() => window.location.reload()}>Retry</Button>
             </div>
         );
     }

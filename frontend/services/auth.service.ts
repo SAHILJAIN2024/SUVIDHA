@@ -24,6 +24,15 @@ export async function register(data: {
     email: string;
     phone: string;
     password: string;
+    dob?: string;
+    gender?: string;
+    state?: string;
+    city?: string;
+    area?: string;
+    pinCode?: string;
+    aadhaarNo?: string;
+    gasNo?: string;
+    ivrsNo?: string;
 }): Promise<{ user: User; token: string }> {
     await delay(800);
     const newUser: User = {
@@ -33,8 +42,17 @@ export async function register(data: {
         phone: data.phone,
         role: "citizen",
         ward: "Ward 12",
-        aadhaarVerified: false,
+        aadhaarVerified: !!data.aadhaarNo,
         createdAt: new Date().toISOString(),
+        dob: data.dob,
+        gender: data.gender as User["gender"],
+        state: data.state,
+        city: data.city,
+        area: data.area,
+        pinCode: data.pinCode,
+        aadhaarNo: data.aadhaarNo,
+        gasNo: data.gasNo,
+        ivrsNo: data.ivrsNo,
     };
     return { user: newUser, token: "mock-jwt-token-" + newUser.id };
 }

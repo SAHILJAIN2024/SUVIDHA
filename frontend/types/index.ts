@@ -25,6 +25,20 @@ export interface User {
     aadhaarVerified: boolean;
     avatarUrl?: string;
     createdAt: string;
+    // Extended ER diagram fields
+    dob?: string;
+    gender?: "male" | "female" | "other";
+    state?: string;
+    city?: string;
+    area?: string;
+    pinCode?: string;
+    aadhaarNo?: string;
+    gasNo?: string;
+    ivrsNo?: string;
+    // Linked account numbers
+    electricityAccountNo?: string;
+    waterAccountNo?: string;
+    propertyTaxId?: string;
 }
 
 export interface Complaint {
@@ -84,4 +98,17 @@ export interface AdminAction {
     ward: string;
     createdAt: string;
     status: ComplaintStatus;
+}
+
+export interface CitizenDocument {
+    id: string;
+    citizenId: string;
+    citizenName: string;
+    type: "aadhaar" | "pan" | "address-proof" | "property" | "id-proof" | "photo";
+    fileName: string;
+    uploadedAt: string;
+    status: "pending" | "verified" | "rejected";
+    rejectionReason?: string;
+    verifiedBy?: string;
+    verifiedAt?: string;
 }

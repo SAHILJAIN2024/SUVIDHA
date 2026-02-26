@@ -20,6 +20,7 @@ import { Card, CardContent, Button, Badge, StatusBadge } from "@/components/ui";
 import { Input, Select } from "@/components/ui";
 import { getComplaints, voteComplaint } from "@/services/complaint.service";
 import { Complaint, ComplaintStatus, Department } from "@/types";
+import { AlertCircle } from "lucide-react";
 
 const deptIcons: Record<string, React.ReactNode> = {
     electricity: <Zap className="h-4 w-4" />,
@@ -40,16 +41,16 @@ const ITEMS_PER_PAGE = 5;
 export default function ComplaintsPage() {
     const [complaints, setComplaints] = useState<Complaint[]>([]);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
     const [search, setSearch] = useState("");
     const [statusFilter, setStatusFilter] = useState<string>("all");
     const [deptFilter, setDeptFilter] = useState<string>("all");
     const [page, setPage] = useState(1);
 
     useEffect(() => {
-        getComplaints().then((data) => {
-            setComplaints(data);
-            setLoading(false);
-        });
+        getComplaints()
+            .then((data) => { setComplaints(data); setLoading(false); })
+            .catch(() => { setError("Failed to load complaints"); setLoading(false); });
     }, []);
 
     const handleVote = async (id: string) => {
@@ -77,6 +78,16 @@ export default function ComplaintsPage() {
                 {[...Array(4)].map((_, i) => (
                     <div key={i} className="h-24 rounded-2xl bg-surface border border-border animate-pulse" />
                 ))}
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="text-center py-16">
+                <AlertCircle className="h-10 w-10 text-danger-500 mx-auto mb-3" />
+                <p className="text-fg-secondary">{error}</p>
+                <Button variant="outline" size="sm" className="mt-4" onClick={() => window.location.reload()}>Retry</Button>
             </div>
         );
     }
@@ -184,8 +195,8 @@ export default function ComplaintsPage() {
                                         onClick={() => !complaint.hasVoted && handleVote(complaint.id)}
                                         disabled={complaint.hasVoted}
                                         className={`flex flex-col items-center gap-0.5 px-3 py-2 rounded-xl transition-all shrink-0 ${complaint.hasVoted
-                                                ? "bg-primary-50 text-primary-600 dark:bg-primary-900/20"
-                                                : "bg-surface-muted text-fg-secondary hover:bg-primary-50 hover:text-primary-600 cursor-pointer"
+                                            ? "bg-primary-50 text-primary-600 dark:bg-primary-900/20"
+                                            : "bg-surface-muted text-fg-secondary hover:bg-primary-50 hover:text-primary-600 cursor-pointer"
                                             }`}
                                     >
                                         <ChevronUp className="h-4 w-4" />

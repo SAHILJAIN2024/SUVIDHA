@@ -4,10 +4,32 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { User, Mail, Phone, Lock, Eye, EyeOff, ArrowRight, Shield } from "lucide-react";
+import {
+    User, Mail, Phone, Lock, Eye, EyeOff, ArrowRight, ArrowLeft, Shield,
+    Calendar, MapPin, Hash, Flame, PhoneCall,
+} from "lucide-react";
 import { Button, Input } from "@/components/ui";
 import { useAuthStore } from "@/store/auth.store";
 import { register as mockRegister } from "@/services/auth.service";
+
+const genderOptions = [
+    { value: "", label: "Select Gender" },
+    { value: "male", label: "Male" },
+    { value: "female", label: "Female" },
+    { value: "other", label: "Other" },
+];
+
+const stateOptions = [
+    { value: "", label: "Select State" },
+    { value: "Assam", label: "Assam" },
+    { value: "West Bengal", label: "West Bengal" },
+    { value: "Bihar", label: "Bihar" },
+    { value: "Uttar Pradesh", label: "Uttar Pradesh" },
+    { value: "Maharashtra", label: "Maharashtra" },
+    { value: "Delhi", label: "Delhi" },
+    { value: "Tamil Nadu", label: "Tamil Nadu" },
+    { value: "Karnataka", label: "Karnataka" },
+];
 
 export default function RegisterPage() {
     const router = useRouter();
@@ -18,11 +40,23 @@ export default function RegisterPage() {
         phone: "",
         password: "",
         confirmPassword: "",
+        // Extended ER fields
+        dob: "",
+        gender: "",
+        state: "",
+        city: "",
+        area: "",
+        pinCode: "",
+        aadhaarNo: "",
+        gasNo: "",
+        ivrsNo: "",
     });
     const [showPassword, setShowPassword] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [step, setStep] = useState(1);
+
+    const totalSteps = 3;
 
     const updateField = (field: string, value: string) => {
         setFormData((prev) => ({ ...prev, [field]: value }));
@@ -31,14 +65,27 @@ export default function RegisterPage() {
 
     const validateStep1 = () => {
         const newErrors: Record<string, string> = {};
-        if (!formData.name.trim()) newErrors.name = "Name is required";
+        if (!formData.name.trim()) newErrors.name = "Full name is required";
         if (!formData.email.trim()) newErrors.email = "Email is required";
-        if (!formData.phone.trim()) newErrors.phone = "Phone is required";
+        if (!formData.phone.trim()) newErrors.phone = "Phone number is required";
+        if (!formData.dob) newErrors.dob = "Date of birth is required";
+        if (!formData.gender) newErrors.gender = "Gender is required";
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
     };
 
     const validateStep2 = () => {
+        const newErrors: Record<string, string> = {};
+        if (!formData.state) newErrors.state = "State is required";
+        if (!formData.city.trim()) newErrors.city = "City is required";
+        if (!formData.area.trim()) newErrors.area = "Area / locality is required";
+        if (!formData.pinCode.trim()) newErrors.pinCode = "PIN code is required";
+        else if (!/^\d{6}$/.test(formData.pinCode)) newErrors.pinCode = "Enter a valid 6-digit PIN code";
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+    };
+
+    const validateStep3 = () => {
         const newErrors: Record<string, string> = {};
         if (formData.password.length < 6) newErrors.password = "Min 6 characters";
         if (formData.password !== formData.confirmPassword)
@@ -48,12 +95,13 @@ export default function RegisterPage() {
     };
 
     const handleNext = () => {
-        if (validateStep1()) setStep(2);
+        if (step === 1 && validateStep1()) setStep(2);
+        else if (step === 2 && validateStep2()) setStep(3);
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!validateStep2()) return;
+        if (!validateStep3()) return;
 
         setIsLoading(true);
         try {
@@ -86,17 +134,17 @@ export default function RegisterPage() {
                         Join the digital<br />governance revolution
                     </h1>
                     <p className="text-lg text-white/70 max-w-md mb-8">
-                        Register to access all civic services, file complaints, and be part of a smarter city.
+                        Register to access civic services, file complaints, pay utility bills, and be part of a smarter city.
                     </p>
                     <div className="flex items-center gap-3 text-white/60 text-sm">
                         <Shield className="h-5 w-5" />
-                        Your data is encrypted and secure
+                        Your data is encrypted and securely stored
                     </div>
                 </div>
             </div>
 
             {/* Right Form */}
-            <div className="flex-1 flex items-center justify-center p-8 bg-bg">
+            <div className="flex-1 flex items-center justify-center p-6 sm:p-8 bg-bg overflow-y-auto">
                 <motion.div
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
@@ -111,12 +159,19 @@ export default function RegisterPage() {
                     </Link>
 
                     <h2 className="text-2xl font-bold text-fg mb-2">Create Account</h2>
-                    <p className="text-fg-secondary mb-8">Step {step} of 2 — {step === 1 ? "Personal Info" : "Set Password"}</p>
+                    <p className="text-fg-secondary mb-6">
+                        Step {step} of {totalSteps} —{" "}
+                        {step === 1 ? "Personal Info" : step === 2 ? "Address Details" : "Set Password"}
+                    </p>
 
                     {/* Step Indicator */}
-                    <div className="flex gap-2 mb-8">
-                        <div className={`h-1 flex-1 rounded-full transition-colors ${step >= 1 ? "bg-primary-600" : "bg-border"}`} />
-                        <div className={`h-1 flex-1 rounded-full transition-colors ${step >= 2 ? "bg-primary-600" : "bg-border"}`} />
+                    <div className="flex gap-2 mb-6">
+                        {Array.from({ length: totalSteps }).map((_, i) => (
+                            <div
+                                key={i}
+                                className={`h-1 flex-1 rounded-full transition-colors ${step > i ? "bg-primary-600" : "bg-border"}`}
+                            />
+                        ))}
                     </div>
 
                     {errors.general && (
@@ -125,13 +180,10 @@ export default function RegisterPage() {
                         </div>
                     )}
 
-                    <form onSubmit={handleSubmit} className="space-y-4">
+                    <form onSubmit={handleSubmit}>
+                        {/* ── Step 1: Personal Info ── */}
                         {step === 1 && (
-                            <motion.div
-                                initial={{ opacity: 0, x: -20 }}
-                                animate={{ opacity: 1, x: 0 }}
-                                className="space-y-4"
-                            >
+                            <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} className="space-y-4">
                                 <Input
                                     label="Full Name"
                                     placeholder="Enter your full name"
@@ -158,18 +210,113 @@ export default function RegisterPage() {
                                     leftIcon={<Phone className="h-4 w-4" />}
                                     error={errors.phone}
                                 />
+                                <Input
+                                    label="Date of Birth"
+                                    type="date"
+                                    value={formData.dob}
+                                    onChange={(e) => updateField("dob", e.target.value)}
+                                    leftIcon={<Calendar className="h-4 w-4" />}
+                                    error={errors.dob}
+                                />
+                                <div className="w-full">
+                                    <label className="block text-sm font-medium text-fg mb-1.5">Gender</label>
+                                    <select
+                                        value={formData.gender}
+                                        onChange={(e) => updateField("gender", e.target.value)}
+                                        className="w-full h-10 px-3 bg-surface border border-border rounded-lg text-sm text-fg focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all"
+                                    >
+                                        {genderOptions.map((opt) => (
+                                            <option key={opt.value} value={opt.value}>{opt.label}</option>
+                                        ))}
+                                    </select>
+                                    {errors.gender && <p className="mt-1 text-xs text-danger-500">{errors.gender}</p>}
+                                </div>
                                 <Button type="button" size="lg" className="w-full" onClick={handleNext} rightIcon={<ArrowRight className="h-4 w-4" />}>
                                     Continue
                                 </Button>
                             </motion.div>
                         )}
 
+                        {/* ── Step 2: Address & IDs ── */}
                         {step === 2 && (
-                            <motion.div
-                                initial={{ opacity: 0, x: 20 }}
-                                animate={{ opacity: 1, x: 0 }}
-                                className="space-y-4"
-                            >
+                            <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-4">
+                                <div className="w-full">
+                                    <label className="block text-sm font-medium text-fg mb-1.5">State</label>
+                                    <select
+                                        value={formData.state}
+                                        onChange={(e) => updateField("state", e.target.value)}
+                                        className="w-full h-10 px-3 bg-surface border border-border rounded-lg text-sm text-fg focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all"
+                                    >
+                                        {stateOptions.map((opt) => (
+                                            <option key={opt.value} value={opt.value}>{opt.label}</option>
+                                        ))}
+                                    </select>
+                                    {errors.state && <p className="mt-1 text-xs text-danger-500">{errors.state}</p>}
+                                </div>
+                                <Input
+                                    label="City"
+                                    placeholder="e.g., Silchar"
+                                    value={formData.city}
+                                    onChange={(e) => updateField("city", e.target.value)}
+                                    leftIcon={<MapPin className="h-4 w-4" />}
+                                    error={errors.city}
+                                />
+                                <Input
+                                    label="Area / Locality"
+                                    placeholder="e.g., Tarapur"
+                                    value={formData.area}
+                                    onChange={(e) => updateField("area", e.target.value)}
+                                    leftIcon={<MapPin className="h-4 w-4" />}
+                                    error={errors.area}
+                                />
+                                <Input
+                                    label="PIN Code"
+                                    placeholder="6-digit PIN code"
+                                    value={formData.pinCode}
+                                    onChange={(e) => updateField("pinCode", e.target.value)}
+                                    leftIcon={<Hash className="h-4 w-4" />}
+                                    error={errors.pinCode}
+                                    maxLength={6}
+                                />
+                                <Input
+                                    label="Aadhaar Number"
+                                    placeholder="XXXX-XXXX-XXXX"
+                                    value={formData.aadhaarNo}
+                                    onChange={(e) => updateField("aadhaarNo", e.target.value)}
+                                    leftIcon={<Shield className="h-4 w-4" />}
+                                    hint="Optional — required for KYC verification"
+                                />
+                                <Input
+                                    label="Gas Connection No."
+                                    placeholder="e.g., GAS-91234"
+                                    value={formData.gasNo}
+                                    onChange={(e) => updateField("gasNo", e.target.value)}
+                                    leftIcon={<Flame className="h-4 w-4" />}
+                                    hint="Optional — link your gas account"
+                                />
+                                <Input
+                                    label="IVRS Number"
+                                    placeholder="e.g., IVRS-7821"
+                                    value={formData.ivrsNo}
+                                    onChange={(e) => updateField("ivrsNo", e.target.value)}
+                                    leftIcon={<PhoneCall className="h-4 w-4" />}
+                                    hint="Optional — for automated helpline"
+                                />
+
+                                <div className="flex gap-3">
+                                    <Button type="button" variant="outline" size="lg" className="flex-1" onClick={() => setStep(1)} leftIcon={<ArrowLeft className="h-4 w-4" />}>
+                                        Back
+                                    </Button>
+                                    <Button type="button" size="lg" className="flex-1" onClick={handleNext} rightIcon={<ArrowRight className="h-4 w-4" />}>
+                                        Continue
+                                    </Button>
+                                </div>
+                            </motion.div>
+                        )}
+
+                        {/* ── Step 3: Password ── */}
+                        {step === 3 && (
+                            <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-4">
                                 <Input
                                     label="Password"
                                     type={showPassword ? "text" : "password"}
@@ -193,9 +340,8 @@ export default function RegisterPage() {
                                     leftIcon={<Lock className="h-4 w-4" />}
                                     error={errors.confirmPassword}
                                 />
-
                                 <div className="flex gap-3">
-                                    <Button type="button" variant="outline" size="lg" className="flex-1" onClick={() => setStep(1)}>
+                                    <Button type="button" variant="outline" size="lg" className="flex-1" onClick={() => setStep(2)} leftIcon={<ArrowLeft className="h-4 w-4" />}>
                                         Back
                                     </Button>
                                     <Button type="submit" size="lg" className="flex-1" isLoading={isLoading} rightIcon={<ArrowRight className="h-4 w-4" />}>

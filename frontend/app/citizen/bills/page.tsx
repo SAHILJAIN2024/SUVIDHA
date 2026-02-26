@@ -36,15 +36,15 @@ const billColors: Record<string, string> = {
 export default function BillsPage() {
     const [bills, setBills] = useState<Bill[]>([]);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
     const [paymentModal, setPaymentModal] = useState<Bill | null>(null);
     const [paying, setPaying] = useState(false);
     const [tab, setTab] = useState<"unpaid" | "paid">("unpaid");
 
     useEffect(() => {
-        getBills().then((data) => {
-            setBills(data);
-            setLoading(false);
-        });
+        getBills()
+            .then((data) => { setBills(data); setLoading(false); })
+            .catch(() => { setError("Failed to load bills"); setLoading(false); });
     }, []);
 
     const handlePay = async (bill: Bill) => {
@@ -67,6 +67,16 @@ export default function BillsPage() {
                 {[...Array(3)].map((_, i) => (
                     <div key={i} className="h-24 rounded-2xl bg-surface border border-border animate-pulse" />
                 ))}
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="text-center py-16">
+                <AlertCircle className="h-10 w-10 text-danger-500 mx-auto mb-3" />
+                <p className="text-fg-secondary">{error}</p>
+                <Button variant="outline" size="sm" className="mt-4" onClick={() => window.location.reload()}>Retry</Button>
             </div>
         );
     }

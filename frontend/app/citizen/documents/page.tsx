@@ -1,25 +1,11 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Upload, FileText, CheckCircle, XCircle, Clock, Shield, Eye, Trash2 } from "lucide-react";
-import { Card, CardContent, Button, Badge, Input, Select } from "@/components/ui";
-
-interface DocumentItem {
-    id: string;
-    name: string;
-    type: string;
-    status: "pending" | "verified" | "rejected";
-    uploadedAt: string;
-    rejectionReason?: string;
-}
-
-const mockDocuments: DocumentItem[] = [
-    { id: "d1", name: "Aadhaar Card", type: "identity", status: "verified", uploadedAt: "2025-06-15" },
-    { id: "d2", name: "PAN Card", type: "identity", status: "verified", uploadedAt: "2025-06-15" },
-    { id: "d3", name: "Electricity Bill (Address Proof)", type: "address", status: "pending", uploadedAt: "2025-12-01" },
-    { id: "d4", name: "Property Tax Receipt", type: "property", status: "rejected", uploadedAt: "2025-11-20", rejectionReason: "Document expired, upload recent copy" },
-];
+import { Upload, FileText, CheckCircle, XCircle, Clock, Shield, Eye, Trash2, AlertCircle } from "lucide-react";
+import { Card, CardContent, Button, Badge } from "@/components/ui";
+import { useAuthStore } from "@/store/auth.store";
+import { getCitizenDocuments, uploadDocument, deleteDocument, CDocumentItem } from "@/services/document.service";
 
 const statusConfig: Record<string, { icon: React.ReactNode; label: string; variant: "success" | "warning" | "danger" }> = {
     verified: { icon: <CheckCircle className="h-3 w-3" />, label: "Verified", variant: "success" },
@@ -28,30 +14,65 @@ const statusConfig: Record<string, { icon: React.ReactNode; label: string; varia
 };
 
 export default function DocumentVerificationPage() {
-    const [documents, setDocuments] = useState<DocumentItem[]>(mockDocuments);
+    const { user } = useAuthStore();
+    const [documents, setDocuments] = useState<CDocumentItem[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
     const [uploading, setUploading] = useState(false);
+
+    useEffect(() => {
+        getCitizenDocuments()
+            .then((data) => { setDocuments(data); setLoading(false); })
+            .catch(() => { setError("Failed to load documents"); setLoading(false); });
+    }, []);
 
     const handleUpload = async () => {
         setUploading(true);
-        await new Promise((r) => setTimeout(r, 1000));
-        const newDoc: DocumentItem = {
-            id: `d${documents.length + 1}`,
-            name: "New Document",
-            type: "other",
-            status: "pending",
-            uploadedAt: new Date().toISOString().split("T")[0],
-        };
-        setDocuments((prev) => [...prev, newDoc]);
-        setUploading(false);
+        try {
+            const newDoc = await uploadDocument("New Document");
+            setDocuments((prev) => [...prev, newDoc]);
+        } catch {
+            setError("Upload failed");
+        } finally {
+            setUploading(false);
+        }
     };
 
-    const handleDelete = (id: string) => {
-        setDocuments((prev) => prev.filter((d) => d.id !== id));
+    const handleDelete = async (id: string) => {
+        try {
+            await deleteDocument(id);
+            setDocuments((prev) => prev.filter((d) => d.id !== id));
+        } catch {
+            setError("Delete failed");
+        }
     };
 
     const verifiedCount = documents.filter((d) => d.status === "verified").length;
     const pendingCount = documents.filter((d) => d.status === "pending").length;
     const rejectedCount = documents.filter((d) => d.status === "rejected").length;
+
+    if (loading) {
+        return (
+            <div className="max-w-2xl mx-auto space-y-6">
+                <div className="h-8 w-48 bg-surface-muted rounded-lg animate-pulse" />
+                <div className="grid grid-cols-3 gap-3">
+                    {[...Array(3)].map((_, i) => <div key={i} className="h-20 rounded-2xl bg-surface border border-border animate-pulse" />)}
+                </div>
+                <div className="h-24 rounded-2xl bg-surface border border-border animate-pulse" />
+                {[...Array(3)].map((_, i) => <div key={i} className="h-20 rounded-2xl bg-surface border border-border animate-pulse" />)}
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="max-w-2xl mx-auto text-center py-16">
+                <AlertCircle className="h-10 w-10 text-danger-500 mx-auto mb-3" />
+                <p className="text-fg-secondary">{error}</p>
+                <Button variant="outline" size="sm" className="mt-4" onClick={() => window.location.reload()}>Retry</Button>
+            </div>
+        );
+    }
 
     return (
         <div className="max-w-2xl mx-auto space-y-6">
@@ -91,7 +112,7 @@ export default function DocumentVerificationPage() {
                 </Card>
             </div>
 
-            {/* Aadhaar Verification Status */}
+            {/* Aadhaar Status */}
             <Card className="bg-gradient-to-r from-primary-50 to-primary-100 dark:from-primary-900/20 dark:to-primary-900/10 border-primary-200 dark:border-primary-800">
                 <CardContent>
                     <div className="flex items-center gap-4">
@@ -100,9 +121,13 @@ export default function DocumentVerificationPage() {
                         </div>
                         <div className="flex-1">
                             <p className="font-semibold text-fg">Aadhaar Verification</p>
-                            <p className="text-sm text-fg-secondary">Your identity has been verified via Aadhaar</p>
+                            <p className="text-sm text-fg-secondary">
+                                {user?.aadhaarVerified ? "Your identity has been verified via Aadhaar" : "Aadhaar not yet verified"}
+                            </p>
                         </div>
-                        <Badge variant="success" size="lg"><CheckCircle className="h-3 w-3" /> Verified</Badge>
+                        <Badge variant={user?.aadhaarVerified ? "success" : "warning"} size="lg">
+                            {user?.aadhaarVerified ? <><CheckCircle className="h-3 w-3" /> Verified</> : <><Clock className="h-3 w-3" /> Pending</>}
+                        </Badge>
                     </div>
                 </CardContent>
             </Card>
@@ -116,15 +141,17 @@ export default function DocumentVerificationPage() {
                     </Button>
                 </div>
 
+                {documents.length === 0 && (
+                    <div className="text-center py-12">
+                        <FileText className="h-10 w-10 text-fg-muted mx-auto mb-3" />
+                        <p className="text-fg-secondary">No documents uploaded yet</p>
+                    </div>
+                )}
+
                 {documents.map((doc, i) => {
                     const config = statusConfig[doc.status];
                     return (
-                        <motion.div
-                            key={doc.id}
-                            initial={{ opacity: 0, y: 12 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: i * 0.05 }}
-                        >
+                        <motion.div key={doc.id} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}>
                             <Card className="hover:shadow-md transition-shadow">
                                 <CardContent>
                                     <div className="flex items-start gap-4">

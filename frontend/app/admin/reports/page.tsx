@@ -3,9 +3,10 @@
 import React, { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import { motion } from "framer-motion";
-import { Download, Calendar, Filter } from "lucide-react";
+import { Download, AlertCircle } from "lucide-react";
 import { Card, CardContent, Button, Select } from "@/components/ui";
 import { getChartData } from "@/services/admin.service";
+import { getReportSummary, ReportSummary } from "@/services/ward.service";
 
 const LazyBarChart = dynamic(
     () => import("recharts").then((mod) => {
@@ -54,17 +55,39 @@ export default function ReportsPage() {
         complaintsOverTime: { month: string; filed: number; resolved: number }[];
         resolutionByWard: { ward: string; rate: number }[];
     } | null>(null);
+    const [summaryStats, setSummaryStats] = useState<ReportSummary[]>([]);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
-        getChartData().then((data) => { setChartData(data); setLoading(false); });
+        Promise.all([getChartData(), getReportSummary()])
+            .then(([charts, summary]) => {
+                setChartData(charts);
+                setSummaryStats(summary);
+                setLoading(false);
+            })
+            .catch(() => { setError("Failed to load reports"); setLoading(false); });
     }, []);
 
     if (loading) {
         return (
             <div className="space-y-6">
+                <div className="h-8 w-48 bg-surface-muted rounded-lg animate-pulse" />
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                    {[...Array(4)].map((_, i) => <div key={i} className="h-24 rounded-2xl bg-surface border border-border animate-pulse" />)}
+                </div>
                 <div className="h-96 rounded-2xl bg-surface border border-border animate-pulse" />
                 <div className="h-96 rounded-2xl bg-surface border border-border animate-pulse" />
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="text-center py-16">
+                <AlertCircle className="h-10 w-10 text-danger-500 mx-auto mb-3" />
+                <p className="text-fg-secondary">{error}</p>
+                <Button variant="outline" size="sm" className="mt-4" onClick={() => window.location.reload()}>Retry</Button>
             </div>
         );
     }
@@ -91,12 +114,7 @@ export default function ReportsPage() {
 
             {/* Summary Stats */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                {[
-                    { label: "Total Filed", value: "1,285", sub: "Last 6 months" },
-                    { label: "Total Resolved", value: "1,170", sub: "91% resolution" },
-                    { label: "Avg Resolution", value: "3.2 days", sub: "↓ 15% from last quarter" },
-                    { label: "Satisfaction", value: "94%", sub: "↑ 3% improvement" },
-                ].map((stat, i) => (
+                {summaryStats.map((stat, i) => (
                     <motion.div key={i} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}>
                         <Card>
                             <CardContent>

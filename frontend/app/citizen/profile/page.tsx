@@ -2,7 +2,10 @@
 
 import React from "react";
 import { motion } from "framer-motion";
-import { User, Mail, Phone, MapPin, Shield, Calendar, Edit3, Camera } from "lucide-react";
+import {
+    User, Mail, Phone, MapPin, Shield, Calendar, Edit3, Camera,
+    Hash, Flame, PhoneCall, Zap, Droplets, Building,
+} from "lucide-react";
 import { Card, CardContent, Button, Badge, Input } from "@/components/ui";
 import { useAuthStore } from "@/store/auth.store";
 
@@ -16,6 +19,18 @@ export default function ProfilePage() {
         role: "citizen",
         aadhaarVerified: true,
         createdAt: "2025-06-15T10:00:00Z",
+        dob: "1990-05-15",
+        gender: "male" as const,
+        state: "Assam",
+        city: "Silchar",
+        area: "Tarapur",
+        pinCode: "788001",
+        aadhaarNo: "XXXX-XXXX-4321",
+        gasNo: "GAS-91234",
+        ivrsNo: "IVRS-7821",
+        electricityAccountNo: "ELEC-78234",
+        waterAccountNo: "WTR-45123",
+        propertyTaxId: "PT-334521",
     };
 
     return (
@@ -55,48 +70,46 @@ export default function ProfilePage() {
                 </CardContent>
             </Card>
 
-            {/* Details */}
+            {/* Personal Information */}
             <Card>
                 <CardContent>
                     <h3 className="text-lg font-semibold text-fg mb-4">Personal Information</h3>
                     <div className="grid sm:grid-cols-2 gap-4">
-                        <Input
-                            label="Full Name"
-                            value={displayUser.name}
-                            readOnly
-                            leftIcon={<User className="h-4 w-4" />}
-                        />
-                        <Input
-                            label="Email"
-                            value={displayUser.email}
-                            readOnly
-                            leftIcon={<Mail className="h-4 w-4" />}
-                        />
-                        <Input
-                            label="Phone"
-                            value={displayUser.phone}
-                            readOnly
-                            leftIcon={<Phone className="h-4 w-4" />}
-                        />
-                        <Input
-                            label="Ward"
-                            value={displayUser.ward}
-                            readOnly
-                            leftIcon={<MapPin className="h-4 w-4" />}
-                        />
-                        <Input
-                            label="Role"
-                            value={displayUser.role}
-                            readOnly
-                            leftIcon={<Shield className="h-4 w-4" />}
-                            className="capitalize"
-                        />
-                        <Input
-                            label="Member Since"
-                            value={new Date(displayUser.createdAt).toLocaleDateString()}
-                            readOnly
-                            leftIcon={<Calendar className="h-4 w-4" />}
-                        />
+                        <Input label="Full Name" value={displayUser.name} readOnly leftIcon={<User className="h-4 w-4" />} />
+                        <Input label="Email" value={displayUser.email} readOnly leftIcon={<Mail className="h-4 w-4" />} />
+                        <Input label="Phone" value={displayUser.phone} readOnly leftIcon={<Phone className="h-4 w-4" />} />
+                        <Input label="Date of Birth" value={displayUser.dob ? new Date(displayUser.dob).toLocaleDateString() : "—"} readOnly leftIcon={<Calendar className="h-4 w-4" />} />
+                        <Input label="Gender" value={displayUser.gender ? displayUser.gender.charAt(0).toUpperCase() + displayUser.gender.slice(1) : "—"} readOnly leftIcon={<User className="h-4 w-4" />} />
+                        <Input label="Member Since" value={new Date(displayUser.createdAt).toLocaleDateString()} readOnly leftIcon={<Calendar className="h-4 w-4" />} />
+                    </div>
+                </CardContent>
+            </Card>
+
+            {/* Address Details */}
+            <Card>
+                <CardContent>
+                    <h3 className="text-lg font-semibold text-fg mb-4">Address Details</h3>
+                    <div className="grid sm:grid-cols-2 gap-4">
+                        <Input label="State" value={displayUser.state || "—"} readOnly leftIcon={<MapPin className="h-4 w-4" />} />
+                        <Input label="City" value={displayUser.city || "—"} readOnly leftIcon={<MapPin className="h-4 w-4" />} />
+                        <Input label="Area / Locality" value={displayUser.area || "—"} readOnly leftIcon={<MapPin className="h-4 w-4" />} />
+                        <Input label="PIN Code" value={displayUser.pinCode || "—"} readOnly leftIcon={<Hash className="h-4 w-4" />} />
+                        <Input label="Ward" value={displayUser.ward} readOnly leftIcon={<MapPin className="h-4 w-4" />} />
+                    </div>
+                </CardContent>
+            </Card>
+
+            {/* Identity & Linked Accounts */}
+            <Card>
+                <CardContent>
+                    <h3 className="text-lg font-semibold text-fg mb-4">Identity & Linked Accounts</h3>
+                    <div className="grid sm:grid-cols-2 gap-4">
+                        <Input label="Aadhaar Number" value={displayUser.aadhaarNo || "Not linked"} readOnly leftIcon={<Shield className="h-4 w-4" />} />
+                        <Input label="Gas Connection No." value={displayUser.gasNo || "Not linked"} readOnly leftIcon={<Flame className="h-4 w-4" />} />
+                        <Input label="IVRS Number" value={displayUser.ivrsNo || "Not linked"} readOnly leftIcon={<PhoneCall className="h-4 w-4" />} />
+                        <Input label="Electricity Account" value={displayUser.electricityAccountNo || "Not linked"} readOnly leftIcon={<Zap className="h-4 w-4" />} />
+                        <Input label="Water Account" value={displayUser.waterAccountNo || "Not linked"} readOnly leftIcon={<Droplets className="h-4 w-4" />} />
+                        <Input label="Property Tax ID" value={displayUser.propertyTaxId || "Not linked"} readOnly leftIcon={<Building className="h-4 w-4" />} />
                     </div>
                 </CardContent>
             </Card>

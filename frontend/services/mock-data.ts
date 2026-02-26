@@ -1,4 +1,4 @@
-import { Complaint, Bill, User, AdminAction, KPIData } from "@/types";
+import { Complaint, Bill, User, AdminAction, KPIData, CitizenDocument } from "@/types";
 
 // ────────────────────────────────────────────────────────
 // Mock Users
@@ -13,6 +13,18 @@ export const mockUsers: User[] = [
         ward: "Ward 12",
         aadhaarVerified: true,
         createdAt: "2025-06-15T10:00:00Z",
+        dob: "1990-05-15",
+        gender: "male",
+        state: "Assam",
+        city: "Silchar",
+        area: "Tarapur",
+        pinCode: "788001",
+        aadhaarNo: "XXXX-XXXX-4321",
+        gasNo: "GAS-91234",
+        ivrsNo: "IVRS-7821",
+        electricityAccountNo: "ELEC-78234",
+        waterAccountNo: "WTR-45123",
+        propertyTaxId: "PT-334521",
     },
     {
         id: "u2",
@@ -23,6 +35,12 @@ export const mockUsers: User[] = [
         ward: "All",
         aadhaarVerified: true,
         createdAt: "2025-01-10T08:00:00Z",
+        dob: "1988-11-22",
+        gender: "female",
+        state: "Assam",
+        city: "Silchar",
+        area: "Central Office",
+        pinCode: "788001",
     },
     {
         id: "u3",
@@ -33,6 +51,57 @@ export const mockUsers: User[] = [
         ward: "All",
         aadhaarVerified: true,
         createdAt: "2024-12-01T08:00:00Z",
+        dob: "1975-03-10",
+        gender: "male",
+        state: "Assam",
+        city: "Silchar",
+        area: "Headquarters",
+        pinCode: "788001",
+    },
+    {
+        id: "u4",
+        name: "Meena Devi",
+        email: "meena.water@suvidha.gov",
+        phone: "+91 98765 22222",
+        role: "admin-water",
+        ward: "All",
+        aadhaarVerified: true,
+        createdAt: "2025-02-15T08:00:00Z",
+        gender: "female",
+        state: "Assam",
+        city: "Silchar",
+        area: "Central Office",
+        pinCode: "788001",
+    },
+    {
+        id: "u5",
+        name: "Vikram Singh",
+        email: "vikram.roads@suvidha.gov",
+        phone: "+91 98765 33333",
+        role: "admin-roads",
+        ward: "All",
+        aadhaarVerified: true,
+        createdAt: "2025-03-01T08:00:00Z",
+        gender: "male",
+        state: "Assam",
+        city: "Silchar",
+        area: "Central Office",
+        pinCode: "788001",
+    },
+    {
+        id: "u6",
+        name: "Sunita Rao",
+        email: "sunita.sanitation@suvidha.gov",
+        phone: "+91 98765 44444",
+        role: "admin-sanitation",
+        ward: "All",
+        aadhaarVerified: true,
+        createdAt: "2025-03-15T08:00:00Z",
+        gender: "female",
+        state: "Assam",
+        city: "Silchar",
+        area: "Central Office",
+        pinCode: "788001",
     },
 ];
 
@@ -245,3 +314,17 @@ export const mockChartData = {
         { ward: "W-15", rate: 84 },
     ],
 };
+
+// ────────────────────────────────────────────────────────
+// Mock Citizen Documents (for admin verification)
+// ────────────────────────────────────────────────────────
+export const mockCitizenDocuments: CitizenDocument[] = [
+    { id: "doc-1", citizenId: "u1", citizenName: "Rajesh Kumar", type: "aadhaar", fileName: "aadhaar_rajesh.pdf", uploadedAt: "2025-12-01T10:00:00Z", status: "verified", verifiedBy: "Priya Sharma", verifiedAt: "2025-12-02T09:00:00Z" },
+    { id: "doc-2", citizenId: "u1", citizenName: "Rajesh Kumar", type: "address-proof", fileName: "address_proof_rajesh.pdf", uploadedAt: "2025-12-01T10:05:00Z", status: "verified", verifiedBy: "Priya Sharma", verifiedAt: "2025-12-02T09:05:00Z" },
+    { id: "doc-3", citizenId: "u1", citizenName: "Rajesh Kumar", type: "property", fileName: "property_doc_rajesh.pdf", uploadedAt: "2025-12-03T14:00:00Z", status: "pending" },
+    { id: "doc-4", citizenId: "u1", citizenName: "Rajesh Kumar", type: "photo", fileName: "passport_photo.jpg", uploadedAt: "2025-12-04T08:30:00Z", status: "rejected", rejectionReason: "Photo is blurred, please upload a clear passport-size photo" },
+    { id: "doc-5", citizenId: "u1", citizenName: "Sita Devi", type: "aadhaar", fileName: "aadhaar_sita.pdf", uploadedAt: "2025-12-05T11:00:00Z", status: "pending" },
+    { id: "doc-6", citizenId: "u1", citizenName: "Sita Devi", type: "pan", fileName: "pan_sita.pdf", uploadedAt: "2025-12-05T11:02:00Z", status: "pending" },
+    { id: "doc-7", citizenId: "u1", citizenName: "Amit Patel", type: "id-proof", fileName: "voter_id_amit.pdf", uploadedAt: "2025-12-06T09:15:00Z", status: "pending" },
+    { id: "doc-8", citizenId: "u1", citizenName: "Amit Patel", type: "address-proof", fileName: "utility_bill_amit.pdf", uploadedAt: "2025-12-06T09:20:00Z", status: "verified", verifiedBy: "Meena Devi", verifiedAt: "2025-12-06T14:00:00Z" },
+];

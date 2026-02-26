@@ -296,6 +296,11 @@ export default function LandingPage() {
                 Kiosk Mode
               </Button>
             </Link>
+            <Link href="/complaints">
+              <Button variant="ghost" size="lg" leftIcon={<Globe className="h-5 w-5" />} className="px-6">
+                View Public Feed
+              </Button>
+            </Link>
           </motion.div>
 
           <motion.div
