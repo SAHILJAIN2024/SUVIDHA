@@ -17,34 +17,25 @@ import {
 import { Card, CardContent, Button, Badge } from "@/components/ui";
 import { getKPIs, getChartData } from "@/services/admin.service";
 import { KPIData } from "@/types";
-import { useGSAP } from "@/hooks/useGSAP";
 import { useI18nStore } from "@/store/i18n.store";
 import Link from "next/link";
 
 const InteractiveMap = dynamic(() => import("@/components/InteractiveMap"), {
     ssr: false,
-    loading: () => <div className="h-full w-full bg-surface-muted flex items-center justify-center animate-pulse" />
+    loading: () => <div className="h-full w-full bg-surface-muted flex items-center justify-center animate-pulse" />,
 });
 
-// Lazy load Recharts
 const LazyBarChart = dynamic(
     () => import("recharts").then((mod) => {
         const { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } = mod;
         return function ChartComponent({ data }: { data: { month: string; filed: number; resolved: number }[] }) {
             return (
-                <ResponsiveContainer width="100%" height={300}>
+                <ResponsiveContainer width="100%" height={280}>
                     <BarChart data={data} barGap={4}>
                         <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
                         <XAxis dataKey="month" tick={{ fontSize: 12, fill: "var(--color-fg-secondary)" }} />
                         <YAxis tick={{ fontSize: 12, fill: "var(--color-fg-secondary)" }} />
-                        <Tooltip
-                            contentStyle={{
-                                backgroundColor: "var(--color-surface)",
-                                border: "1px solid var(--color-border)",
-                                borderRadius: "12px",
-                                fontSize: 12,
-                            }}
-                        />
+                        <Tooltip contentStyle={{ backgroundColor: "var(--color-surface)", border: "1px solid var(--color-border)", borderRadius: "12px", fontSize: 12 }} />
                         <Legend />
                         <Bar dataKey="filed" fill="#6366F1" radius={[4, 4, 0, 0]} name="Filed" />
                         <Bar dataKey="resolved" fill="#10B981" radius={[4, 4, 0, 0]} name="Resolved" />
@@ -53,7 +44,7 @@ const LazyBarChart = dynamic(
             );
         };
     }),
-    { ssr: false, loading: () => <div className="h-[300px] bg-surface-muted rounded-xl animate-pulse" /> }
+    { ssr: false, loading: () => <div className="h-[280px] bg-surface-muted rounded-xl animate-pulse" /> }
 );
 
 const LazyPieChart = dynamic(
@@ -61,27 +52,20 @@ const LazyPieChart = dynamic(
         const { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } = mod;
         return function PieComponent({ data }: { data: { name: string; value: number; color: string }[] }) {
             return (
-                <ResponsiveContainer width="100%" height={250}>
+                <ResponsiveContainer width="100%" height={220}>
                     <PieChart>
-                        <Pie data={data} cx="50%" cy="50%" outerRadius={90} innerRadius={50} paddingAngle={4} dataKey="value">
+                        <Pie data={data} cx="50%" cy="50%" outerRadius={80} innerRadius={45} paddingAngle={4} dataKey="value">
                             {data.map((entry, i) => (
                                 <Cell key={i} fill={entry.color} />
                             ))}
                         </Pie>
-                        <Tooltip
-                            contentStyle={{
-                                backgroundColor: "var(--color-surface)",
-                                border: "1px solid var(--color-border)",
-                                borderRadius: "12px",
-                                fontSize: 12,
-                            }}
-                        />
+                        <Tooltip contentStyle={{ backgroundColor: "var(--color-surface)", border: "1px solid var(--color-border)", borderRadius: "12px", fontSize: 12 }} />
                     </PieChart>
                 </ResponsiveContainer>
             );
         };
     }),
-    { ssr: false, loading: () => <div className="h-[250px] bg-surface-muted rounded-xl animate-pulse" /> }
+    { ssr: false, loading: () => <div className="h-[220px] bg-surface-muted rounded-xl animate-pulse" /> }
 );
 
 const kpiIcons: Record<string, React.ReactNode> = {
@@ -91,11 +75,11 @@ const kpiIcons: Record<string, React.ReactNode> = {
     ThumbsUp: <ThumbsUp className="h-5 w-5" />,
 };
 
-const fadeUp = {
-    hidden: { opacity: 0, y: 16 },
+const cardAnim = {
+    hidden: { opacity: 0, y: 24, scale: 0.97 },
     visible: (i: number) => ({
-        opacity: 1, y: 0,
-        transition: { delay: i * 0.06, duration: 0.4, ease: [0, 0, 0.2, 1] as const },
+        opacity: 1, y: 0, scale: 1,
+        transition: { delay: i * 0.08, duration: 0.5, ease: [0.22, 1, 0.36, 1] as const },
     }),
 };
 
@@ -124,7 +108,6 @@ export default function AdminDashboard() {
         }
         load();
     }, []);
-    const gsapRef = useGSAP<HTMLDivElement>(".gsap-card", { y: 16, stagger: 0.06 });
 
     if (loading) {
         return (
@@ -132,7 +115,9 @@ export default function AdminDashboard() {
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                     {[...Array(4)].map((_, i) => (<div key={i} className="h-28 rounded-2xl bg-surface border border-border animate-pulse" />))}
                 </div>
-                <div className="h-80 rounded-2xl bg-surface border border-border animate-pulse" />
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    {[...Array(4)].map((_, i) => (<div key={i} className="h-80 rounded-2xl bg-surface border border-border animate-pulse" />))}
+                </div>
             </div>
         );
     }
@@ -148,7 +133,8 @@ export default function AdminDashboard() {
     }
 
     return (
-        <div ref={gsapRef} className="space-y-6">
+        <motion.div initial="hidden" animate="visible" className="space-y-6">
+            {/* Header */}
             <div className="flex items-center justify-between">
                 <div>
                     <h1 className="text-2xl font-bold text-fg">{t("admin.dashboard")}</h1>
@@ -159,11 +145,11 @@ export default function AdminDashboard() {
                 </Button>
             </div>
 
-            {/* KPI Cards */}
-            <motion.div initial="hidden" animate="visible" className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            {/* KPI Cards — 2x2 grid */}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                 {kpis.map((kpi, i) => (
-                    <motion.div key={i} variants={fadeUp} custom={i}>
-                        <Card className="hover:shadow-md transition-shadow">
+                    <motion.div key={i} variants={cardAnim} custom={i}>
+                        <Card className="hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300">
                             <CardContent>
                                 <div className="flex items-start justify-between">
                                     <div>
@@ -190,90 +176,97 @@ export default function AdminDashboard() {
                         </Card>
                     </motion.div>
                 ))}
-            </motion.div>
-
-            {/* Live Ward Map Widget */}
-            <div className="gsap-card">
-                <Card padding="none" className="overflow-hidden">
-                    <CardContent className="p-4 border-b border-border flex items-center justify-between">
-                        <h2 className="text-lg font-semibold text-fg">{t("admin.wardMap")} (Live)</h2>
-                        <Link href="/admin/map">
-                            <Button variant="ghost" size="sm" rightIcon={<ArrowRight className="h-4 w-4" />}>
-                                {t("common.viewAll")}
-                            </Button>
-                        </Link>
-                    </CardContent>
-                    <div className="h-[300px] relative">
-                        <InteractiveMap
-                            center={[28.6139, 77.2090]}
-                            markers={chartData?.resolutionByWard.map((w, i) => {
-                                // Map minimal ward data to markers
-                                const mockCoords = [
-                                    [28.6328, 77.2197], [28.6139, 77.2090], [28.5932, 77.2215],
-                                    [28.5623, 77.1852], [28.4595, 77.0266], [28.7041, 77.1025]
-                                ];
-                                return {
-                                    lat: mockCoords[i % 6][0],
-                                    lng: mockCoords[i % 6][1],
-                                    label: w.ward,
-                                    complaints: Math.floor(Math.random() * 50),
-                                    status: w.rate < 80 ? 'high' : w.rate < 90 ? 'medium' : 'low'
-                                };
-                            }) || []}
-                        />
-                    </div>
-                </Card>
             </div>
 
-            {/* Charts */}
-            <div className="grid lg:grid-cols-3 gap-6">
-                {/* Bar Chart */}
-                <div className="lg:col-span-2 gsap-card">
-                    <Card>
-                        <CardContent>
+            {/* ── Main Content: 2-Column Card Grid ── */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+                {/* Card 1: Live Ward Map */}
+                <motion.div variants={cardAnim} custom={4}>
+                    <Card padding="none" className="overflow-hidden border border-border shadow-sm hover:shadow-lg transition-shadow duration-300 h-full">
+                        <CardContent className="p-4 border-b border-border flex items-center justify-between bg-surface/50">
+                            <h2 className="text-lg font-semibold text-fg">{t("admin.wardMap")} (Live)</h2>
+                            <Link href="/admin/map">
+                                <Button variant="ghost" size="sm" rightIcon={<ArrowRight className="h-4 w-4" />}>
+                                    {t("common.viewAll")}
+                                </Button>
+                            </Link>
+                        </CardContent>
+                        <div className="h-[350px] relative">
+                            <InteractiveMap
+                                center={[28.6139, 77.2090]}
+                                markers={chartData?.resolutionByWard.map((w, i) => {
+                                    const mockCoords = [
+                                        [28.6328, 77.2197], [28.6139, 77.2090], [28.5932, 77.2215],
+                                        [28.5623, 77.1852], [28.4595, 77.0266], [28.7041, 77.1025]
+                                    ];
+                                    return {
+                                        lat: mockCoords[i % 6][0],
+                                        lng: mockCoords[i % 6][1],
+                                        label: w.ward,
+                                        complaints: Math.floor(Math.random() * 50),
+                                        status: w.rate < 80 ? 'high' : w.rate < 90 ? 'medium' : 'low'
+                                    };
+                                }) || []}
+                            />
+                        </div>
+                    </Card>
+                </motion.div>
+
+                {/* Card 2: Complaints Over Time — Bar Chart */}
+                <motion.div variants={cardAnim} custom={5}>
+                    <Card className="border border-border shadow-sm hover:shadow-lg transition-shadow duration-300 h-full">
+                        <CardContent className="p-5">
                             <h2 className="text-lg font-semibold text-fg mb-4">{t("admin.complaintsOverTime")}</h2>
-                            {chartData && <LazyBarChart data={chartData.complaintsOverTime} />}
+                            <div className="w-full">
+                                {chartData && <LazyBarChart data={chartData.complaintsOverTime} />}
+                            </div>
                         </CardContent>
                     </Card>
-                </div>
+                </motion.div>
 
-                {/* Pie Chart */}
-                <Card>
-                    <CardContent>
-                        <h2 className="text-lg font-semibold text-fg mb-4">{t("admin.byDepartment")}</h2>
-                        {chartData && <LazyPieChart data={chartData.byDepartment} />}
-                        {/* Legend */}
-                        <div className="space-y-2 mt-4">
-                            {chartData?.byDepartment.map((dept) => (
-                                <div key={dept.name} className="flex items-center justify-between text-sm">
-                                    <div className="flex items-center gap-2">
-                                        <div className="w-3 h-3 rounded-full" style={{ backgroundColor: dept.color }} />
-                                        <span className="text-fg-secondary">{dept.name}</span>
-                                    </div>
-                                    <span className="font-medium text-fg">{dept.value}</span>
+                {/* Card 3: By Department — Pie Chart */}
+                <motion.div variants={cardAnim} custom={6}>
+                    <Card className="border border-border shadow-sm hover:shadow-lg transition-shadow duration-300 h-full">
+                        <CardContent className="p-5">
+                            <h2 className="text-lg font-semibold text-fg mb-4">{t("admin.byDepartment")}</h2>
+                            <div className="flex flex-col items-center w-full">
+                                {chartData && <LazyPieChart data={chartData.byDepartment} />}
+                                <div className="space-y-3 mt-4 w-full px-2">
+                                    {chartData?.byDepartment.map((dept) => (
+                                        <div key={dept.name} className="flex items-center justify-between text-sm">
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-3.5 h-3.5 rounded-full shadow-sm" style={{ backgroundColor: dept.color }} />
+                                                <span className="text-fg-secondary tracking-tight font-medium">{dept.name}</span>
+                                            </div>
+                                            <span className="font-semibold text-fg">{dept.value}</span>
+                                        </div>
+                                    ))}
                                 </div>
-                            ))}
-                        </div>
-                    </CardContent>
-                </Card>
-            </div>
-
-            {/* Resolution by Ward */}
-            <Card className="gsap-card">
-                <CardContent>
-                    <h2 className="text-lg font-semibold text-fg mb-4">{t("admin.resolutionByWard")}</h2>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
-                        {chartData?.resolutionByWard.map((ward) => (
-                            <div key={ward.ward} className="text-center p-4 rounded-xl bg-surface-muted">
-                                <p className="text-2xl font-bold" style={{ color: ward.rate >= 90 ? "#10B981" : ward.rate >= 80 ? "#F59E0B" : "#EF4444" }}>
-                                    {ward.rate}%
-                                </p>
-                                <p className="text-xs text-fg-secondary mt-1">{ward.ward}</p>
                             </div>
-                        ))}
-                    </div>
-                </CardContent>
-            </Card>
-        </div>
+                        </CardContent>
+                    </Card>
+                </motion.div>
+
+                {/* Card 4: Resolution by Ward */}
+                <motion.div variants={cardAnim} custom={7}>
+                    <Card className="border border-border shadow-sm hover:shadow-lg transition-shadow duration-300 h-full">
+                        <CardContent>
+                            <h2 className="text-lg font-semibold text-fg mb-4">{t("admin.resolutionByWard")}</h2>
+                            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                                {chartData?.resolutionByWard.map((ward) => (
+                                    <div key={ward.ward} className="text-center p-4 rounded-xl bg-surface-muted hover:bg-surface-muted/70 transition-colors">
+                                        <p className="text-2xl font-bold" style={{ color: ward.rate >= 90 ? "#10B981" : ward.rate >= 80 ? "#F59E0B" : "#EF4444" }}>
+                                            {ward.rate}%
+                                        </p>
+                                        <p className="text-xs text-fg-secondary mt-1">{ward.ward}</p>
+                                    </div>
+                                ))}
+                            </div>
+                        </CardContent>
+                    </Card>
+                </motion.div>
+            </div>
+        </motion.div>
     );
 }

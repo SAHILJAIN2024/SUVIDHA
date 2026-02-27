@@ -24,7 +24,6 @@ import { useAuthStore } from "@/store/auth.store";
 import { getComplaints } from "@/services/complaint.service";
 import { getBills } from "@/services/bill.service";
 import { Complaint, Bill } from "@/types";
-import { useGSAP } from "@/hooks/useGSAP";
 
 import { useI18nStore } from "@/store/i18n.store";
 
@@ -35,12 +34,11 @@ const deptIcons: Record<string, React.ReactNode> = {
     sanitation: <Recycle className="h-4 w-4" />,
 };
 
-const fadeUp = {
-    hidden: { opacity: 0, y: 16 },
+const cardAnim = {
+    hidden: { opacity: 0, y: 24, scale: 0.97 },
     visible: (i: number) => ({
-        opacity: 1,
-        y: 0,
-        transition: { delay: i * 0.06, duration: 0.4, ease: [0, 0, 0.2, 1] as const },
+        opacity: 1, y: 0, scale: 1,
+        transition: { delay: i * 0.08, duration: 0.5, ease: [0.22, 1, 0.36, 1] as const },
     }),
 };
 
@@ -72,7 +70,6 @@ export default function CitizenDashboard() {
     const resolvedCount = complaints.filter((c) => c.status === "resolved").length;
     const unpaidBills = bills.filter((b) => b.status !== "paid");
     const totalDue = unpaidBills.reduce((sum, b) => sum + b.amount, 0);
-    const gsapRef = useGSAP<HTMLDivElement>(".gsap-card", { y: 20, stagger: 0.05 });
 
     const summaryCards = [
         { label: t("dashboard.totalComplaints"), value: complaints.length, icon: FileText, color: "text-primary-600", bg: "bg-primary-50 dark:bg-primary-900/20" },
@@ -89,7 +86,11 @@ export default function CitizenDashboard() {
                         <div key={i} className="h-28 rounded-2xl bg-surface border border-border animate-pulse" />
                     ))}
                 </div>
-                <div className="h-64 rounded-2xl bg-surface border border-border animate-pulse" />
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    {[...Array(2)].map((_, i) => (
+                        <div key={i} className="h-64 rounded-2xl bg-surface border border-border animate-pulse" />
+                    ))}
+                </div>
             </div>
         );
     }
@@ -105,7 +106,7 @@ export default function CitizenDashboard() {
     }
 
     return (
-        <div ref={gsapRef} className="space-y-6">
+        <motion.div initial="hidden" animate="visible" className="space-y-6">
             {/* Welcome */}
             <div>
                 <h1 className="text-2xl font-bold text-fg">
@@ -116,15 +117,11 @@ export default function CitizenDashboard() {
                 </p>
             </div>
 
-            {/* Summary Cards */}
-            <motion.div
-                initial="hidden"
-                animate="visible"
-                className="grid grid-cols-2 lg:grid-cols-4 gap-4"
-            >
+            {/* Summary Cards — 2x2 grid */}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                 {summaryCards.map((card, i) => (
-                    <motion.div key={i} variants={fadeUp} custom={i}>
-                        <Card className="hover:shadow-md transition-shadow">
+                    <motion.div key={i} variants={cardAnim} custom={i}>
+                        <Card className="hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300">
                             <CardContent>
                                 <div className="flex items-start justify-between">
                                     <div>
@@ -139,10 +136,10 @@ export default function CitizenDashboard() {
                         </Card>
                     </motion.div>
                 ))}
-            </motion.div>
+            </div>
 
             {/* Quick Actions */}
-            <div className="flex flex-wrap gap-3">
+            <motion.div variants={cardAnim} custom={4} className="flex flex-wrap gap-3">
                 <Link href="/citizen/complaints/new">
                     <Button leftIcon={<Plus className="h-4 w-4" />}>
                         {t("complaints.fileNew")}
@@ -153,12 +150,14 @@ export default function CitizenDashboard() {
                         {t("bills.payBills")} ({unpaidBills.length})
                     </Button>
                 </Link>
-            </div>
+            </motion.div>
 
-            <div className="grid lg:grid-cols-3 gap-6">
-                {/* Recent Complaints */}
-                <div className="lg:col-span-2 gsap-card">
-                    <Card>
+            {/* ── Main Content: 2-Column Card Grid ── */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+                {/* Card 1: Recent Complaints */}
+                <motion.div variants={cardAnim} custom={5}>
+                    <Card className="hover:shadow-lg transition-shadow duration-300 h-full">
                         <CardContent>
                             <div className="flex items-center justify-between mb-4">
                                 <h2 className="text-lg font-semibold text-fg">{t("dashboard.recentComplaints")}</h2>
@@ -195,11 +194,11 @@ export default function CitizenDashboard() {
                             </div>
                         </CardContent>
                     </Card>
-                </div>
+                </motion.div>
 
-                {/* Bills Summary */}
-                <div>
-                    <Card className="gsap-card">
+                {/* Card 2: Bills Summary */}
+                <motion.div variants={cardAnim} custom={6}>
+                    <Card className="hover:shadow-lg transition-shadow duration-300 h-full">
                         <CardContent>
                             <div className="flex items-center justify-between mb-4">
                                 <h2 className="text-lg font-semibold text-fg">{t("bills.billsDue")}</h2>
@@ -220,7 +219,7 @@ export default function CitizenDashboard() {
 
                             <div className="space-y-3">
                                 {unpaidBills.slice(0, 3).map((bill) => (
-                                    <div key={bill.id} className="flex items-center justify-between p-3 rounded-xl bg-surface-muted">
+                                    <div key={bill.id} className="flex items-center justify-between p-3 rounded-xl bg-surface-muted hover:bg-surface-muted/70 transition-colors">
                                         <div>
                                             <p className="text-sm font-medium text-fg capitalize">{bill.type.replace("-", " ")}</p>
                                             <p className="text-xs text-fg-muted">{bill.period} • Due {bill.dueDate}</p>
@@ -238,8 +237,8 @@ export default function CitizenDashboard() {
                             </div>
                         </CardContent>
                     </Card>
-                </div>
+                </motion.div>
             </div>
-        </div>
+        </motion.div>
     );
 }

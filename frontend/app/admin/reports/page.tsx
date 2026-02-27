@@ -7,14 +7,13 @@ import { Download, AlertCircle } from "lucide-react";
 import { Card, CardContent, Button, Select } from "@/components/ui";
 import { getChartData } from "@/services/admin.service";
 import { getReportSummary, ReportSummary } from "@/services/ward.service";
-import { useGSAP } from "@/hooks/useGSAP";
 
 const LazyBarChart = dynamic(
     () => import("recharts").then((mod) => {
         const { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } = mod;
         return function Chart({ data }: { data: { ward: string; rate: number }[] }) {
             return (
-                <ResponsiveContainer width="100%" height={350}>
+                <ResponsiveContainer width="100%" height={320}>
                     <BarChart data={data} layout="vertical" barSize={20}>
                         <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
                         <XAxis type="number" domain={[0, 100]} tick={{ fontSize: 12, fill: "var(--color-fg-secondary)" }} />
@@ -26,7 +25,7 @@ const LazyBarChart = dynamic(
             );
         };
     }),
-    { ssr: false, loading: () => <div className="h-[350px] bg-surface-muted rounded-xl animate-pulse" /> }
+    { ssr: false, loading: () => <div className="h-[320px] bg-surface-muted rounded-xl animate-pulse" /> }
 );
 
 const LazyLineChart = dynamic(
@@ -34,7 +33,7 @@ const LazyLineChart = dynamic(
         const { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } = mod;
         return function Chart({ data }: { data: { month: string; filed: number; resolved: number }[] }) {
             return (
-                <ResponsiveContainer width="100%" height={350}>
+                <ResponsiveContainer width="100%" height={320}>
                     <LineChart data={data}>
                         <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
                         <XAxis dataKey="month" tick={{ fontSize: 12, fill: "var(--color-fg-secondary)" }} />
@@ -48,8 +47,16 @@ const LazyLineChart = dynamic(
             );
         };
     }),
-    { ssr: false, loading: () => <div className="h-[350px] bg-surface-muted rounded-xl animate-pulse" /> }
+    { ssr: false, loading: () => <div className="h-[320px] bg-surface-muted rounded-xl animate-pulse" /> }
 );
+
+const cardAnim = {
+    hidden: { opacity: 0, y: 24, scale: 0.97 },
+    visible: (i: number) => ({
+        opacity: 1, y: 0, scale: 1,
+        transition: { delay: i * 0.08, duration: 0.5, ease: [0.22, 1, 0.36, 1] as const },
+    }),
+};
 
 export default function ReportsPage() {
     const [chartData, setChartData] = useState<{
@@ -69,7 +76,6 @@ export default function ReportsPage() {
             })
             .catch(() => { setError("Failed to load reports"); setLoading(false); });
     }, []);
-        const gsapRef = useGSAP<HTMLDivElement>(".gsap-item", { y: 14, stagger: 0.05 });
 
     if (loading) {
         return (
@@ -78,8 +84,9 @@ export default function ReportsPage() {
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                     {[...Array(4)].map((_, i) => <div key={i} className="h-24 rounded-2xl bg-surface border border-border animate-pulse" />)}
                 </div>
-                <div className="h-96 rounded-2xl bg-surface border border-border animate-pulse" />
-                <div className="h-96 rounded-2xl bg-surface border border-border animate-pulse" />
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    {[...Array(2)].map((_, i) => <div key={i} className="h-96 rounded-2xl bg-surface border border-border animate-pulse" />)}
+                </div>
             </div>
         );
     }
@@ -95,7 +102,7 @@ export default function ReportsPage() {
     }
 
     return (
-        <div ref={gsapRef} className="space-y-6">
+        <motion.div initial="hidden" animate="visible" className="space-y-6">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
                     <h1 className="text-2xl font-bold text-fg">Reports & Analytics</h1>
@@ -114,11 +121,11 @@ export default function ReportsPage() {
                 </div>
             </div>
 
-            {/* Summary Stats */}
+            {/* Summary Stats — 2x2 on mobile, 4-col on desktop */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                 {summaryStats.map((stat, i) => (
-                    <motion.div key={i} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}>
-                        <Card>
+                    <motion.div key={i} variants={cardAnim} custom={i}>
+                        <Card className="hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300">
                             <CardContent>
                                 <p className="text-xs text-fg-secondary uppercase tracking-wider">{stat.label}</p>
                                 <p className="text-2xl font-bold text-fg mt-1">{stat.value}</p>
@@ -129,21 +136,28 @@ export default function ReportsPage() {
                 ))}
             </div>
 
-            {/* Trend Chart */}
-            <Card>
-                <CardContent>
-                    <h2 className="text-lg font-semibold text-fg mb-4">Complaint Trends</h2>
-                    {chartData && <LazyLineChart data={chartData.complaintsOverTime} />}
-                </CardContent>
-            </Card>
+            {/* ── Charts: 2-Column Card Grid ── */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* Card 1: Trend Chart */}
+                <motion.div variants={cardAnim} custom={4}>
+                    <Card className="hover:shadow-lg transition-shadow duration-300 h-full">
+                        <CardContent>
+                            <h2 className="text-lg font-semibold text-fg mb-4">Complaint Trends</h2>
+                            {chartData && <LazyLineChart data={chartData.complaintsOverTime} />}
+                        </CardContent>
+                    </Card>
+                </motion.div>
 
-            {/* Ward Resolution */}
-            <Card>
-                <CardContent>
-                    <h2 className="text-lg font-semibold text-fg mb-4">Resolution Rate by Ward</h2>
-                    {chartData && <LazyBarChart data={chartData.resolutionByWard} />}
-                </CardContent>
-            </Card>
-        </div>
+                {/* Card 2: Ward Resolution */}
+                <motion.div variants={cardAnim} custom={5}>
+                    <Card className="hover:shadow-lg transition-shadow duration-300 h-full">
+                        <CardContent>
+                            <h2 className="text-lg font-semibold text-fg mb-4">Resolution Rate by Ward</h2>
+                            {chartData && <LazyBarChart data={chartData.resolutionByWard} />}
+                        </CardContent>
+                    </Card>
+                </motion.div>
+            </div>
+        </motion.div>
     );
 }

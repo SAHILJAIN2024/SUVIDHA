@@ -121,56 +121,57 @@ export default function RegisterPage() {
     };
 
     return (
-        <div className="min-h-screen flex">
+        <div className="min-h-screen flex flex-col lg:flex-row overflow-x-hidden">
             {/* Left Branding */}
-            <div className="hidden lg:flex lg:w-1/2 relative bg-gradient-to-br from-primary-700 via-primary-800 to-primary-950 text-white">
+            <div className="hidden lg:flex lg:w-1/2 relative bg-gradient-to-br from-primary-700 via-primary-800 to-primary-950 text-white overflow-hidden">
                 <div className="absolute inset-0">
-                    <div className="absolute top-1/4 left-10 w-64 h-64 bg-accent-400/10 rounded-full blur-[80px]" />
-                    <div className="absolute bottom-1/4 right-10 w-48 h-48 bg-primary-400/15 rounded-full blur-[60px]" />
+                    <div className="absolute top-1/4 left-10 w-40 h-40 md:w-56 md:h-56 lg:w-64 lg:h-64 bg-accent-400/10 rounded-full blur-[60px] lg:blur-[80px]" />
+                    <div className="absolute bottom-1/4 right-10 w-32 h-32 md:w-40 md:h-40 lg:w-48 lg:h-48 bg-primary-400/15 rounded-full blur-[40px] lg:blur-[60px]" />
                 </div>
-                <div className="relative flex flex-col justify-center px-16">
-                    <Link href="/" className="flex items-center gap-3 mb-12">
-                        <div className="w-12 h-12 rounded-2xl bg-white/20 backdrop-blur flex items-center justify-center text-2xl font-bold">
+                <div className="relative flex flex-col justify-center items-center text-center w-full px-6 lg:px-16">
+                    <Link href="/" className="flex items-center gap-2 lg:gap-3 mb-8 lg:mb-12">
+                        <div className="w-10 h-10 lg:w-12 lg:h-12 rounded-xl lg:rounded-2xl bg-white/20 backdrop-blur flex items-center justify-center text-xl lg:text-2xl font-bold">
                             S
                         </div>
-                        <span className="text-2xl font-bold">SUVIDHA</span>
+                        <span className="text-xl lg:text-2xl font-bold">SUVIDHA</span>
                     </Link>
-                    <h1 className="text-4xl font-bold leading-tight mb-4">
+                    <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold leading-tight mb-3 lg:mb-4 max-w-lg">
                         Join the digital<br />governance revolution
                     </h1>
-                    <p className="text-lg text-white/70 max-w-md mb-8">
+                    <p className="text-sm md:text-base lg:text-lg text-white/70 max-w-md mb-6 lg:mb-8">
                         Register to access civic services, file complaints, pay utility bills, and be part of a smarter city.
                     </p>
-                    <div className="flex items-center gap-3 text-white/60 text-sm">
-                        <Shield className="h-5 w-5" />
-                        Your data is encrypted and securely stored
+                    <div className="flex items-center gap-2 lg:gap-3 text-white/60 text-xs lg:text-sm">
+                        <Shield className="h-4 w-4 lg:h-5 lg:w-5" />
+                        <span className="hidden sm:inline">Your data is encrypted and securely stored</span>
+                        <span className="sm:hidden">Data is encrypted</span>
                     </div>
                 </div>
             </div>
 
             {/* Right Form */}
-            <div className="flex-1 flex items-center justify-center p-6 sm:p-8 bg-bg overflow-y-auto">
+            <div className="flex-1 flex items-center justify-center p-4 sm:p-6 lg:p-8 bg-bg overflow-y-auto w-full lg:w-1/2">
                 <motion.div
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ duration: 0.5 }}
-                    className="w-full max-w-md"
+                    className="w-full max-w-sm sm:max-w-md"
                 >
-                    <Link href="/" className="flex lg:hidden items-center gap-3 mb-8">
-                        <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-primary-500 to-primary-700 text-white font-bold text-lg flex items-center justify-center">
+                    <Link href="/" className="flex lg:hidden items-center gap-2 mb-6 sm:mb-8">
+                        <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl bg-gradient-to-br from-primary-500 to-primary-700 text-white font-bold text-base sm:text-lg flex items-center justify-center">
                             S
                         </div>
-                        <span className="font-bold text-xl text-fg">SUVIDHA</span>
+                        <span className="font-bold text-lg sm:text-xl text-fg">SUVIDHA</span>
                     </Link>
 
-                    <h2 className="text-2xl font-bold text-fg mb-2">Create Account</h2>
-                    <p className="text-fg-secondary mb-6">
+                    <h2 className="text-xl sm:text-2xl font-bold text-fg mb-1 sm:mb-2">Create Account</h2>
+                    <p className="text-xs sm:text-sm text-fg-secondary mb-4 sm:mb-6">
                         Step {step} of {totalSteps} —{" "}
                         {step === 1 ? "Personal Info" : step === 2 ? "Address Details" : "Set Password"}
                     </p>
 
                     {/* Step Indicator */}
-                    <div className="flex gap-2 mb-6">
+                    <div className="flex gap-2 mb-4 sm:mb-6">
                         {Array.from({ length: totalSteps }).map((_, i) => (
                             <div
                                 key={i}
@@ -180,7 +181,7 @@ export default function RegisterPage() {
                     </div>
 
                     {errors.general && (
-                        <div className="mb-4 p-3 rounded-xl bg-danger-50 text-danger-600 text-sm border border-danger-500/20">
+                        <div className="mb-3 sm:mb-4 p-2 sm:p-3 rounded-lg sm:rounded-xl bg-danger-50 text-danger-600 text-xs sm:text-sm border border-danger-500/20">
                             {errors.general}
                         </div>
                     )}
@@ -188,7 +189,7 @@ export default function RegisterPage() {
                     <form onSubmit={handleSubmit}>
                         {/* ── Step 1: Personal Info ── */}
                         {step === 1 && (
-                            <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} className="space-y-4">
+                            <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} className="space-y-4 sm:space-y-5">
                                 <Input
                                     label="Full Name"
                                     placeholder="Enter your full name"
@@ -236,7 +237,7 @@ export default function RegisterPage() {
                                     </select>
                                     {errors.gender && <p className="mt-1 text-xs text-danger-500">{errors.gender}</p>}
                                 </div>
-                                <Button type="button" size="lg" className="w-full" onClick={handleNext} rightIcon={<ArrowRight className="h-4 w-4" />}>
+                                <Button type="button" size="lg" className="w-full text-sm sm:text-base" onClick={handleNext} rightIcon={<ArrowRight className="h-3 w-3 sm:h-4 sm:w-4" />}>
                                     Continue
                                 </Button>
                             </motion.div>
@@ -244,13 +245,13 @@ export default function RegisterPage() {
 
                         {/* ── Step 2: Address & IDs ── */}
                         {step === 2 && (
-                            <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-4">
+                            <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-4 sm:space-y-5">
                                 {/* Ward auto-detect */}
-                                <div className="p-4 rounded-xl border border-border bg-surface">
-                                    <div className="flex items-center justify-between mb-2">
+                                <div className="p-3 sm:p-4 rounded-lg sm:rounded-xl border border-border bg-surface">
+                                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-0 mb-2 sm:mb-2">
                                         <div>
-                                            <p className="text-sm font-medium text-fg">Ward Number</p>
-                                            <p className="text-xs text-fg-muted">Auto-detect using your location</p>
+                                            <p className="text-xs sm:text-sm font-medium text-fg">Ward Number</p>
+                                            <p className="text-[10px] sm:text-xs text-fg-muted">Auto-detect using location</p>
                                         </div>
                                         <Button
                                             type="button"
@@ -280,32 +281,34 @@ export default function RegisterPage() {
                                                 }
                                             }}
                                             disabled={geoStatus === "requesting" || geoStatus === "fetching"}
+                                            className="text-xs sm:text-sm px-2 sm:px-3"
                                             leftIcon={
                                                 geoStatus === "requesting" || geoStatus === "fetching"
-                                                    ? <Loader2 className="h-4 w-4 animate-spin" />
+                                                    ? <Loader2 className="h-3 w-3 sm:h-4 sm:w-4 animate-spin" />
                                                     : geoStatus === "success"
-                                                        ? <CheckCircle className="h-4 w-4" />
-                                                        : <Navigation className="h-4 w-4" />
+                                                        ? <CheckCircle className="h-3 w-3 sm:h-4 sm:w-4" />
+                                                        : <Navigation className="h-3 w-3 sm:h-4 sm:w-4" />
                                             }
                                         >
-                                            {geoStatus === "requesting" ? "Detecting..." : geoStatus === "success" ? "Detected" : "Detect Location"}
+                                            <span className="hidden sm:inline">{geoStatus === "requesting" ? "Detecting..." : geoStatus === "success" ? "Detected" : "Detect Location"}</span>
+                                            <span className="sm:hidden">{geoStatus === "requesting" ? "..." : geoStatus === "success" ? "✓" : "Detect"}</span>
                                         </Button>
                                     </div>
                                     {geoStatus === "success" && wardDisplay && (
-                                        <div className="flex flex-col gap-1 p-3 rounded-lg bg-success-50 dark:bg-success-500/10 text-sm border border-success-500/20 animate-in fade-in slide-in-from-top-1">
+                                        <div className="flex flex-col gap-1 p-2 sm:p-3 rounded-lg bg-success-50 dark:bg-success-500/10 text-xs sm:text-sm border border-success-500/20 animate-in fade-in slide-in-from-top-1 mt-2">
                                             <div className="flex items-center gap-2">
-                                                <CheckCircle className="h-4 w-4 text-success-500 shrink-0" />
+                                                <CheckCircle className="h-3 w-3 sm:h-4 sm:w-4 text-success-500 shrink-0" />
                                                 <span className="text-success-700 dark:text-success-400 font-medium">Location Detected!</span>
                                             </div>
-                                            <p className="text-xs text-success-600 dark:text-success-400/80 ml-6">
-                                                Assigned to <span className="font-bold">{wardDisplay}</span>. Address fields have been auto-filled.
+                                            <p className="text-[10px] sm:text-xs text-success-600 dark:text-success-400/80 ml-5">
+                                                Assigned to <span className="font-bold">{wardDisplay}</span>. Address fields auto-filled.
                                             </p>
                                         </div>
                                     )}
                                     {(geoStatus === "denied" || geoStatus === "unavailable" || geoStatus === "error") && (
-                                        <div className="flex items-center gap-2 p-2 rounded-lg bg-warning-50 dark:bg-warning-500/10 text-sm">
-                                            <AlertCircle className="h-4 w-4 text-warning-500 shrink-0" />
-                                            <span className="text-warning-700 dark:text-warning-400">{errors.ward || "Could not detect. Enter manually below."}</span>
+                                        <div className="flex items-center gap-2 p-2 rounded-lg bg-warning-50 dark:bg-warning-500/10 text-xs sm:text-sm mt-2">
+                                            <AlertCircle className="h-3 w-3 sm:h-4 sm:w-4 text-warning-500 shrink-0" />
+                                            <span className="text-warning-700 dark:text-warning-400 text-[10px] sm:text-xs">{errors.ward || "Could not detect. Enter manually."}</span>
                                         </div>
                                     )}
                                     {!wardAutoDetected && (
@@ -390,11 +393,11 @@ export default function RegisterPage() {
                                     hint="Optional — for automated helpline"
                                 />
 
-                                <div className="flex gap-3">
-                                    <Button type="button" variant="outline" size="lg" className="flex-1" onClick={() => setStep(1)} leftIcon={<ArrowLeft className="h-4 w-4" />}>
+                                <div className="flex gap-2 sm:gap-3">
+                                    <Button type="button" variant="outline" size="lg" className="flex-1 text-sm sm:text-base" onClick={() => setStep(1)} leftIcon={<ArrowLeft className="h-3 w-3 sm:h-4 sm:w-4" />}>
                                         Back
                                     </Button>
-                                    <Button type="button" size="lg" className="flex-1" onClick={handleNext} rightIcon={<ArrowRight className="h-4 w-4" />}>
+                                    <Button type="button" size="lg" className="flex-1 text-sm sm:text-base" onClick={handleNext} rightIcon={<ArrowRight className="h-3 w-3 sm:h-4 sm:w-4" />}>
                                         Continue
                                     </Button>
                                 </div>
@@ -403,7 +406,7 @@ export default function RegisterPage() {
 
                         {/* ── Step 3: Password ── */}
                         {step === 3 && (
-                            <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-4">
+                            <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-4 sm:space-y-5">
                                 <Input
                                     label="Password"
                                     type={showPassword ? "text" : "password"}
@@ -427,11 +430,11 @@ export default function RegisterPage() {
                                     leftIcon={<Lock className="h-4 w-4" />}
                                     error={errors.confirmPassword}
                                 />
-                                <div className="flex gap-3">
-                                    <Button type="button" variant="outline" size="lg" className="flex-1" onClick={() => setStep(2)} leftIcon={<ArrowLeft className="h-4 w-4" />}>
+                                <div className="flex gap-2 sm:gap-3">
+                                    <Button type="button" variant="outline" size="lg" className="flex-1 text-sm sm:text-base" onClick={() => setStep(2)} leftIcon={<ArrowLeft className="h-3 w-3 sm:h-4 sm:w-4" />}>
                                         Back
                                     </Button>
-                                    <Button type="submit" size="lg" className="flex-1" isLoading={isLoading} rightIcon={<ArrowRight className="h-4 w-4" />}>
+                                    <Button type="submit" size="lg" className="flex-1 text-sm sm:text-base" isLoading={isLoading} rightIcon={<ArrowRight className="h-3 w-3 sm:h-4 sm:w-4" />}>
                                         Register
                                     </Button>
                                 </div>
@@ -439,7 +442,7 @@ export default function RegisterPage() {
                         )}
                     </form>
 
-                    <p className="mt-8 text-center text-sm text-fg-secondary">
+                    <p className="mt-6 sm:mt-8 text-center text-xs sm:text-sm text-fg-secondary">
                         Already have an account?{" "}
                         <Link href="/auth/login" className="text-primary-600 font-medium hover:text-primary-700">
                             Sign in
