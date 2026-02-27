@@ -12,10 +12,7 @@ const generateToken = (user) => {
 // POST /api/auth/register
 const register = async (req, res, next) => {
   try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ success: false, errors: errors.array() });
-    }
+    
     const { name, email, password, phone, dob, gender, adhaar_no, gas_no, ivrs_no, address } = req.body;
     // Check if user exists
     const [existing] = await pool.query('SELECT id FROM users WHERE email = ?', [email]);
