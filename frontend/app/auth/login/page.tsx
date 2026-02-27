@@ -7,7 +7,7 @@ import { motion } from "framer-motion";
 import { Mail, Lock, Eye, EyeOff, ArrowRight, Globe, Smartphone } from "lucide-react";
 import { Button, Input } from "@/components/ui";
 import { useAuthStore } from "@/store/auth.store";
-import { login as mockLogin } from "@/services/auth.service";
+
 
 export default function LoginPage() {
     const router = useRouter();
@@ -21,46 +21,65 @@ export default function LoginPage() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError("");
+
+        if (!email || !password) {
+            setError("Email and password are required");
+            return;
+        }
+
         setIsLoading(true);
 
         try {
-            const result = await mockLogin(email, password);
-            if (result) {
-                login(result.user, result.token);
-                const role = result.user.role;
-                if (role === "citizen") {
-                    router.push("/citizen/dashboard");
-                } else {
-                    router.push("/admin/dashboard");
+            const response = await fetch(
+                "http://localhost:5000/api/auth/login",
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        email: email.trim().toLowerCase(),
+                        password,
+                    }),
                 }
-            } else {
-                setError("Invalid credentials");
+            );
+
+            const data = await response.json();
+
+            // ❌ Validation errors from express-validator
+            if (!response.ok) {
+                if (data.errors && Array.isArray(data.errors)) {
+                    setError(data.errors[0].msg);
+                } else {
+                    setError(data.message || "Login failed");
+                }
+                return;
             }
-        } catch {
-            setError("Something went wrong");
+
+            // Extra safety
+            if (!data.success) {
+                setError(data.message || "Login failed");
+                return;
+            }
+
+            // ✅ Save auth state
+            login(data.user, data.token);
+
+            // ✅ Redirect by role
+            if (data.user.role === "admin") {
+                router.push("/admin/dashboard");
+            } else {
+                router.push("/citizen/dashboard");
+            }
+
+        } catch (error) {
+            console.error("Login error:", error);
+            setError("Server error. Please try again.");
         } finally {
             setIsLoading(false);
         }
     };
 
-    const loginAsRole = async (role: string) => {
-        setIsLoading(true);
-        const emails: Record<string, string> = {
-            citizen: "rajesh@example.com",
-            admin: "priya.admin@suvidha.gov",
-            super: "anil.super@suvidha.gov",
-        };
-        const result = await mockLogin(emails[role] || emails.citizen, "demo");
-        if (result) {
-            login(result.user, result.token);
-            if (result.user.role === "citizen") {
-                router.push("/citizen/dashboard");
-            } else {
-                router.push("/admin/dashboard");
-            }
-        }
-        setIsLoading(false);
-    };
 
     return (
         <div className="min-h-screen flex flex-col lg:flex-row overflow-x-hidden">
@@ -168,29 +187,7 @@ export default function LoginPage() {
                         </Button>
                     </form>
 
-                    {/* Quick Role Login */}
-                    <div className="mt-6 sm:mt-8">
-                        <div className="relative mb-3 sm:mb-4">
-                            <div className="absolute inset-0 flex items-center">
-                                <div className="w-full border-t border-border" />
-                            </div>
-                            <div className="relative flex justify-center text-xs text-fg-muted">
-                                <span className="px-2 sm:px-3 bg-bg text-[10px] sm:text-xs">Quick Demo Login</span>
-                            </div>
-                        </div>
-                        <div className="grid grid-cols-3 gap-2">
-                            <Button variant="outline" size="sm" onClick={() => loginAsRole("citizen")} disabled={isLoading} className="text-xs sm:text-sm">
-                                Citizen
-                            </Button>
-                            <Button variant="outline" size="sm" onClick={() => loginAsRole("admin")} disabled={isLoading} className="text-xs sm:text-sm">
-                                Admin
-                            </Button>
-                            <Button variant="outline" size="sm" onClick={() => loginAsRole("super")} disabled={isLoading} className="text-xs sm:text-sm">
-                                <span className="hidden sm:inline">Super Admin</span>
-                                <span className="sm:hidden">Super</span>
-                            </Button>
-                        </div>
-                    </div>
+
 
                     <p className="mt-6 sm:mt-8 text-center text-xs sm:text-sm text-fg-secondary">
                         Don&apos;t have an account?{" "}
