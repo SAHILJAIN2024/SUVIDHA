@@ -259,6 +259,20 @@ body {
    Kiosk Overrides
    ═══════════════════════════════════════════════════════ */
 
+/* Ensure elements have at least 10px padding as requested */
+.div-padded, div {
+  padding: 10px;
+}
+
+/* Specific resets to prevent the global rule from breaking the grid layout */
+.grid > div {
+  padding: 0;
+}
+
+.grid > div > div {
+  padding: 10px;
+}
+
 .kiosk-mode {
   user-select: none;
   -webkit-user-select: none;

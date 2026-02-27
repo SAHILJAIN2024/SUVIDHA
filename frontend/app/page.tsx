@@ -6,6 +6,8 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import {
+  Menu,
+  X,
   ArrowRight,
   Shield,
   Zap,
@@ -154,11 +156,11 @@ function QuickServiceCard({ service, isAuthenticated }: { service: typeof quickS
       <motion.div
         whileHover={{ y: -4, scale: 1.02 }}
         whileTap={{ scale: 0.98 }}
-        className="w-full group flex flex-col items-center text-center gap-2 sm:gap-4 p-4 sm:p-6 lg:p-8 rounded-2xl sm:rounded-3xl bg-surface border border-border/60 hover:border-transparent hover:shadow-xl hover:shadow-primary-500/10 transition-all duration-300 cursor-pointer"
+        className="w-full group flex flex-col items-center text-center gap-2 sm:gap-4 p-5 sm:p-6 lg:p-8 rounded-2xl sm:rounded-3xl bg-surface border border-border/60 hover:border-transparent hover:shadow-xl hover:shadow-primary-500/10 transition-all duration-300 cursor-pointer"
         onClick={handleClick}
       >
         <div
-          className="w-12 h-12 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl flex items-center justify-center text-white transition-transform duration-500 group-hover:scale-110 group-hover:rotate-6 mx-auto text-lg sm:text-2xl"
+          className="w-12 h-12 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl flex items-center justify-center text-white transition-transform duration-500 group-hover:scale-110 group-hover:rotate-6 mx-auto text-lg sm:text-2xl mt-2"
           style={{ backgroundColor: service.color, boxShadow: `0 8px 20px -5px ${service.color}50` }}
         >
           {service.icon}
@@ -179,6 +181,7 @@ function QuickServiceCard({ service, isAuthenticated }: { service: typeof quickS
    ═══════════════════════════════════════════════════════════ */
 export default function LandingPage() {
   const [scrolled, setScrolled] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { user } = useAuthStore();
   const isAuthenticated = !!user;
 
@@ -192,7 +195,7 @@ export default function LandingPage() {
 
   return (
     // strict overflow-x-hidden prevents the gallery/ticker from causing horizontal scroll
-    <div className="min-h-screen bg-bg selection:bg-primary-500/30 overflow-x-hidden flex flex-col">
+    <div className="min-h-screen w-full bg-bg selection:bg-primary-500/30 overflow-x-hidden flex flex-col items-center">
 
       {/* ── Navbar ───────────────────────────────────────── */}
       <nav
@@ -225,8 +228,33 @@ export default function LandingPage() {
                 Register
               </Button>
             </Link>
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="md:hidden p-2 text-fg-secondary hover:text-primary-600 transition-colors"
+            >
+              {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+            </button>
           </div>
         </div>
+
+        {/* Mobile Menu */}
+        <motion.div
+          initial={false}
+          animate={mobileMenuOpen ? { height: "auto", opacity: 1 } : { height: 0, opacity: 0 }}
+          className="md:hidden overflow-hidden bg-bg/95 backdrop-blur-md border-b border-border/50"
+        >
+          <div className="px-4 pt-2 pb-6 space-y-2">
+            <a href="#features" onClick={() => setMobileMenuOpen(false)} className="block px-3 py-4 text-base font-semibold text-fg-secondary hover:text-primary-600 hover:bg-primary-50 rounded-xl transition-all">Features</a>
+            <a href="#how-it-works" onClick={() => setMobileMenuOpen(false)} className="block px-3 py-4 text-base font-semibold text-fg-secondary hover:text-primary-600 hover:bg-primary-50 rounded-xl transition-all">How It Works</a>
+            <a href="#stats" onClick={() => setMobileMenuOpen(false)} className="block px-3 py-4 text-base font-semibold text-fg-secondary hover:text-primary-600 hover:bg-primary-50 rounded-xl transition-all">Impact</a>
+            <a href="#services" onClick={() => setMobileMenuOpen(false)} className="block px-3 py-4 text-base font-semibold text-fg-secondary hover:text-primary-600 hover:bg-primary-50 rounded-xl transition-all">Services</a>
+            <div className="pt-4 border-t border-border/50 flex flex-col gap-3">
+              <Link href="/auth/login" onClick={() => setMobileMenuOpen(false)}>
+                <Button variant="outline" className="w-full justify-center">Sign In</Button>
+              </Link>
+            </div>
+          </div>
+        </motion.div>
       </nav>
 
       {/* Spacing to account for fixed navbar */}
@@ -255,20 +283,22 @@ export default function LandingPage() {
       <div className="h-6 sm:h-8" />
 
       {/* ── Photo Gallery Marquee ────────────────────────── */}
-      <div className="w-full bg-bg">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 mb-4 sm:mb-8 relative overflow-hidden">
+      <div className="w-full bg-bg overflow-hidden relative flex justify-center">
+        <div className="w-full py-4 sm:py-6 mb-4 sm:mb-8 relative overflow-hidden">
           <motion.div
-            className="flex gap-3 sm:gap-4 md:gap-6"
-            style={{ width: "200%" }}
-            animate={{ x: ["-50%", "-100%"] }}
-            transition={{ repeat: Infinity, duration: 50, ease: "linear" }}
+            className="flex gap-3 sm:gap-4 md:gap-6 w-max"
+            animate={{ x: [0, "-50%"] }}
+            transition={{ repeat: Infinity, duration: 30, ease: "linear" }}
           >
             {[...galleryImages, ...galleryImages].map((img, idx) => (
-              <div key={idx} className="relative w-40 h-28 sm:w-56 sm:h-40 md:w-72 md:h-48 lg:w-80 lg:h-52 rounded-xl sm:rounded-2xl overflow-hidden flex-shrink-0 shadow-sm border border-border/50">
+              <div key={idx} className="relative w-48 h-32 sm:w-64 sm:h-44 md:w-80 md:h-56 lg:w-[400px] lg:h-[260px] rounded-xl sm:rounded-2xl overflow-hidden flex-shrink-0 shadow-md border border-border/50">
                 <img src={img} alt="City Infrastructure" className="w-full h-full object-cover hover:scale-105 transition-transform duration-700 ease-out" />
               </div>
             ))}
           </motion.div>
+          {/* Gradient masks for smooth edges */}
+          <div className="absolute inset-y-0 left-0 w-16 sm:w-32 bg-gradient-to-r from-bg to-transparent z-10 pointer-events-none" />
+          <div className="absolute inset-y-0 right-0 w-16 sm:w-32 bg-gradient-to-l from-bg to-transparent z-10 pointer-events-none" />
         </div>
       </div>
 
@@ -276,12 +306,12 @@ export default function LandingPage() {
       <div className="h-4 sm:h-6" />
 
       {/* ── Hero ─────────────────────────────────────────── */}
-      <section className="w-full relative bg-bg overflow-hidden">
+      <section className="w-full flex justify-center relative bg-bg overflow-hidden p-2.5">
         <div className="absolute inset-0 bg-gradient-to-br from-primary-50/50 via-bg to-accent-50/50 dark:from-primary-950/10 dark:via-bg dark:to-accent-950/5 -z-20" />
         <div className="hidden sm:block absolute top-4 sm:top-10 left-1/4 w-48 h-48 sm:w-80 sm:h-80 md:w-[400px] md:h-[400px] lg:w-[500px] lg:h-[500px] bg-primary-300/20 rounded-full blur-[80px] sm:blur-[100px] -z-10 pointer-events-none" />
         <div className="hidden sm:block absolute bottom-4 sm:bottom-10 right-1/4 w-40 h-40 sm:w-64 sm:h-64 md:w-80 md:h-80 lg:w-[400px] lg:h-[400px] bg-accent-300/15 rounded-full blur-[60px] sm:blur-[80px] -z-10 pointer-events-none" />
 
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12 sm:pb-20 pt-6 sm:pt-10 text-center flex flex-col items-center">
+        <div className="relative w-full max-w-[1440px] px-4 sm:px-6 lg:px-8 pb-12 sm:pb-20 pt-6 sm:pt-10 text-center flex flex-col items-center p-2.5">
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
@@ -296,7 +326,7 @@ export default function LandingPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.1 }}
-            className="text-2xl sm:text-3xl md:text-5xl lg:text-7xl font-extrabold text-fg tracking-tight leading-[1.15] mb-4 sm:mb-6 max-w-5xl"
+            className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-extrabold text-fg tracking-tight leading-[1.15] mb-4 sm:mb-6 max-w-5xl"
           >
             Your City.{" "}
             <span className="bg-gradient-to-r from-primary-600 via-primary-500 to-accent-500 bg-clip-text text-transparent">
@@ -310,8 +340,8 @@ export default function LandingPage() {
                 <path d="M0 7 Q50 0 100 4 Q150 8 200 1" stroke="url(#hero-gradient)" strokeWidth="4" fill="none" />
                 <defs>
                   <linearGradient id="hero-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                    <stop offset="0%" stopColor="#6366f1" />
-                    <stop offset="100%" stopColor="#f59e0b" />
+                    <stop offset="0%" stopColor="var(--primary-600, #4f46e5)" />
+                    <stop offset="100%" stopColor="var(--accent-500, #f59e0b)" />
                   </linearGradient>
                 </defs>
               </svg>
@@ -376,20 +406,20 @@ export default function LandingPage() {
       <div className="h-6 sm:h-8 lg:h-12" />
 
       {/* ── Stats ────────────────────────────────────────── */}
-      <section id="stats" className="bg-surface/50 py-12 sm:py-16 border-y border-border/40">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section id="stats" className="w-full flex justify-center bg-surface-muted/30 py-12 sm:py-16 md:py-20 border-y border-border/40 p-2.5">
+        <div className="w-full max-w-[1440px] px-4 sm:px-6 lg:px-8 p-2.5">
           <RevealSection>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6 lg:gap-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
               {stats.map((stat, i) => (
                 <motion.div
                   key={i}
-                  className="flex flex-col items-center text-center p-3 sm:p-6 rounded-xl sm:rounded-2xl bg-bg shadow-sm border border-border/40"
+                  className="flex flex-col items-center text-center p-6 sm:p-8 rounded-2xl sm:rounded-3xl bg-bg shadow-sm border border-border/40 hover:border-primary-500/30 transition-colors"
                   whileHover={{ y: -4, scale: 1.02 }}
                 >
-                  <div className="text-xl sm:text-3xl md:text-4xl font-extrabold bg-gradient-to-r from-primary-600 to-primary-400 bg-clip-text text-transparent mb-1 sm:mb-2">
+                  <div className="text-3xl sm:text-4xl lg:text-5xl font-extrabold bg-gradient-to-r from-primary-600 to-primary-400 bg-clip-text text-transparent mb-2 sm:mb-3">
                     {stat.value}
                   </div>
-                  <p className="text-xs sm:text-sm md:text-base text-fg-secondary font-medium">{stat.label}</p>
+                  <p className="text-sm sm:text-base text-fg-secondary font-semibold uppercase tracking-wider">{stat.label}</p>
                 </motion.div>
               ))}
             </div>
@@ -401,31 +431,33 @@ export default function LandingPage() {
       <div className="h-6 sm:h-8 lg:h-12" />
 
       {/* ── Quick Services ───────────────────────────────── */}
-      <section id="services" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-20 relative">
-        <RevealSection>
-          <div className="text-center mb-8 sm:mb-12 flex flex-col items-center">
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-fg mb-3 sm:mb-4">
-              Quick <span className="text-primary-600">Services</span>
-            </h2>
-            <p className="max-w-2xl mx-auto text-sm sm:text-base text-fg-secondary leading-relaxed px-2">
-              Access essential civic services with just one click. Select a category below to get started immediately.
-            </p>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-            {quickServices.map((service, i) => (
-              <QuickServiceCard key={i} service={service} isAuthenticated={isAuthenticated} />
-            ))}
-          </div>
-        </RevealSection>
+      <section id="services" className="w-full flex justify-center py-12 sm:py-20 relative p-2.5">
+        <div className="w-full max-w-[1440px] px-4 sm:px-6 lg:px-8 p-2.5">
+          <RevealSection>
+            <div className="text-center mb-8 sm:mb-12 flex flex-col items-center">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-fg mb-3 sm:mb-4">
+                Quick <span className="text-primary-600">Services</span>
+              </h2>
+              <p className="max-w-2xl mx-auto text-sm sm:text-base text-fg-secondary leading-relaxed px-2">
+                Access essential civic services with just one click. Select a category below to get started immediately.
+              </p>
+            </div>
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
+              {quickServices.map((service, i) => (
+                <QuickServiceCard key={i} service={service} isAuthenticated={isAuthenticated} />
+              ))}
+            </div>
+          </RevealSection>
+        </div>
       </section>
 
       {/* ── Spacer ── */}
       <div className="h-6 sm:h-8 lg:h-12" />
 
       {/* ── Features ─────────────────────────────────────── */}
-      <section id="features" className="w-full bg-surface-muted/50 relative">
+      <section id="features" className="w-full flex justify-center bg-surface-muted/50 relative p-2.5">
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-primary-50/10 to-transparent dark:via-primary-900/5 pointer-events-none -z-10" />
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-20 relative">
+        <div className="w-full max-w-[1440px] px-4 sm:px-6 lg:px-8 py-12 sm:py-20 relative p-2.5">
           <RevealSection>
             <div className="text-center flex flex-col items-center mb-10 sm:mb-16">
               <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-fg mb-3 sm:mb-4">
@@ -467,8 +499,8 @@ export default function LandingPage() {
       <div className="h-6 sm:h-8 lg:h-12" />
 
       {/* ── How It Works ─────────────────────────────────── */}
-      <section id="how-it-works" className="w-full bg-bg">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-20">
+      <section id="how-it-works" className="w-full flex justify-center bg-bg p-2.5">
+        <div className="w-full max-w-[1440px] px-4 sm:px-6 lg:px-8 py-12 sm:py-20 p-2.5">
           <RevealSection>
             <div className="text-center flex flex-col items-center mb-10 sm:mb-16">
               <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-fg mb-3 sm:mb-4">
@@ -509,8 +541,8 @@ export default function LandingPage() {
       <div className="h-6 sm:h-8 lg:h-12" />
 
       {/* ── About ────────────────────────────────────────── */}
-      <section className="w-full bg-surface-muted/30">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-20">
+      <section className="w-full flex justify-center bg-surface-muted/30 p-2.5">
+        <div className="w-full max-w-[1440px] px-4 sm:px-6 lg:px-8 py-12 sm:py-20 p-2.5">
           <RevealSection>
             <div className="grid lg:grid-cols-2 gap-8 sm:gap-12 lg:gap-20 items-center">
               <div className="flex flex-col order-2 lg:order-1">
@@ -573,8 +605,8 @@ export default function LandingPage() {
       <div className="h-6 sm:h-8 lg:h-12" />
 
       {/* ── CTA ──────────────────────────────────────────── */}
-      <section className="w-full bg-bg">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-20">
+      <section className="w-full flex justify-center bg-bg p-2.5">
+        <div className="w-full max-w-[1440px] px-4 sm:px-6 lg:px-8 py-12 sm:py-20 p-2.5">
           <RevealSection>
             <motion.div
               whileHover={{ scale: 1.01 }}
@@ -621,8 +653,8 @@ export default function LandingPage() {
       <div className="h-6 sm:h-8 lg:h-12" />
 
       {/* ── Footer ───────────────────────────────────────── */}
-      <footer className="bg-surface-muted/50 pt-12 sm:pt-16 mt-auto border-t border-border/50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-8 sm:pb-10">
+      <footer className="w-full flex justify-center bg-surface-muted/50 pt-12 sm:pt-16 mt-auto border-t border-border/50 p-2.5">
+        <div className="w-full max-w-[1440px] px-4 sm:px-6 lg:px-8 pb-8 sm:pb-10 p-2.5">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 sm:gap-12 mb-12 sm:mb-16">
             {/* Brand */}
             <div>
