@@ -7,7 +7,7 @@ import { motion } from "framer-motion";
 import { Mail, Lock, Eye, EyeOff, ArrowRight, Globe, Smartphone } from "lucide-react";
 import { Button, Input } from "@/components/ui";
 import { useAuthStore } from "@/store/auth.store";
-import { login as mockLogin } from "@/services/auth.service";
+
 
 export default function LoginPage() {
     const router = useRouter();
@@ -19,48 +19,67 @@ export default function LoginPage() {
     const [error, setError] = useState("");
 
     const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setError("");
-        setIsLoading(true);
+    e.preventDefault();
+    setError("");
 
-        try {
-            const result = await mockLogin(email, password);
-            if (result) {
-                login(result.user, result.token);
-                const role = result.user.role;
-                if (role === "citizen") {
-                    router.push("/citizen/dashboard");
-                } else {
-                    router.push("/admin/dashboard");
-                }
-            } else {
-                setError("Invalid credentials");
-            }
-        } catch {
-            setError("Something went wrong");
-        } finally {
-            setIsLoading(false);
-        }
-    };
+    if (!email || !password) {
+        setError("Email and password are required");
+        return;
+    }
 
-    const loginAsRole = async (role: string) => {
-        setIsLoading(true);
-        const emails: Record<string, string> = {
-            citizen: "rajesh@example.com",
-            admin: "priya.admin@suvidha.gov",
-            super: "anil.super@suvidha.gov",
-        };
-        const result = await mockLogin(emails[role] || emails.citizen, "demo");
-        if (result) {
-            login(result.user, result.token);
-            if (result.user.role === "citizen") {
-                router.push("/citizen/dashboard");
-            } else {
-                router.push("/admin/dashboard");
+    setIsLoading(true);
+
+    try {
+        const response = await fetch(
+            "http://localhost:5000/api/auth/login",
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    email: email.trim().toLowerCase(),
+                    password,
+                }),
             }
+        );
+
+        const data = await response.json();
+
+        // ❌ Validation errors from express-validator
+        if (!response.ok) {
+            if (data.errors && Array.isArray(data.errors)) {
+                setError(data.errors[0].msg);
+            } else {
+                setError(data.message || "Login failed");
+            }
+            return;
         }
+
+        // Extra safety
+        if (!data.success) {
+            setError(data.message || "Login failed");
+            return;
+        }
+
+        // ✅ Save auth state
+        login(data.user, data.token);
+
+        // ✅ Redirect by role
+        if (data.user.role === "admin") {
+            router.push("/admin/dashboard");
+        } else {
+            router.push("/citizen/dashboard");
+        }
+
+    } catch (error) {
+        console.error("Login error:", error);
+        setError("Server error. Please try again.");
+    } finally {
         setIsLoading(false);
-    };
+    }
+};
+
 
     return (
         <div className="min-h-screen flex">
@@ -176,17 +195,6 @@ export default function LoginPage() {
                             <div className="relative flex justify-center text-xs text-fg-muted">
                                 <span className="px-3 bg-bg">Quick Demo Login</span>
                             </div>
-                        </div>
-                        <div className="grid grid-cols-3 gap-2">
-                            <Button variant="outline" size="sm" onClick={() => loginAsRole("citizen")} disabled={isLoading}>
-                                Citizen
-                            </Button>
-                            <Button variant="outline" size="sm" onClick={() => loginAsRole("admin")} disabled={isLoading}>
-                                Admin
-                            </Button>
-                            <Button variant="outline" size="sm" onClick={() => loginAsRole("super")} disabled={isLoading}>
-                                Super Admin
-                            </Button>
                         </div>
                     </div>
 
