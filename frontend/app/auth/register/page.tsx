@@ -5,19 +5,19 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import {
-    User, Mail, Phone, Lock, Eye, EyeOff, ArrowRight, ArrowLeft, Shield,
-    Calendar, MapPin, Hash, Flame, PhoneCall, Navigation, Loader2, CheckCircle, AlertCircle,
+    User, Mail, Phone, Lock, Eye, EyeOff,
+    Shield, Calendar, MapPin, Hash, Flame, PhoneCall,
+    ArrowLeft, ArrowRight, Loader2, Navigation, CheckCircle, AlertCircle
 } from "lucide-react";
+import { fetchUserLocation, GeoStatus } from "@/services/geolocation.service";
 import { Button, Input } from "@/components/ui";
 import { useAuthStore } from "@/store/auth.store";
-import { register as mockRegister } from "@/services/auth.service";
-import { fetchUserLocation, GeoStatus } from "@/services/geolocation.service";
 
 const genderOptions = [
     { value: "", label: "Select Gender" },
-    { value: "male", label: "Male" },
-    { value: "female", label: "Female" },
-    { value: "other", label: "Other" },
+    { value: "Male", label: "Male" },
+    { value: "Female", label: "Female" },
+    { value: "Other", label: "Other" },
 ];
 
 const stateOptions = [
@@ -35,13 +35,14 @@ const stateOptions = [
 export default function RegisterPage() {
     const router = useRouter();
     const { login } = useAuthStore();
+    const totalSteps = 3;
+
     const [formData, setFormData] = useState({
         name: "",
         email: "",
         phone: "",
         password: "",
         confirmPassword: "",
-        // Extended ER fields
         dob: "",
         gender: "",
         state: "",
@@ -53,48 +54,64 @@ export default function RegisterPage() {
         gasNo: "",
         ivrsNo: "",
     });
+
     const [showPassword, setShowPassword] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [step, setStep] = useState(1);
     const [geoStatus, setGeoStatus] = useState<GeoStatus>("idle");
-    const [wardAutoDetected, setWardAutoDetected] = useState(false);
     const [wardDisplay, setWardDisplay] = useState("");
-
-    const totalSteps = 3;
+    const [wardAutoDetected, setWardAutoDetected] = useState(false);
 
     const updateField = (field: string, value: string) => {
-        setFormData((prev) => ({ ...prev, [field]: value }));
-        setErrors((prev) => ({ ...prev, [field]: "" }));
+        setFormData(prev => ({ ...prev, [field]: value }));
+        setErrors(prev => ({ ...prev, [field]: "" }));
+    };
+
+    /* ---------------- VALIDATION ---------------- */
+
+    const validatePassword = (password: string) => {
+        return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).{8,}$/.test(password);
     };
 
     const validateStep1 = () => {
         const newErrors: Record<string, string> = {};
-        if (!formData.name.trim()) newErrors.name = "Full name is required";
-        if (!formData.email.trim()) newErrors.email = "Email is required";
-        if (!formData.phone.trim()) newErrors.phone = "Phone number is required";
-        if (!formData.dob) newErrors.dob = "Date of birth is required";
-        if (!formData.gender) newErrors.gender = "Gender is required";
+
+        if (!formData.name.trim()) newErrors.name = "Full name required";
+        if (!formData.email.trim()) newErrors.email = "Email required";
+        if (!/^\d{10}$/.test(formData.phone.replace(/\D/g, "")))
+            newErrors.phone = "Phone must be 10 digits";
+        if (!formData.dob) newErrors.dob = "DOB required";
+        if (!formData.gender) newErrors.gender = "Gender required";
+
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
     };
 
     const validateStep2 = () => {
         const newErrors: Record<string, string> = {};
-        if (!formData.state) newErrors.state = "State is required";
-        if (!formData.city.trim()) newErrors.city = "City is required";
-        if (!formData.area.trim()) newErrors.area = "Area / locality is required";
-        if (!formData.pinCode.trim()) newErrors.pinCode = "PIN code is required";
-        else if (!/^\d{6}$/.test(formData.pinCode)) newErrors.pinCode = "Enter a valid 6-digit PIN code";
+
+        if (!formData.state) newErrors.state = "State required";
+        if (!formData.city.trim()) newErrors.city = "City required";
+        if (!formData.area.trim()) newErrors.area = "Area required";
+        if (!formData.ward) newErrors.ward = "Ward required";
+        if (!/^\d{6}$/.test(formData.pinCode))
+            newErrors.pinCode = "Valid 6-digit PIN required";
+
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
     };
 
     const validateStep3 = () => {
         const newErrors: Record<string, string> = {};
-        if (formData.password.length < 6) newErrors.password = "Min 6 characters";
+
+        if (!validatePassword(formData.password))
+            newErrors.password =
+                "Min 8 chars with uppercase, lowercase, number & special character";
+
         if (formData.password !== formData.confirmPassword)
-            newErrors.confirmPassword = "Passwords don't match";
+            newErrors.confirmPassword = "Passwords do not match";
+
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
     };
@@ -104,74 +121,126 @@ export default function RegisterPage() {
         else if (step === 2 && validateStep2()) setStep(3);
     };
 
+    /* ---------------- SUBMIT ---------------- */
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+
         if (!validateStep3()) return;
 
         setIsLoading(true);
+        setErrors({});
+
         try {
-            const result = await mockRegister(formData);
-            login(result.user, result.token);
+            const payload = {
+                name: formData.name.trim(),
+                email: formData.email.trim().toLowerCase(),
+                password: formData.password,
+                phone: formData.phone.replace(/\D/g, ""),
+                dob: formData.dob,
+                gender: formData.gender,
+                adhaar_no: formData.aadhaarNo
+                    ? formData.aadhaarNo.replace(/\D/g, "")
+                    : "",
+                gas_no: formData.gasNo || "",
+                ivrs_no: formData.ivrsNo || "",
+                address: {
+                    state: formData.state,
+                    city: formData.city.trim(),
+                    area: formData.area.trim(),
+                    ward: formData.ward,
+                    pincode: formData.pinCode,
+                },
+            };
+
+            const response = await fetch(
+                "http://localhost:5000/api/auth/register",
+                {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(payload),
+                }
+            );
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                if (data.errors) {
+                    const backendErrors: Record<string, string> = {};
+                    data.errors.forEach((err: any) => {
+                        backendErrors[err.path] = err.msg;
+                    });
+                    setErrors(backendErrors);
+                } else {
+                    setErrors({ general: data.message || "Registration failed" });
+                }
+                return;
+            }
+
+            login(data.user, data.token);
             router.push("/citizen/dashboard");
-        } catch {
-            setErrors({ general: "Registration failed" });
+
+        } catch (error) {
+            console.error(error);
+            setErrors({ general: "Server error. Please try again." });
         } finally {
             setIsLoading(false);
         }
     };
 
+    /* ---------------- UI ---------------- */
+
     return (
-        <div className="min-h-screen flex flex-col lg:flex-row overflow-x-hidden">
+        <div className="min-h-screen flex">
             {/* Left Branding */}
-            <div className="hidden lg:flex lg:w-1/2 relative bg-gradient-to-br from-primary-700 via-primary-800 to-primary-950 text-white overflow-hidden">
+            <div className="hidden lg:flex lg:w-1/2 relative bg-gradient-to-br from-primary-700 via-primary-800 to-primary-950 text-white">
                 <div className="absolute inset-0">
-                    <div className="absolute top-1/4 left-10 w-40 h-40 md:w-56 md:h-56 lg:w-64 lg:h-64 bg-accent-400/10 rounded-full blur-[60px] lg:blur-[80px]" />
-                    <div className="absolute bottom-1/4 right-10 w-32 h-32 md:w-40 md:h-40 lg:w-48 lg:h-48 bg-primary-400/15 rounded-full blur-[40px] lg:blur-[60px]" />
+                    <div className="absolute top-1/4 left-10 w-64 h-64 bg-accent-400/10 rounded-full blur-[80px]" />
+                    <div className="absolute bottom-1/4 right-10 w-48 h-48 bg-primary-400/15 rounded-full blur-[60px]" />
                 </div>
-                <div className="relative flex flex-col justify-center items-center text-center w-full px-6 lg:px-16">
-                    <Link href="/" className="flex items-center gap-2 lg:gap-3 mb-8 lg:mb-12">
-                        <div className="w-10 h-10 lg:w-12 lg:h-12 rounded-xl lg:rounded-2xl bg-white/20 backdrop-blur flex items-center justify-center text-xl lg:text-2xl font-bold">
+                <div className="relative flex flex-col justify-center px-16">
+                    <Link href="/" className="flex items-center gap-3 mb-12">
+                        <div className="w-12 h-12 rounded-2xl bg-white/20 backdrop-blur flex items-center justify-center text-2xl font-bold">
                             S
                         </div>
-                        <span className="text-xl lg:text-2xl font-bold">SUVIDHA</span>
+                        <span className="text-2xl font-bold">SUVIDHA</span>
                     </Link>
-                    <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold leading-tight mb-3 lg:mb-4 max-w-lg">
+                    <h1 className="text-4xl font-bold leading-tight mb-4">
                         Join the digital<br />governance revolution
                     </h1>
-                    <p className="text-sm md:text-base lg:text-lg text-white/70 max-w-md mb-6 lg:mb-8">
+                    <p className="text-lg text-white/70 max-w-md mb-8">
                         Register to access civic services, file complaints, pay utility bills, and be part of a smarter city.
                     </p>
-                    <div className="flex items-center gap-2 lg:gap-3 text-white/60 text-xs lg:text-sm">
-                        <Shield className="h-4 w-4 lg:h-5 lg:w-5" />
-                        <span className="hidden sm:inline">Your data is encrypted and securely stored</span>
-                        <span className="sm:hidden">Data is encrypted</span>
+                    <div className="flex items-center gap-3 text-white/60 text-sm">
+                        <Shield className="h-5 w-5" />
+                        Your data is encrypted and securely stored
                     </div>
                 </div>
             </div>
 
             {/* Right Form */}
-            <div className="flex-1 flex items-center justify-center p-4 sm:p-6 lg:p-8 bg-bg overflow-y-auto w-full lg:w-1/2">
+            <div className="flex-1 flex items-center justify-center p-6 sm:p-8 bg-bg overflow-y-auto">
                 <motion.div
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ duration: 0.5 }}
-                    className="w-full max-w-sm sm:max-w-md"
+                    className="w-full max-w-md"
                 >
-                    <Link href="/" className="flex lg:hidden items-center gap-2 mb-6 sm:mb-8">
-                        <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl bg-gradient-to-br from-primary-500 to-primary-700 text-white font-bold text-base sm:text-lg flex items-center justify-center">
+                    <Link href="/" className="flex lg:hidden items-center gap-3 mb-8">
+                        <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-primary-500 to-primary-700 text-white font-bold text-lg flex items-center justify-center">
                             S
                         </div>
-                        <span className="font-bold text-lg sm:text-xl text-fg">SUVIDHA</span>
+                        <span className="font-bold text-xl text-fg">SUVIDHA</span>
                     </Link>
 
-                    <h2 className="text-xl sm:text-2xl font-bold text-fg mb-1 sm:mb-2">Create Account</h2>
-                    <p className="text-xs sm:text-sm text-fg-secondary mb-4 sm:mb-6">
+                    <h2 className="text-2xl font-bold text-fg mb-2">Create Account</h2>
+                    <p className="text-fg-secondary mb-6">
                         Step {step} of {totalSteps} —{" "}
                         {step === 1 ? "Personal Info" : step === 2 ? "Address Details" : "Set Password"}
                     </p>
 
                     {/* Step Indicator */}
-                    <div className="flex gap-2 mb-4 sm:mb-6">
+                    <div className="flex gap-2 mb-6">
                         {Array.from({ length: totalSteps }).map((_, i) => (
                             <div
                                 key={i}
@@ -181,7 +250,7 @@ export default function RegisterPage() {
                     </div>
 
                     {errors.general && (
-                        <div className="mb-3 sm:mb-4 p-2 sm:p-3 rounded-lg sm:rounded-xl bg-danger-50 text-danger-600 text-xs sm:text-sm border border-danger-500/20">
+                        <div className="mb-4 p-3 rounded-xl bg-danger-50 text-danger-600 text-sm border border-danger-500/20">
                             {errors.general}
                         </div>
                     )}
@@ -189,7 +258,7 @@ export default function RegisterPage() {
                     <form onSubmit={handleSubmit}>
                         {/* ── Step 1: Personal Info ── */}
                         {step === 1 && (
-                            <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} className="space-y-4 sm:space-y-5">
+                            <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} className="space-y-4">
                                 <Input
                                     label="Full Name"
                                     placeholder="Enter your full name"
@@ -237,7 +306,7 @@ export default function RegisterPage() {
                                     </select>
                                     {errors.gender && <p className="mt-1 text-xs text-danger-500">{errors.gender}</p>}
                                 </div>
-                                <Button type="button" size="lg" className="w-full text-sm sm:text-base" onClick={handleNext} rightIcon={<ArrowRight className="h-3 w-3 sm:h-4 sm:w-4" />}>
+                                <Button type="button" size="lg" className="w-full" onClick={handleNext} rightIcon={<ArrowRight className="h-4 w-4" />}>
                                     Continue
                                 </Button>
                             </motion.div>
@@ -245,13 +314,13 @@ export default function RegisterPage() {
 
                         {/* ── Step 2: Address & IDs ── */}
                         {step === 2 && (
-                            <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-4 sm:space-y-5">
+                            <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-4">
                                 {/* Ward auto-detect */}
-                                <div className="p-3 sm:p-4 rounded-lg sm:rounded-xl border border-border bg-surface">
-                                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-0 mb-2 sm:mb-2">
+                                <div className="p-4 rounded-xl border border-border bg-surface">
+                                    <div className="flex items-center justify-between mb-2">
                                         <div>
-                                            <p className="text-xs sm:text-sm font-medium text-fg">Ward Number</p>
-                                            <p className="text-[10px] sm:text-xs text-fg-muted">Auto-detect using location</p>
+                                            <p className="text-sm font-medium text-fg">Ward Number</p>
+                                            <p className="text-xs text-fg-muted">Auto-detect using your location</p>
                                         </div>
                                         <Button
                                             type="button"
@@ -281,34 +350,32 @@ export default function RegisterPage() {
                                                 }
                                             }}
                                             disabled={geoStatus === "requesting" || geoStatus === "fetching"}
-                                            className="text-xs sm:text-sm px-2 sm:px-3"
                                             leftIcon={
                                                 geoStatus === "requesting" || geoStatus === "fetching"
-                                                    ? <Loader2 className="h-3 w-3 sm:h-4 sm:w-4 animate-spin" />
+                                                    ? <Loader2 className="h-4 w-4 animate-spin" />
                                                     : geoStatus === "success"
-                                                        ? <CheckCircle className="h-3 w-3 sm:h-4 sm:w-4" />
-                                                        : <Navigation className="h-3 w-3 sm:h-4 sm:w-4" />
+                                                        ? <CheckCircle className="h-4 w-4" />
+                                                        : <Navigation className="h-4 w-4" />
                                             }
                                         >
-                                            <span className="hidden sm:inline">{geoStatus === "requesting" ? "Detecting..." : geoStatus === "success" ? "Detected" : "Detect Location"}</span>
-                                            <span className="sm:hidden">{geoStatus === "requesting" ? "..." : geoStatus === "success" ? "✓" : "Detect"}</span>
+                                            {geoStatus === "requesting" ? "Detecting..." : geoStatus === "success" ? "Detected" : "Detect Location"}
                                         </Button>
                                     </div>
                                     {geoStatus === "success" && wardDisplay && (
-                                        <div className="flex flex-col gap-1 p-2 sm:p-3 rounded-lg bg-success-50 dark:bg-success-500/10 text-xs sm:text-sm border border-success-500/20 animate-in fade-in slide-in-from-top-1 mt-2">
+                                        <div className="flex flex-col gap-1 p-3 rounded-lg bg-success-50 dark:bg-success-500/10 text-sm border border-success-500/20 animate-in fade-in slide-in-from-top-1">
                                             <div className="flex items-center gap-2">
-                                                <CheckCircle className="h-3 w-3 sm:h-4 sm:w-4 text-success-500 shrink-0" />
+                                                <CheckCircle className="h-4 w-4 text-success-500 shrink-0" />
                                                 <span className="text-success-700 dark:text-success-400 font-medium">Location Detected!</span>
                                             </div>
-                                            <p className="text-[10px] sm:text-xs text-success-600 dark:text-success-400/80 ml-5">
-                                                Assigned to <span className="font-bold">{wardDisplay}</span>. Address fields auto-filled.
+                                            <p className="text-xs text-success-600 dark:text-success-400/80 ml-6">
+                                                Assigned to <span className="font-bold">{wardDisplay}</span>. Address fields have been auto-filled.
                                             </p>
                                         </div>
                                     )}
                                     {(geoStatus === "denied" || geoStatus === "unavailable" || geoStatus === "error") && (
-                                        <div className="flex items-center gap-2 p-2 rounded-lg bg-warning-50 dark:bg-warning-500/10 text-xs sm:text-sm mt-2">
-                                            <AlertCircle className="h-3 w-3 sm:h-4 sm:w-4 text-warning-500 shrink-0" />
-                                            <span className="text-warning-700 dark:text-warning-400 text-[10px] sm:text-xs">{errors.ward || "Could not detect. Enter manually."}</span>
+                                        <div className="flex items-center gap-2 p-2 rounded-lg bg-warning-50 dark:bg-warning-500/10 text-sm">
+                                            <AlertCircle className="h-4 w-4 text-warning-500 shrink-0" />
+                                            <span className="text-warning-700 dark:text-warning-400">{errors.ward || "Could not detect. Enter manually below."}</span>
                                         </div>
                                     )}
                                     {!wardAutoDetected && (
@@ -393,11 +460,11 @@ export default function RegisterPage() {
                                     hint="Optional — for automated helpline"
                                 />
 
-                                <div className="flex gap-2 sm:gap-3">
-                                    <Button type="button" variant="outline" size="lg" className="flex-1 text-sm sm:text-base" onClick={() => setStep(1)} leftIcon={<ArrowLeft className="h-3 w-3 sm:h-4 sm:w-4" />}>
+                                <div className="flex gap-3">
+                                    <Button type="button" variant="outline" size="lg" className="flex-1" onClick={() => setStep(1)} leftIcon={<ArrowLeft className="h-4 w-4" />}>
                                         Back
                                     </Button>
-                                    <Button type="button" size="lg" className="flex-1 text-sm sm:text-base" onClick={handleNext} rightIcon={<ArrowRight className="h-3 w-3 sm:h-4 sm:w-4" />}>
+                                    <Button type="button" size="lg" className="flex-1" onClick={handleNext} rightIcon={<ArrowRight className="h-4 w-4" />}>
                                         Continue
                                     </Button>
                                 </div>
@@ -406,7 +473,7 @@ export default function RegisterPage() {
 
                         {/* ── Step 3: Password ── */}
                         {step === 3 && (
-                            <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-4 sm:space-y-5">
+                            <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-4">
                                 <Input
                                     label="Password"
                                     type={showPassword ? "text" : "password"}
@@ -430,11 +497,11 @@ export default function RegisterPage() {
                                     leftIcon={<Lock className="h-4 w-4" />}
                                     error={errors.confirmPassword}
                                 />
-                                <div className="flex gap-2 sm:gap-3">
-                                    <Button type="button" variant="outline" size="lg" className="flex-1 text-sm sm:text-base" onClick={() => setStep(2)} leftIcon={<ArrowLeft className="h-3 w-3 sm:h-4 sm:w-4" />}>
+                                <div className="flex gap-3">
+                                    <Button type="button" variant="outline" size="lg" className="flex-1" onClick={() => setStep(2)} leftIcon={<ArrowLeft className="h-4 w-4" />}>
                                         Back
                                     </Button>
-                                    <Button type="submit" size="lg" className="flex-1 text-sm sm:text-base" isLoading={isLoading} rightIcon={<ArrowRight className="h-3 w-3 sm:h-4 sm:w-4" />}>
+                                    <Button type="submit" size="lg" className="flex-1" isLoading={isLoading} rightIcon={<ArrowRight className="h-4 w-4" />}>
                                         Register
                                     </Button>
                                 </div>
@@ -442,7 +509,7 @@ export default function RegisterPage() {
                         )}
                     </form>
 
-                    <p className="mt-6 sm:mt-8 text-center text-xs sm:text-sm text-fg-secondary">
+                    <p className="mt-8 text-center text-sm text-fg-secondary">
                         Already have an account?{" "}
                         <Link href="/auth/login" className="text-primary-600 font-medium hover:text-primary-700">
                             Sign in
