@@ -6,14 +6,6 @@ export type Role =
     | "admin-sanitation"
     | "super-admin";
 
-export type ComplaintStatus =
-    | "pending"
-    | "in-progress"
-    | "resolved"
-    | "rejected"
-    | "escalated";
-
-export type Department = "electricity" | "water" | "roads" | "sanitation";
 
 export interface User {
     id: string;
@@ -41,25 +33,41 @@ export interface User {
     propertyTaxId?: string;
 }
 
+export type ComplaintStatus =
+  | "pending"
+  | "in-progress"
+  | "resolved"
+  | "rejected"
+  | "escalated";
+
+export type ComplaintPriority =
+  | "low"
+  | "medium"
+  | "high"
+  | "critical";
+
+export type Department =
+  | "electricity"
+  | "water"
+  | "roads"
+  | "sanitation";
+
 export interface Complaint {
-    id: string;
-    title: string;
-    description: string;
-    department: Department;
-    status: ComplaintStatus;
-    priority: "low" | "medium" | "high" | "critical";
-    ward: string;
-    location: { lat: number; lng: number };
-    images: string[];
-    citizenId: string;
-    citizenName: string;
-    assignedTo?: string;
-    votes: number;
-    hasVoted: boolean;
-    createdAt: string;
-    updatedAt: string;
-    resolvedAt?: string;
-    timeline: TimelineEntry[];
+  id: string; // IMPORTANT: always string on frontend
+  title: string;
+  description: string;
+
+  department: Department;
+  ward: string;
+
+  status: ComplaintStatus;
+  priority: ComplaintPriority;
+
+  votes: number;
+  hasVoted?: boolean;
+
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface TimelineEntry {

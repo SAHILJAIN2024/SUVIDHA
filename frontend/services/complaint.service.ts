@@ -1,58 +1,101 @@
-import { mockComplaints } from "./mock-data";
 import { Complaint } from "@/types";
 
-const delay = (ms: number) => new Promise((r) => setTimeout(r, ms));
+const API_BASE = "http://localhost:5000/api";
 
-export async function getComplaints(): Promise<Complaint[]> {
-    await delay(300);
-    return mockComplaints;
+/* -------------------------------- */
+/* Helper: Handle JSON + Errors */
+/* -------------------------------- */
+async function handleResponse<T>(res: Response): Promise<T> {
+  if (!res.ok) {
+    const errorText = await res.text();
+    throw new Error(errorText || "Request failed");
+  }
+  return res.json();
 }
 
-export async function getComplaintById(id: string): Promise<Complaint | undefined> {
-    await delay(200);
-    return mockComplaints.find((c) => c.id === id);
-}
+/* -------------------------------- */
+/* CREATE COMPLAINT */
+/* -------------------------------- */
+export const createComplaint = async (formData: FormData) => {
+  const res = await fetch(`${API_BASE}/complaints`, {
+    method: "POST",
+    body: formData,
+    credentials: "include", // send HTTP-only cookie
+    mode: "cors",           // cross-origin requests
+  });
 
-export async function createComplaint(
-    data: Partial<Complaint>
-): Promise<Complaint> {
-    await delay(500);
-    const newComplaint: Complaint = {
-        id: `CMP-2025-${String(mockComplaints.length + 1).padStart(3, "0")}`,
-        title: data.title || "",
-        description: data.description || "",
-        department: data.department || "electricity",
-        status: "pending",
-        priority: data.priority || "medium",
-        ward: data.ward || "Ward 12",
-        location: data.location || { lat: 28.46, lng: 77.03 },
-        images: data.images || [],
-        citizenId: "u1",
-        citizenName: "Rajesh Kumar",
-        votes: 0,
-        hasVoted: false,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        timeline: [
-            {
-                id: "t1",
-                action: "Filed",
-                description: "Complaint registered",
-                by: "Rajesh Kumar",
-                timestamp: new Date().toISOString(),
-            },
-        ],
-    };
-    mockComplaints.push(newComplaint);
-    return newComplaint;
-}
+  const data = await handleResponse<{ success: boolean; message: string; ticketId: string; complaintId: number }>(res);
+  return data;
+};
 
-export async function voteComplaint(id: string): Promise<Complaint | undefined> {
-    await delay(200);
-    const complaint = mockComplaints.find((c) => c.id === id);
-    if (complaint) {
-        complaint.votes += 1;
-        complaint.hasVoted = true;
-    }
-    return complaint;
-}
+/* -------------------------------- */
+/* GET MY COMPLAINTS */
+/* -------------------------------- */
+export const getMyComplaints = async (): Promise<Complaint[]> => {
+  const res = await fetch(`${API_BASE}/complaints`, {
+    method: "GET",
+    credentials: "include",
+    mode: "cors",
+  });
+
+  const data = await handleResponse<{ success: boolean; data: Complaint[] }>(res);
+
+  return data.data.map((c: Complaint) => ({ ...c, id: String(c.id) }));
+};
+
+/* -------------------------------- */
+/* GET PUBLIC COMPLAINTS */
+/* -------------------------------- */
+export const getPublicComplaints = async (params?: Record<string, any>): Promise<Complaint[]> => {
+  const query = params ? "?" + new URLSearchParams(params).toString() : "";
+
+  const res = await fetch(`${API_BASE}/complaints/public${query}`, {
+    method: "GET",
+    mode: "cors",
+  });
+
+  const data = await handleResponse<{ success: boolean; data: Complaint[] }>(res);
+  return data.data.map((c: Complaint) => ({ ...c, id: String(c.id) }));
+};
+
+/* -------------------------------- */
+/* GET ONE COMPLAINT BY ID */
+/* -------------------------------- */
+export const getComplaintById = async (id: string): Promise<Complaint> => {
+  const res = await fetch(`${API_BASE}/complaints/${id}`, {
+    method: "GET",
+    credentials: "include",
+    mode: "cors",
+  });
+
+  const data = await handleResponse<{ success: boolean; data: Complaint }>(res);
+  return { ...data.data, id: String(data.data.id) };
+};
+
+/* -------------------------------- */
+/* UPDATE COMPLAINT */
+/* -------------------------------- */
+export const updateComplaint = async (id: string, body: any) => {
+  const res = await fetch(`${API_BASE}/complaints/${id}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+    credentials: "include",
+    mode: "cors",
+  });
+
+  return handleResponse<{ success: boolean; message: string }>(res);
+};
+
+/* -------------------------------- */
+/* VOTE COMPLAINT */
+/* -------------------------------- */
+export const voteComplaint = async (id: string) => {
+  const res = await fetch(`${API_BASE}/complaints/${id}/vote`, {
+    method: "POST",
+    credentials: "include",
+    mode: "cors",
+  });
+
+  return handleResponse<{ success: boolean; message: string }>(res);
+};
