@@ -30,7 +30,6 @@ import {
   AlertCircle,
 } from "lucide-react";
 import { Button } from "@/components/ui";
-import { useScrollReveal } from "@/hooks/useScrollReveal";
 import { useAuthStore } from "@/store/auth.store";
 
 /* ═══════════════════════════════════════════════════════════
@@ -126,17 +125,7 @@ const stagger = {
 /* ═══════════════════════════════════════════════════════════
    Scroll Reveal Wrapper
    ═══════════════════════════════════════════════════════════ */
-function RevealSection({ children, className = "" }: { children: React.ReactNode; className?: string }) {
-  const [ref, isVisible] = useScrollReveal<HTMLDivElement>();
-  return (
-    <div
-      ref={ref}
-      className={`transition-all duration-1000 ease-out ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"} ${className}`}
-    >
-      {children}
-    </div>
-  );
-}
+
 
 /* ═══════════════════════════════════════════════════════════
    Quick Service Card
@@ -378,7 +367,7 @@ export default function LandingPage() {
       {/* ── Stats ────────────────────────────────────────── */}
       <section id="stats" className="bg-surface/50 py-12 sm:py-16 border-y border-border/40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <RevealSection>
+          
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6 lg:gap-8">
               {stats.map((stat, i) => (
                 <motion.div
@@ -393,7 +382,7 @@ export default function LandingPage() {
                 </motion.div>
               ))}
             </div>
-          </RevealSection>
+          
         </div>
       </section>
 
@@ -402,7 +391,7 @@ export default function LandingPage() {
 
       {/* ── Quick Services ───────────────────────────────── */}
       <section id="services" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-20 relative">
-        <RevealSection>
+      
           <div className="text-center mb-8 sm:mb-12 flex flex-col items-center">
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-fg mb-3 sm:mb-4">
               Quick <span className="text-primary-600">Services</span>
@@ -416,7 +405,7 @@ export default function LandingPage() {
               <QuickServiceCard key={i} service={service} isAuthenticated={isAuthenticated} />
             ))}
           </div>
-        </RevealSection>
+        
       </section>
 
       {/* ── Spacer ── */}
@@ -426,7 +415,7 @@ export default function LandingPage() {
       <section id="features" className="w-full bg-surface-muted/50 relative">
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-primary-50/10 to-transparent dark:via-primary-900/5 pointer-events-none -z-10" />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-20 relative">
-          <RevealSection>
+          
             <div className="text-center flex flex-col items-center mb-10 sm:mb-16">
               <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-fg mb-3 sm:mb-4">
                 Built for <span className="text-primary-600">Real Governance</span>
@@ -435,7 +424,7 @@ export default function LandingPage() {
                 Enterprise-grade features perfectly crafted for millions of citizens and massive government infrastructure.
               </p>
             </div>
-          </RevealSection>
+       
 
           <motion.div
             variants={stagger}
@@ -469,7 +458,7 @@ export default function LandingPage() {
       {/* ── How It Works ─────────────────────────────────── */}
       <section id="how-it-works" className="w-full bg-bg">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-20">
-          <RevealSection>
+         
             <div className="text-center flex flex-col items-center mb-10 sm:mb-16">
               <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-fg mb-3 sm:mb-4">
                 How It <span className="text-primary-600">Works</span>
@@ -478,14 +467,14 @@ export default function LandingPage() {
                 From registration to resolution — a seamless journey broken down into four incredibly simple steps.
               </p>
             </div>
-          </RevealSection>
+          
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8 relative">
             {/* Connector line perfectly centered behind icons */}
             <div className="hidden lg:block absolute top-10 left-[12%] right-[12%] h-0.5 bg-gradient-to-r from-primary-100 via-primary-300 to-primary-100 dark:from-primary-900/40 dark:via-primary-700/60 dark:to-primary-900/40 z-0" />
 
             {howItWorksSteps.map((item, i) => (
-              <RevealSection key={i}>
+            
                 <motion.div
                   whileHover={{ y: -4 }}
                   className="relative z-10 group flex flex-col items-center text-center bg-bg/60 backdrop-blur-sm p-3 sm:p-4 rounded-2xl sm:rounded-3xl transition-all duration-300"
@@ -499,7 +488,7 @@ export default function LandingPage() {
                   <h3 className="text-sm sm:text-base lg:text-lg font-bold text-fg mb-2 sm:mb-3">{item.title}</h3>
                   <p className="text-xs sm:text-sm text-fg-secondary leading-relaxed px-1 sm:px-2">{item.description}</p>
                 </motion.div>
-              </RevealSection>
+             
             ))}
           </div>
         </div>
@@ -511,7 +500,7 @@ export default function LandingPage() {
       {/* ── About ────────────────────────────────────────── */}
       <section className="w-full bg-surface-muted/30">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-20">
-          <RevealSection>
+          
             <div className="grid lg:grid-cols-2 gap-8 sm:gap-12 lg:gap-20 items-center">
               <div className="flex flex-col order-2 lg:order-1">
                 <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-fg mb-4 sm:mb-6">
@@ -565,7 +554,7 @@ export default function LandingPage() {
                 </motion.div>
               </div>
             </div>
-          </RevealSection>
+         
         </div>
       </section>
 
@@ -575,7 +564,7 @@ export default function LandingPage() {
       {/* ── CTA ──────────────────────────────────────────── */}
       <section className="w-full bg-bg">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-20">
-          <RevealSection>
+          
             <motion.div
               whileHover={{ scale: 1.01 }}
               className="relative overflow-hidden rounded-2xl sm:rounded-3xl bg-gradient-to-br from-primary-600 via-primary-700 to-primary-900 p-6 sm:p-12 lg:p-16 text-center text-white shadow-2xl shadow-primary-900/20 flex flex-col items-center"
@@ -613,7 +602,7 @@ export default function LandingPage() {
                 </div>
               </div>
             </motion.div>
-          </RevealSection>
+     
         </div>
       </section>
 

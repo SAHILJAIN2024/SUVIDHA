@@ -1,55 +1,58 @@
 "use client";
 
 import React, { useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { useAuthStore } from "@/store/auth.store";
 import { Role } from "@/types";
 
 interface AuthGuardProps {
-    children: React.ReactNode;
-    allowedRoles?: Role[];
+  children: React.ReactNode;
+  allowedRoles?: Role[];
 }
 
 export function AuthGuard({ children, allowedRoles }: AuthGuardProps) {
-    const router = useRouter();
-    const { isAuthenticated, user } = useAuthStore();
+  const router = useRouter();
+  const pathname = usePathname();
 
-    useEffect(() => {
-        if (!isAuthenticated) {
-            router.replace("/auth/login");
-            return;
-        }
-        if (allowedRoles && user && !allowedRoles.includes(user.role)) {
-            // Wrong role — redirect to appropriate dashboard
-            if (user.role === "citizen") {
-                router.replace("/citizen/dashboard");
-            } else {
-                router.replace("/admin/dashboard");
-            }
-        }
-    }, [isAuthenticated, user, allowedRoles, router]);
+  const { isAuthenticated, user,} = useAuthStore();
 
-    if (!isAuthenticated) {
-        return (
-            <div className="min-h-screen bg-bg flex items-center justify-center">
-                <div className="text-center">
-                    <div className="w-10 h-10 border-3 border-primary-600 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
-                    <p className="text-sm text-fg-secondary">Redirecting to login...</p>
-                </div>
-            </div>
-        );
+  useEffect(() => {
+
+    // Not logged in
+    if (!isAuthenticated || !user) {
+      if (pathname !== "/auth/login") {
+        router.replace("/auth/login");
+      }
+      return;
     }
 
-    if (allowedRoles && user && !allowedRoles.includes(user.role)) {
-        return (
-            <div className="min-h-screen bg-bg flex items-center justify-center">
-                <div className="text-center">
-                    <div className="w-10 h-10 border-3 border-primary-600 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
-                    <p className="text-sm text-fg-secondary">Access denied. Redirecting...</p>
-                </div>
-            </div>
-        );
-    }
+    // Role restriction
+    if (allowedRoles && !allowedRoles.includes(user.role)) {
+      const correctDashboard =
+        user.role === "admin"
+          ? "/admin/dashboard"
+          : "/citizen/dashboard";
 
-    return <>{children}</>;
+      if (pathname !== correctDashboard) {
+        router.replace(correctDashboard);
+      }
+    }
+  }, [isAuthenticated, user, allowedRoles, router, pathname]);
+
+
+  /*
+    BLOCK IF NOT AUTHENTICATED
+  */
+  if (!isAuthenticated || !user) {
+    return null;
+  }
+
+  /*
+    BLOCK IF ROLE NOT ALLOWED
+  */
+  if (allowedRoles && !allowedRoles.includes(user.role)) {
+    return null;
+  }
+
+  return <>{children}</>;
 }

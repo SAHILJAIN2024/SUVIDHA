@@ -34,7 +34,7 @@ const stateOptions = [
 
 export default function RegisterPage() {
     const router = useRouter();
-    const { login } = useAuthStore();
+    const login = useAuthStore((state) => state.login);
     const totalSteps = 3;
 
     const [formData, setFormData] = useState({

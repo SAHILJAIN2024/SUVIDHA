@@ -59,7 +59,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     const displayRole = user?.role || "admin-electricity";
 
     return (
-        <AuthGuard allowedRoles={["admin-electricity", "admin-water", "admin-roads", "admin-sanitation", "super-admin"]}>
+        <AuthGuard allowedRoles={["admin-electricity", "admin-water", "admin", "admin-sanitation", "super-admin"]}>
             {/* Changed to flex-col for top-to-bottom layout */}
             <div className="min-h-screen bg-bg flex flex-col">
 

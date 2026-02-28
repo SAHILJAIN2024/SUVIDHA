@@ -1,8 +1,8 @@
 export type Role =
-    | "citizen"
+    | "user"
     | "admin-electricity"
     | "admin-water"
-    | "admin-roads"
+    | "admin"
     | "admin-sanitation"
     | "super-admin";
 
