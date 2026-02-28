@@ -231,7 +231,7 @@ export default function LandingPage() {
               <Button variant="ghost" size={scrolled ? "sm" : "md"} className="transition-all">Sign In</Button>
             </Link>
             <Link href="/auth/register">
-              <Button variant="primary" size={scrolled ? "sm" : "md"} rightIcon={<ArrowRight className="h-4 w-4" />} className="transition-all shadow-md text-xs sm:text-sm px-2 sm:px-4">
+              <Button variant="primary" size={scrolled ? "sm" : "md"} rightIcon={<ArrowRight className="h-4 w-4" />} className="transition-all shadow-md text-xs sm:text-sm !pr-2 !pl-[18px] sm:!pr-4 sm:!pl-[26px]">
                 Register
               </Button>
             </Link>
@@ -361,9 +361,15 @@ export default function LandingPage() {
             transition={{ duration: 0.6, delay: 0.2 }}
             className="max-w-3xl mx-auto text-sm sm:text-base md:text-lg lg:text-xl text-fg-secondary leading-relaxed mb-6 sm:mb-10 px-2"
           >
+              {/* ── Spacer ── */}
+      <div className="h-6 sm:h-8 lg:h-12" />
+
             A unified platform for filing complaints, paying utility bills,
             requesting government services, and tracking resolutions — all from one place.
           </motion.p>
+            {/* ── Spacer ── */}
+      <div className="h-6 sm:h-8 lg:h-12" />
+
 
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -372,9 +378,13 @@ export default function LandingPage() {
             className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 px-2 w-full sm:w-auto"
           >
             <Link href="/auth/register" className="w-full sm:w-auto">
-              <Button size="lg" rightIcon={<ArrowRight className="h-4 w-4 sm:h-5 sm:w-5" />} className="px-4 sm:px-8 w-full sm:w-auto shadow-lg shadow-primary-500/25 hover:shadow-xl hover:-translate-y-0.5 transition-all text-sm sm:text-base">
-                Get Started Free
-              </Button>
+              <Button 
+  size="lg" 
+  rightIcon={<ArrowRight className="h-4 w-4 sm:h-5 sm:w-5" />} 
+  className="!pr-4 !pl-[26px] sm:!pr-8 sm:!pl-[42px] w-full sm:w-auto shadow-lg shadow-primary-500/25 hover:shadow-xl hover:-translate-y-0.5 transition-all text-sm sm:text-base"
+>
+  Get Started Free
+</Button>
             </Link>
             <Link href="/auth/login?mode=kiosk" className="w-full sm:w-auto">
               <Button variant="outline" size="lg" leftIcon={<Smartphone className="h-4 w-4 sm:h-5 sm:w-5" />} className="px-4 sm:px-8 w-full sm:w-auto hover:bg-primary-50 hover:border-primary-200 transition-all text-sm sm:text-base">
@@ -444,10 +454,17 @@ export default function LandingPage() {
             <div className="text-center mb-8 sm:mb-12 flex flex-col items-center">
               <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-fg mb-3 sm:mb-4">
                 Quick <span className="text-primary-600">Services</span>
+                  {/* ── Spacer ── */}
+      <div className="h-6 sm:h-8 lg:h-12" />
+
               </h2>
+
               <p className="max-w-2xl mx-auto text-sm sm:text-base text-fg-secondary leading-relaxed px-2">
                 Access essential civic services with just one click. Select a category below to get started immediately.
               </p>
+                {/* ── Spacer ── */}
+      <div className="h-6 sm:h-8 lg:h-12" />
+
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
               {quickServices.map((service, i) => (
@@ -466,13 +483,21 @@ export default function LandingPage() {
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-primary-50/10 to-transparent dark:via-primary-900/5 pointer-events-none -z-10" />
         <div className="w-full max-w-7xl px-4 sm:px-6 lg:px-8 py-12 sm:py-20 relative">
           <RevealSection>
+              {/* ── Spacer ── */}
+      <div className="h-6 sm:h-8 lg:h-12" />
+
             <div className="text-center flex flex-col items-center mb-10 sm:mb-16">
               <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-fg mb-3 sm:mb-4">
                 Built for <span className="text-primary-600">Real Governance</span>
+            
               </h2>
               <p className="max-w-2xl mx-auto text-sm sm:text-base text-fg-secondary leading-relaxed px-2">
+                 
                 Enterprise-grade features perfectly crafted for millions of citizens and massive government infrastructure.
               </p>
+                {/* ── Spacer ── */}
+      <div className="h-6 sm:h-8 lg:h-12" />
+
             </div>
        
 
@@ -489,14 +514,18 @@ export default function LandingPage() {
                 variants={fadeUp}
                 custom={i}
                 whileHover={{ y: -4 }}
-                className="group flex flex-col items-center text-center p-4 sm:p-6 lg:p-8 rounded-2xl sm:rounded-3xl bg-surface border border-border/60 hover:shadow-xl hover:shadow-primary-500/5 transition-all duration-300"
-              >
-                <div className={`w-10 h-10 sm:w-14 sm:h-14 mx-auto rounded-xl sm:rounded-2xl bg-gradient-to-br ${feature.color} flex items-center justify-center text-white mb-3 sm:mb-6 group-hover:scale-110 group-hover:rotate-[-5deg] transition-transform duration-500 shadow-md text-lg sm:text-2xl`}>
-                  {feature.icon}
-                </div>
-                <h3 className="text-base sm:text-lg lg:text-xl font-bold text-fg mb-2 sm:mb-3">{feature.title}</h3>
-                <p className="text-xs sm:text-sm text-fg-secondary leading-relaxed">{feature.description}</p>
-              </motion.div>
+              className="group flex flex-col items-center text-center pt-8 pb-6 px-4 sm:pt-12 sm:pb-10 sm:px-6 lg:pt-16 lg:pb-12 lg:px-8 rounded-2xl sm:rounded-3xl bg-surface border border-border/60 hover:shadow-xl hover:shadow-primary-500/5 transition-all duration-300"
+>
+              <div className={`w-10 h-10 sm:w-14 sm:h-14 mx-auto rounded-xl sm:rounded-2xl bg-gradient-to-br ${feature.color} flex items-center justify-center text-white mb-4 sm:mb-6 group-hover:scale-110 group-hover:rotate-[-5deg] transition-transform duration-500 shadow-md text-lg sm:text-2xl`}>
+    {feature.icon}
+  </div>
+              <h3 className="text-base sm:text-lg lg:text-xl font-bold text-fg mb-2 sm:mb-3">
+    {feature.title}
+  </h3>
+  <p className="text-xs sm:text-sm text-fg-secondary leading-relaxed">
+    {feature.description}
+  </p>
+             </motion.div>
             ))}
           </motion.div>
           </RevealSection>
@@ -507,6 +536,7 @@ export default function LandingPage() {
       <div className="h-6 sm:h-8 lg:h-12" />
 
       {/* ── How It Works ─────────────────────────────────── */}
+     {/* ── How It Works ─────────────────────────────────── */}
       <section id="how-it-works" className="w-full flex justify-center bg-bg p-2.5">
         <div className="w-full max-w-7xl px-4 sm:px-6 lg:px-8 py-12 sm:py-20">
           <RevealSection>
@@ -520,13 +550,22 @@ export default function LandingPage() {
             </div>
           
 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8 relative">
+          {/* Changed this div to a motion.div with your stagger variants */}
+          <motion.div 
+            variants={stagger}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-50px" }}
+            className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8 relative"
+          >
             {/* Connector line perfectly centered behind icons */}
             <div className="hidden lg:block absolute top-10 left-[12%] right-[12%] h-0.5 bg-gradient-to-r from-primary-100 via-primary-300 to-primary-100 dark:from-primary-900/40 dark:via-primary-700/60 dark:to-primary-900/40 z-0" />
 
             {howItWorksSteps.map((item, i) => (
-            
                 <motion.div
+                  key={i} // Added missing React key
+                  variants={fadeUp} // Applied your fadeUp variant
+                  custom={i} // Passes the index so they stagger one by one
                   whileHover={{ y: -4 }}
                   className="relative z-10 group flex flex-col items-center text-center bg-bg/60 backdrop-blur-sm p-3 sm:p-4 rounded-2xl sm:rounded-3xl transition-all duration-300"
                 >
@@ -539,13 +578,11 @@ export default function LandingPage() {
                   <h3 className="text-sm sm:text-base lg:text-lg font-bold text-fg mb-2 sm:mb-3">{item.title}</h3>
                   <p className="text-xs sm:text-sm text-fg-secondary leading-relaxed px-1 sm:px-2">{item.description}</p>
                 </motion.div>
-
             ))}
-          </div>
+          </motion.div>
           </RevealSection>
         </div>
       </section>
-
       {/* ── Spacer ── */}
       <div className="h-6 sm:h-8 lg:h-12" />
 
@@ -636,7 +673,8 @@ export default function LandingPage() {
                     <Button
                       variant="secondary"
                       size="lg"
-                      className="bg-white text-primary-700 hover:bg-white/90 shadow-xl px-4 sm:px-8 py-3 text-sm sm:text-base hover:-translate-y-0.5 transition-all w-full sm:w-auto"
+                      className="bg-white text-primary-700 hover:bg-white/90 shadow-xl !pr-4 !pl-[26px] sm:!pr-8 sm:!pl-[42px] py-3 text-sm sm:text-base hover:-translate-y-0.5 transition-all w-full sm:w-auto"
+
                       rightIcon={<ChevronRight className="h-4 w-4 sm:h-5 sm:w-5" />}
                     >
                       Register as Citizen
@@ -646,8 +684,8 @@ export default function LandingPage() {
                     <Button
                       variant="outline"
                       size="lg"
-                      className="border-white/40 text-white hover:bg-white/10 hover:border-white/70 px-4 sm:px-8 py-3 text-sm sm:text-base hover:-translate-y-0.5 transition-all w-full sm:w-auto"
-                    >
+                      className="border-white/40 text-white hover:bg-white/10 hover:border-white/70 !pr-4 !pl-[26px] sm:!pr-8 sm:!pl-[42px] py-3 text-sm sm:text-base hover:-translate-y-0.5 transition-all w-full sm:w-auto"
+>
                       Admin Login
                     </Button>
                   </Link>
