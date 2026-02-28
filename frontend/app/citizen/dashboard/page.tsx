@@ -85,14 +85,14 @@ export default function UserDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 p-8">
-      <div className="max-w-5xl mx-auto">
-        <h1 className="text-3xl font-bold mb-6">
+    <div className="min-h-screen bg-gray-100 p-8 md:p-12">
+      <div className="max-w-5xl mx-auto space-y-8">
+        <h1 className="text-3xl font-bold text-gray-900">
           Welcome, {user?.email}
         </h1>
 
-        <div className="bg-white p-6 rounded-xl shadow">
-          <h2 className="text-xl font-semibold mb-4">
+        <div className="bg-white p-8 md:p-10 rounded-2xl shadow-sm border border-gray-100">
+          <h2 className="text-2xl font-semibold mb-8 text-gray-800">
             My Complaints
           </h2>
 
@@ -101,23 +101,25 @@ export default function UserDashboard() {
           ) : complaints.length === 0 ? (
             <p>No complaints found.</p>
           ) : (
-            <div className="space-y-4">
+            <div className="space-y-6">
               {complaints.map((complaint) => (
                 <div
                   key={complaint._id}
-                  className="border p-4 rounded-lg hover:shadow-md transition"
+                  className="border border-gray-100 p-6 md:p-8 rounded-xl hover:shadow-md transition bg-gray-50/50 flex flex-col md:flex-row md:items-center justify-between gap-4"
                 >
-                  <h3 className="font-semibold">
+                  <h3 className="font-semibold text-lg text-gray-900">
                     {complaint.title}
                   </h3>
-                  <p className="text-sm text-gray-600">
-                    Status: {complaint.status}
-                  </p>
-                  <p className="text-xs text-gray-400">
-                    {new Date(
-                      complaint.createdAt
-                    ).toLocaleString()}
-                  </p>
+                  <div className="flex flex-col md:flex-row gap-2 md:gap-6 md:items-center">
+                    <p className="text-sm px-4 py-1.5 rounded-full border bg-white border-gray-200 shadow-sm inline-flex font-medium text-gray-700">
+                      Status: {complaint.status}
+                    </p>
+                    <p className="text-sm text-gray-500 font-medium whitespace-nowrap">
+                      {new Date(
+                        complaint.createdAt
+                      ).toLocaleString()}
+                    </p>
+                  </div>
                 </div>
               ))}
             </div>
