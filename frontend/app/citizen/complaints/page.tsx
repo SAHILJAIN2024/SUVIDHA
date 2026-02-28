@@ -69,8 +69,8 @@ export default function ComplaintsPage() {
           return;
         }
 
-        const data = await getMyComplaints();
-        setComplaints(data);
+        const res = await getMyComplaints();
+        setComplaints(res.data || []);
       } catch (err) {
         console.error(err);
         setError("Failed to load complaints");

@@ -48,13 +48,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body className={`${inter.variable} ${jetbrainsMono.variable} antialiased overflow-x-hidden`}>
+    <html lang="en" suppressHydrationWarning className="w-full h-full">
+      <body className={`${inter.variable} ${jetbrainsMono.variable} antialiased overflow-x-hidden w-full min-h-full flex flex-col`}>
         {children}
       </body>
     </html>
   );
 }
-
-
-
