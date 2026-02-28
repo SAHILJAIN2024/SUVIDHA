@@ -1,6 +1,7 @@
+import { authFetch } from "./authFetch";
 import { Complaint } from "@/types";
 
-const API_BASE = "http://localhost:5000/api";
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
 
 /* -------------------------------- */
 /* Helper: Handle JSON + Errors */
@@ -17,11 +18,16 @@ async function handleResponse<T>(res: Response): Promise<T> {
 /* CREATE COMPLAINT */
 /* -------------------------------- */
 export const createComplaint = async (formData: FormData) => {
+  const { useAuthStore } = await import("@/store/auth.store");
+  const token = useAuthStore.getState().token;
+
   const res = await fetch(`${API_BASE}/complaints`, {
     method: "POST",
     body: formData,
-    credentials: "include", // send HTTP-only cookie
-    mode: "cors",           // cross-origin requests
+    headers: {
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+    mode: "cors",
   });
 
   const data = await handleResponse<{ success: boolean; message: string; ticketId: string; complaintId: number }>(res);
@@ -31,22 +37,18 @@ export const createComplaint = async (formData: FormData) => {
 /* -------------------------------- */
 /* GET MY COMPLAINTS */
 /* -------------------------------- */
-export const getMyComplaints = async (): Promise<Complaint[]> => {
-  const res = await fetch(`${API_BASE}/complaints`, {
-    method: "GET",
-    credentials: "include",
-    mode: "cors",
-  });
-
-  const data = await handleResponse<{ success: boolean; data: Complaint[] }>(res);
-
-  return data.data.map((c: Complaint) => ({ ...c, id: String(c.id) }));
+export const getMyComplaints = async (): Promise<any> => {
+  const res = await authFetch(`${API_BASE}/complaints/my`);
+  return {
+    ...res,
+    data: (res.data || []).map((c: any) => ({ ...c, id: String(c.id) }))
+  };
 };
 
 /* -------------------------------- */
 /* GET PUBLIC COMPLAINTS */
 /* -------------------------------- */
-export const getPublicComplaints = async (params?: Record<string, any>): Promise<Complaint[]> => {
+export const getPublicComplaints = async (params?: Record<string, any>): Promise<any> => {
   const query = params ? "?" + new URLSearchParams(params).toString() : "";
 
   const res = await fetch(`${API_BASE}/complaints/public${query}`, {
@@ -55,61 +57,54 @@ export const getPublicComplaints = async (params?: Record<string, any>): Promise
   });
 
   const data = await handleResponse<{ success: boolean; data: Complaint[] }>(res);
-  return data.data.map((c: Complaint) => ({ ...c, id: String(c.id) }));
+  return {
+    ...data,
+    data: (data.data || []).map((c: Complaint) => ({ ...c, id: String(c.id) }))
+  };
 };
 
 /* -------------------------------- */
 /* GET ALL COMPLAINTS (ADMIN) */
 /* -------------------------------- */
-export const getComplaints = async (): Promise<Complaint[]> => {
-  const res = await fetch(`${API_BASE}/complaints/all`, {
-    method: "GET",
-    credentials: "include",
-    mode: "cors",
-  });
-
-  const data = await handleResponse<{ success: boolean; data: Complaint[] }>(res);
-  return data.data.map((c: Complaint) => ({ ...c, id: String(c.id) }));
+export const getComplaints = async (): Promise<any> => {
+  const res = await authFetch(`${API_BASE}/complaints/all`);
+  return {
+    ...res,
+    data: (res.data || []).map((c: any) => ({ ...c, id: String(c.id) }))
+  };
 };
 
 /* -------------------------------- */
 /* GET ONE COMPLAINT BY ID */
 /* -------------------------------- */
-export const getComplaintById = async (id: string): Promise<Complaint> => {
-  const res = await fetch(`${API_BASE}/complaints/${id}`, {
-    method: "GET",
-    credentials: "include",
-    mode: "cors",
-  });
-
-  const data = await handleResponse<{ success: boolean; data: Complaint }>(res);
-  return { ...data.data, id: String(data.data.id) };
+export const getComplaintById = async (id: string): Promise<any> => {
+  const res = await authFetch(`${API_BASE}/complaints/${id}`);
+  return { 
+    ...res,
+    data: { 
+      ...res.data, 
+      id: String(res.data?.id || id),
+      subject: res.data?.subject || res.data?.title,
+      updates: res.data?.updates || [] 
+    } 
+  };
 };
 
 /* -------------------------------- */
 /* UPDATE COMPLAINT */
 /* -------------------------------- */
 export const updateComplaint = async (id: string, body: any) => {
-  const res = await fetch(`${API_BASE}/complaints/${id}`, {
+  return authFetch(`${API_BASE}/complaints/${id}`, {
     method: "PUT",
-    headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
-    credentials: "include",
-    mode: "cors",
   });
-
-  return handleResponse<{ success: boolean; message: string }>(res);
 };
 
 /* -------------------------------- */
 /* VOTE COMPLAINT */
 /* -------------------------------- */
 export const voteComplaint = async (id: string) => {
-  const res = await fetch(`${API_BASE}/complaints/${id}/vote`, {
+  return authFetch(`${API_BASE}/complaints/${id}/vote`, {
     method: "POST",
-    credentials: "include",
-    mode: "cors",
   });
-
-  return handleResponse<{ success: boolean; message: string }>(res);
 };

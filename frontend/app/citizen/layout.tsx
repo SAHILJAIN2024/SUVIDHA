@@ -55,7 +55,7 @@ export default function CitizenLayout({ children }: { children: React.ReactNode 
     const displayEmail = user?.email || "citizen@suvidha.gov";
 
     return (
-        <AuthGuard allowedRoles={["citizen"]}>
+        <AuthGuard allowedRoles={["user"]}>
             <div className="min-h-screen bg-bg flex flex-col">
 
                 {/* ── Top Navigation Bar ────── */}

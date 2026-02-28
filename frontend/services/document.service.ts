@@ -1,4 +1,3 @@
-import { mockCitizenDocuments } from "./mock-data";
 import { CitizenDocument } from "@/types";
 
 const delay = (ms: number) => new Promise((r) => setTimeout(r, ms));
@@ -44,27 +43,4 @@ export async function deleteDocument(id: string): Promise<void> {
     if (idx !== -1) citizenDocs.splice(idx, 1);
 }
 
-// Admin-side document verification
-export async function getAdminDocuments(): Promise<CitizenDocument[]> {
-    await delay(400);
-    return [...mockCitizenDocuments];
-}
 
-export async function verifyDocument(id: string): Promise<void> {
-    await delay(500);
-    const doc = mockCitizenDocuments.find((d) => d.id === id);
-    if (doc) {
-        doc.status = "verified";
-        doc.verifiedBy = "Current Admin";
-        doc.verifiedAt = new Date().toISOString();
-    }
-}
-
-export async function rejectDocument(id: string, reason: string): Promise<void> {
-    await delay(500);
-    const doc = mockCitizenDocuments.find((d) => d.id === id);
-    if (doc) {
-        doc.status = "rejected";
-        doc.rejectionReason = reason;
-    }
-}

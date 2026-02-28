@@ -15,7 +15,7 @@ import {
     AlertCircle as AlertCircleIcon,
 } from "lucide-react";
 import { Card, CardContent, Button, Badge } from "@/components/ui";
-import { getKPIs, getChartData } from "@/services/admin.service";
+
 import { KPIData } from "@/types";
 import { useI18nStore } from "@/store/i18n.store";
 import Link from "next/link";
@@ -93,21 +93,6 @@ export default function AdminDashboard() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const { t } = useI18nStore();
-
-    useEffect(() => {
-        async function load() {
-            try {
-                const [k, c] = await Promise.all([getKPIs(), getChartData()]);
-                setKpis(k);
-                setChartData(c);
-            } catch {
-                setError("Failed to load dashboard data");
-            } finally {
-                setLoading(false);
-            }
-        }
-        load();
-    }, []);
 
     if (loading) {
         return (
