@@ -20,7 +20,7 @@ import { getActionQueue, updateComplaintStatus } from "@/services/admin.service"
 import { getComplaintById } from "@/services/complaint.service";
 import { AdminAction, Complaint, Department } from "@/types";
 import { useAuthStore } from "@/store/auth.store";
-import { useGSAP } from "@/hooks/useGSAP";
+
 
 const deptIcons: Record<string, React.ReactNode> = {
     electricity: <Zap className="h-4 w-4" />,
@@ -42,6 +42,14 @@ const roleToDept: Record<string, Department | null> = {
     "admin-roads": "roads",
     "admin-sanitation": "sanitation",
     "super-admin": null,
+};
+
+const cardAnim = {
+    hidden: { opacity: 0, y: 24, scale: 0.97 },
+    visible: (i: number) => ({
+        opacity: 1, y: 0, scale: 1,
+        transition: { delay: i * 0.08, duration: 0.5, ease: [0.22, 1, 0.36, 1] as const },
+    }),
 };
 
 export default function ActionQueuePage() {
@@ -87,7 +95,7 @@ export default function ActionQueuePage() {
         }
     };
 
-    const gsapRef = useGSAP<HTMLDivElement>(".gsap-item", { y: 14, stagger: 0.04 });
+
 
     if (loading) {
         return (
@@ -109,102 +117,159 @@ export default function ActionQueuePage() {
         );
     }
 
+    const pendingActions = actions.filter((a) => a.status === "pending" || a.status === "escalated");
+    const completedActions = actions.filter((a) => a.status === "in-progress" || a.status === "resolved" || a.status === "rejected");
+
     return (
-        <div ref={gsapRef} className="space-y-6">
+        <motion.div initial="hidden" animate="visible" className="space-y-6">
             <div className="flex items-center justify-between">
                 <div>
                     <h1 className="text-2xl font-bold text-fg">Action Queue</h1>
-                    <p className="text-fg-secondary mt-1">{actions.filter((a) => a.status === "pending" || a.status === "escalated").length} items need attention</p>
+                    <p className="text-fg-secondary mt-1">{pendingActions.length} items need attention</p>
                 </div>
                 <Button variant="outline" size="sm" leftIcon={<ArrowUpDown className="h-4 w-4" />}>
                     Sort by Priority
                 </Button>
             </div>
 
-            {/* Queue Table */}
-            <Card padding="none">
-                <div className="overflow-x-auto">
-                    <table className="w-full text-sm">
-                        <thead>
-                            <tr className="border-b border-border bg-surface-muted/50">
-                                <th className="text-left py-3 px-4 text-xs font-semibold text-fg-secondary uppercase tracking-wider">Complaint</th>
-                                <th className="text-left py-3 px-4 text-xs font-semibold text-fg-secondary uppercase tracking-wider">Department</th>
-                                <th className="text-left py-3 px-4 text-xs font-semibold text-fg-secondary uppercase tracking-wider hidden sm:table-cell">Priority</th>
-                                <th className="text-left py-3 px-4 text-xs font-semibold text-fg-secondary uppercase tracking-wider hidden md:table-cell">Ward</th>
-                                <th className="text-left py-3 px-4 text-xs font-semibold text-fg-secondary uppercase tracking-wider">Status</th>
-                                <th className="text-right py-3 px-4 text-xs font-semibold text-fg-secondary uppercase tracking-wider">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {actions.map((action, i) => (
-                                <motion.tr
-                                    key={action.id}
-                                    initial={{ opacity: 0 }}
-                                    animate={{ opacity: 1 }}
-                                    transition={{ delay: i * 0.04 }}
-                                    className="border-b border-border last:border-0 hover:bg-surface-muted/30 transition-colors"
-                                >
-                                    <td className="py-3 px-4">
-                                        <div>
-                                            <p className="font-medium text-fg truncate max-w-[200px] lg:max-w-[300px]">{action.title}</p>
-                                            <div className="flex items-center gap-2 mt-0.5">
-                                                <span className="text-xs text-fg-muted">{action.complaintId}</span>
-                                                <span className="text-xs text-fg-muted">•</span>
-                                                <span className="text-xs text-fg-muted">{action.citizenName}</span>
+            {/* ── 2-Column Card Grid ── */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* Card 1: Queue Summary */}
+                <motion.div variants={cardAnim} custom={0}>
+                    <Card className="hover:shadow-lg transition-shadow duration-300 h-full">
+                        <CardContent>
+                            <h2 className="text-lg font-semibold text-fg mb-4">Queue Summary</h2>
+                            <div className="grid grid-cols-2 gap-3">
+                                {[
+                                    { label: "Pending", value: actions.filter(a => a.status === "pending").length, color: "text-warning-500" },
+                                    { label: "Escalated", value: actions.filter(a => a.status === "escalated").length, color: "text-danger-500" },
+                                    { label: "In Progress", value: actions.filter(a => a.status === "in-progress").length, color: "text-blue-500" },
+                                    { label: "Resolved", value: actions.filter(a => a.status === "resolved" || a.status === "rejected").length, color: "text-success-500" },
+                                ].map((s) => (
+                                    <div key={s.label} className="p-3 rounded-xl bg-surface-muted text-center hover:bg-surface-muted/70 transition-colors">
+                                        <p className={`text-2xl font-bold ${s.color}`}>{s.value}</p>
+                                        <p className="text-xs text-fg-muted mt-1">{s.label}</p>
+                                    </div>
+                                ))}
+                            </div>
+                        </CardContent>
+                    </Card>
+                </motion.div>
+
+                {/* Card 2: Priority Breakdown */}
+                <motion.div variants={cardAnim} custom={1}>
+                    <Card className="hover:shadow-lg transition-shadow duration-300 h-full">
+                        <CardContent>
+                            <h2 className="text-lg font-semibold text-fg mb-4">Priority Breakdown</h2>
+                            <div className="space-y-3">
+                                {["critical", "high", "medium", "low"].map((p) => {
+                                    const count = actions.filter(a => a.priority === p).length;
+                                    const pct = actions.length > 0 ? (count / actions.length) * 100 : 0;
+                                    return (
+                                        <div key={p} className="flex items-center gap-3">
+                                            <span className={`text-sm font-medium capitalize w-16 ${priorityColors[p]}`}>{p}</span>
+                                            <div className="flex-1 h-2 rounded-full bg-surface-muted overflow-hidden">
+                                                <div
+                                                    className="h-full rounded-full transition-all duration-500"
+                                                    style={{ width: `${pct}%`, backgroundColor: p === "critical" ? "#EF4444" : p === "high" ? "#F59E0B" : p === "medium" ? "#6B7280" : "#9CA3AF" }}
+                                                />
                                             </div>
+                                            <span className="text-sm font-semibold text-fg w-8 text-right">{count}</span>
                                         </div>
-                                    </td>
-                                    <td className="py-3 px-4">
-                                        <div className="flex items-center gap-1.5">
-                                            <span className="text-fg-secondary">{deptIcons[action.department]}</span>
-                                            <span className="capitalize text-fg-secondary">{action.department}</span>
-                                        </div>
-                                    </td>
-                                    <td className="py-3 px-4 hidden sm:table-cell">
-                                        <div className={`flex items-center gap-1 capitalize font-medium ${priorityColors[action.priority]}`}>
-                                            {action.priority === "critical" && <AlertTriangle className="h-3 w-3" />}
-                                            {action.priority}
-                                        </div>
-                                    </td>
-                                    <td className="py-3 px-4 hidden md:table-cell text-fg-secondary">{action.ward}</td>
-                                    <td className="py-3 px-4">
-                                        <StatusBadge status={action.status} size="sm" />
-                                    </td>
-                                    <td className="py-3 px-4">
-                                        <div className="flex items-center justify-end gap-1.5">
-                                            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handlePreview(action.complaintId)}>
-                                                <Eye className="h-4 w-4" />
-                                            </Button>
-                                            {(action.status === "pending" || action.status === "escalated") && (
-                                                <>
-                                                    <Button
-                                                        variant="success"
-                                                        size="icon"
-                                                        className="h-8 w-8"
-                                                        onClick={() => handleAccept(action)}
-                                                        disabled={processing === action.id}
-                                                    >
-                                                        <CheckCircle className="h-4 w-4" />
-                                                    </Button>
-                                                    <Button
-                                                        variant="danger"
-                                                        size="icon"
-                                                        className="h-8 w-8"
-                                                        onClick={() => handleReject(action)}
-                                                        disabled={processing === action.id}
-                                                    >
-                                                        <XCircle className="h-4 w-4" />
-                                                    </Button>
-                                                </>
-                                            )}
-                                        </div>
-                                    </td>
-                                </motion.tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
-            </Card>
+                                    );
+                                })}
+                            </div>
+                        </CardContent>
+                    </Card>
+                </motion.div>
+            </div>
+
+            {/* Full-width Table Card */}
+            <motion.div variants={cardAnim} custom={2}>
+                <Card padding="none" className="hover:shadow-lg transition-shadow duration-300">
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-sm">
+                            <thead>
+                                <tr className="border-b border-border bg-surface-muted/50">
+                                    <th className="text-left py-3 px-4 text-xs font-semibold text-fg-secondary uppercase tracking-wider">Complaint</th>
+                                    <th className="text-left py-3 px-4 text-xs font-semibold text-fg-secondary uppercase tracking-wider">Department</th>
+                                    <th className="text-left py-3 px-4 text-xs font-semibold text-fg-secondary uppercase tracking-wider hidden sm:table-cell">Priority</th>
+                                    <th className="text-left py-3 px-4 text-xs font-semibold text-fg-secondary uppercase tracking-wider hidden md:table-cell">Ward</th>
+                                    <th className="text-left py-3 px-4 text-xs font-semibold text-fg-secondary uppercase tracking-wider">Status</th>
+                                    <th className="text-right py-3 px-4 text-xs font-semibold text-fg-secondary uppercase tracking-wider">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {actions.map((action, i) => (
+                                    <motion.tr
+                                        key={action.id}
+                                        initial={{ opacity: 0 }}
+                                        animate={{ opacity: 1 }}
+                                        transition={{ delay: i * 0.04 }}
+                                        className="border-b border-border last:border-0 hover:bg-surface-muted/30 transition-colors"
+                                    >
+                                        <td className="py-3 px-4">
+                                            <div>
+                                                <p className="font-medium text-fg truncate max-w-[200px] lg:max-w-[300px]">{action.title}</p>
+                                                <div className="flex items-center gap-2 mt-0.5">
+                                                    <span className="text-xs text-fg-muted">{action.complaintId}</span>
+                                                    <span className="text-xs text-fg-muted">•</span>
+                                                    <span className="text-xs text-fg-muted">{action.citizenName}</span>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td className="py-3 px-4">
+                                            <div className="flex items-center gap-1.5">
+                                                <span className="text-fg-secondary">{deptIcons[action.department]}</span>
+                                                <span className="capitalize text-fg-secondary">{action.department}</span>
+                                            </div>
+                                        </td>
+                                        <td className="py-3 px-4 hidden sm:table-cell">
+                                            <div className={`flex items-center gap-1 capitalize font-medium ${priorityColors[action.priority]}`}>
+                                                {action.priority === "critical" && <AlertTriangle className="h-3 w-3" />}
+                                                {action.priority}
+                                            </div>
+                                        </td>
+                                        <td className="py-3 px-4 hidden md:table-cell text-fg-secondary">{action.ward}</td>
+                                        <td className="py-3 px-4">
+                                            <StatusBadge status={action.status} size="sm" />
+                                        </td>
+                                        <td className="py-3 px-4">
+                                            <div className="flex items-center justify-end gap-1.5">
+                                                <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handlePreview(action.complaintId)}>
+                                                    <Eye className="h-4 w-4" />
+                                                </Button>
+                                                {(action.status === "pending" || action.status === "escalated") && (
+                                                    <>
+                                                        <Button
+                                                            variant="success"
+                                                            size="icon"
+                                                            className="h-8 w-8"
+                                                            onClick={() => handleAccept(action)}
+                                                            disabled={processing === action.id}
+                                                        >
+                                                            <CheckCircle className="h-4 w-4" />
+                                                        </Button>
+                                                        <Button
+                                                            variant="danger"
+                                                            size="icon"
+                                                            className="h-8 w-8"
+                                                            onClick={() => handleReject(action)}
+                                                            disabled={processing === action.id}
+                                                        >
+                                                            <XCircle className="h-4 w-4" />
+                                                        </Button>
+                                                    </>
+                                                )}
+                                            </div>
+                                        </td>
+                                    </motion.tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </Card>
+            </motion.div>
 
             {/* Preview Modal */}
             <Modal
@@ -263,6 +328,6 @@ export default function ActionQueuePage() {
                     </div>
                 )}
             </Modal>
-        </div>
+        </motion.div>
     );
 }
