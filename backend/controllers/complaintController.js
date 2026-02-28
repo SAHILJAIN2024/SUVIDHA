@@ -8,13 +8,13 @@ const generateTicketId = () => {
 // POST /api/complaints
 const createComplaint = async (req, res, next) => {
   try {
-    const { category, complaint_type, subject, description, location, latitude, longitude } = req.body;
+    const { category, complaint_type, subject, location} = req.body;
     const ticket_id = generateTicketId();
-    const image_path = req.file ? req.file.path : null;
+    // const image_path = req.file ? req.file.path : null;
     const [result] = await pool.query(
-      `INSERT INTO complaints (user_id, ticket_id, category, complaint_type, subject, description, location, latitude, longitude, image_path)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      [req.user.id, ticket_id, category, complaint_type, subject, description, location, latitude, longitude, image_path]
+      `INSERT INTO complaints (user_id, ticket_id, category, complaint_type, subject, location)
+       VALUES (?, ?, ?, ?, ?, ?)`,
+      [req.user.id, ticket_id, category, complaint_type, subject, location]
     );
     res.status(201).json({ success: true, message: 'Complaint filed', ticketId: ticket_id, complaintId: result.insertId });
   } catch (error) { next(error); }
