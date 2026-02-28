@@ -204,8 +204,8 @@ export default function LandingPage() {
           : "bg-bg/80 backdrop-blur-sm py-5"
           }`}
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
-          <div className="flex items-center gap-4 sm:gap-6 lg:gap-8 flex-1">
+        <div className="w-full px-4 sm:px-6 lg:px-8 flex items-center justify-between">
+          <div className="flex items-center gap-4 sm:gap-6 lg:gap-8">
             <Link href="/" className="flex items-center gap-2 sm:gap-3 group flex-shrink-0">
               <div className={`flex items-center justify-center rounded-xl bg-gradient-to-br from-primary-500 to-primary-700 text-white font-bold shadow-sm transition-all duration-300 ${scrolled ? 'w-8 h-8 sm:w-9 sm:h-9 text-sm sm:text-base' : 'w-9 h-9 sm:w-10 sm:h-10 text-base sm:text-lg group-hover:scale-105'}`}>
                 S
@@ -219,7 +219,7 @@ export default function LandingPage() {
               <a href="#services" className="hover:text-primary-600 transition-colors">Services</a>
             </div>
           </div>
-          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0 ml-auto">
             <Link href="/auth/login" className="hidden sm:inline">
               <Button variant="ghost" size={scrolled ? "sm" : "md"} className="transition-all">Sign In</Button>
             </Link>

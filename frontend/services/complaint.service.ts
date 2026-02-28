@@ -59,6 +59,20 @@ export const getPublicComplaints = async (params?: Record<string, any>): Promise
 };
 
 /* -------------------------------- */
+/* GET ALL COMPLAINTS (ADMIN) */
+/* -------------------------------- */
+export const getComplaints = async (): Promise<Complaint[]> => {
+  const res = await fetch(`${API_BASE}/complaints/all`, {
+    method: "GET",
+    credentials: "include",
+    mode: "cors",
+  });
+
+  const data = await handleResponse<{ success: boolean; data: Complaint[] }>(res);
+  return data.data.map((c: Complaint) => ({ ...c, id: String(c.id) }));
+};
+
+/* -------------------------------- */
 /* GET ONE COMPLAINT BY ID */
 /* -------------------------------- */
 export const getComplaintById = async (id: string): Promise<Complaint> => {
