@@ -18,6 +18,7 @@ app.use(cors({
   credentials: true,
   maxAge: 86400,                                 // Preflight cache 24h
 }));
+
 app.use(express.json({ limit: '1mb' }));         // Body size limit
 app.use(express.urlencoded({ extended: true, limit: '1mb' }));
 app.use(sanitizeInputs);                         // XSS sanitization
