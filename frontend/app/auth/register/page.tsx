@@ -198,8 +198,8 @@ export default function RegisterPage() {
                     <div className="absolute top-1/4 left-10 w-64 h-64 bg-accent-400/10 rounded-full blur-[80px]" />
                     <div className="absolute bottom-1/4 right-10 w-48 h-48 bg-primary-400/15 rounded-full blur-[60px]" />
                 </div>
-                <div className="relative flex flex-col justify-center px-16">
-                    <Link href="/" className="flex items-center gap-3 mb-12">
+                <div className="relative flex flex-col justify-center items-center text-center px-16 w-full z-10">
+                    <Link href="/" className="flex items-center justify-center gap-3 mb-12">
                         <div className="w-12 h-12 rounded-2xl bg-white/20 backdrop-blur flex items-center justify-center text-2xl font-bold">
                             S
                         </div>
@@ -208,10 +208,10 @@ export default function RegisterPage() {
                     <h1 className="text-4xl font-bold leading-tight mb-4">
                         Join the digital<br />governance revolution
                     </h1>
-                    <p className="text-lg text-white/70 max-w-md mb-8">
+                    <p className="text-lg text-white/70 max-w-md mb-8 mx-auto">
                         Register to access civic services, file complaints, pay utility bills, and be part of a smarter city.
                     </p>
-                    <div className="flex items-center gap-3 text-white/60 text-sm">
+                    <div className="flex items-center justify-center gap-3 text-white/60 text-sm">
                         <Shield className="h-5 w-5" />
                         Your data is encrypted and securely stored
                     </div>
@@ -264,17 +264,21 @@ export default function RegisterPage() {
                                     placeholder="Enter your full name"
                                     value={formData.name}
                                     onChange={(e) => updateField("name", e.target.value)}
-                                    leftIcon={<User className="h-4 w-4" />}
+                                    // leftIcon={<User className="h-5 w-5" />}
                                     error={errors.name}
+                                    className="pl-12"
+                                    containerClassName="my-5"
                                 />
                                 <Input
                                     label="Email Address"
                                     type="email"
-                                    placeholder="you@example.com"
+                                    placeholder="Enter your email"
                                     value={formData.email}
                                     onChange={(e) => updateField("email", e.target.value)}
-                                    leftIcon={<Mail className="h-4 w-4" />}
+                                    // leftIcon={<Mail className="h-5 w-5" />}
                                     error={errors.email}
+                                    className="pl-12"
+                                    containerClassName="my-5"
                                 />
                                 <Input
                                     label="Phone Number"
@@ -282,16 +286,20 @@ export default function RegisterPage() {
                                     placeholder="+91 XXXXX XXXXX"
                                     value={formData.phone}
                                     onChange={(e) => updateField("phone", e.target.value)}
-                                    leftIcon={<Phone className="h-4 w-4" />}
+                                    // leftIcon={<Phone className="h-5 w-5" />}
                                     error={errors.phone}
+                                    className="pl-12"
+                                    containerClassName="my-5"
                                 />
                                 <Input
                                     label="Date of Birth"
                                     type="date"
                                     value={formData.dob}
                                     onChange={(e) => updateField("dob", e.target.value)}
-                                    leftIcon={<Calendar className="h-4 w-4" />}
+                                    // leftIcon={<Calendar className="h-5 w-5" />}
                                     error={errors.dob}
+                                    className="pl-12"
+                                    containerClassName="my-5"
                                 />
                                 <div className="w-full">
                                     <label className="block text-sm font-medium text-fg mb-1.5">Gender</label>
@@ -415,49 +423,55 @@ export default function RegisterPage() {
                                     placeholder="e.g., Silchar"
                                     value={formData.city}
                                     onChange={(e) => updateField("city", e.target.value)}
-                                    leftIcon={<MapPin className="h-4 w-4" />}
+                                    // leftIcon={<MapPin className="h-5 w-5" />}
                                     error={errors.city}
+                                    className="pl-12"
                                 />
                                 <Input
                                     label="Area / Locality"
                                     placeholder="e.g., Tarapur"
                                     value={formData.area}
                                     onChange={(e) => updateField("area", e.target.value)}
-                                    leftIcon={<MapPin className="h-4 w-4" />}
+                                    // leftIcon={<MapPin className="h-5 w-5" />}
                                     error={errors.area}
+                                    className="pl-12"
                                 />
                                 <Input
                                     label="PIN Code"
                                     placeholder="6-digit PIN code"
                                     value={formData.pinCode}
                                     onChange={(e) => updateField("pinCode", e.target.value)}
-                                    leftIcon={<Hash className="h-4 w-4" />}
+                                    // leftIcon={<Hash className="h-5 w-5" />}
                                     error={errors.pinCode}
                                     maxLength={6}
+                                    className="pl-12"
                                 />
                                 <Input
                                     label="Aadhaar Number"
                                     placeholder="XXXX-XXXX-XXXX"
                                     value={formData.aadhaarNo}
                                     onChange={(e) => updateField("aadhaarNo", e.target.value)}
-                                    leftIcon={<Shield className="h-4 w-4" />}
+                                    // leftIcon={<Shield className="h-5 w-5" />}
                                     hint="Optional — required for KYC verification"
+                                    className="pl-12"
                                 />
                                 <Input
                                     label="Gas Connection No."
                                     placeholder="e.g., GAS-91234"
                                     value={formData.gasNo}
                                     onChange={(e) => updateField("gasNo", e.target.value)}
-                                    leftIcon={<Flame className="h-4 w-4" />}
+                                    // leftIcon={<Flame className="h-5 w-5" />}
                                     hint="Optional — link your gas account"
+                                    className="pl-12"
                                 />
                                 <Input
                                     label="IVRS Number"
                                     placeholder="e.g., IVRS-7821"
                                     value={formData.ivrsNo}
                                     onChange={(e) => updateField("ivrsNo", e.target.value)}
-                                    leftIcon={<PhoneCall className="h-4 w-4" />}
+                                    // leftIcon={<PhoneCall className="h-5 w-5" />}
                                     hint="Optional — for automated helpline"
+                                    className="pl-12"
                                 />
 
                                 <div className="flex gap-3">
@@ -480,13 +494,14 @@ export default function RegisterPage() {
                                     placeholder="Min 6 characters"
                                     value={formData.password}
                                     onChange={(e) => updateField("password", e.target.value)}
-                                    leftIcon={<Lock className="h-4 w-4" />}
+                                    // leftIcon={<Lock className="h-5 w-5" />}
                                     rightIcon={
-                                        <button type="button" onClick={() => setShowPassword(!showPassword)} className="hover:text-fg transition-colors">
-                                            {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                        <button type="button" onClick={() => setShowPassword(!showPassword)} className="hover:text-primary-500 transition-colors p-1">
+                                            {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                                         </button>
                                     }
                                     error={errors.password}
+                                    className="pl-12 pr-12"
                                 />
                                 <Input
                                     label="Confirm Password"
@@ -494,8 +509,9 @@ export default function RegisterPage() {
                                     placeholder="Re-enter password"
                                     value={formData.confirmPassword}
                                     onChange={(e) => updateField("confirmPassword", e.target.value)}
-                                    leftIcon={<Lock className="h-4 w-4" />}
+                                    // leftIcon={<Lock className="h-5 w-5" />}
                                     error={errors.confirmPassword}
+                                    className="pl-12"
                                 />
                                 <div className="flex gap-3">
                                     <Button type="button" variant="outline" size="lg" className="flex-1" onClick={() => setStep(2)} leftIcon={<ArrowLeft className="h-4 w-4" />}>

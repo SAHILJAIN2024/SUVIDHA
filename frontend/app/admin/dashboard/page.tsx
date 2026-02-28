@@ -118,7 +118,7 @@ export default function AdminDashboard() {
     }
 
     return (
-        <motion.div initial="hidden" animate="visible" className="space-y-6">
+        <motion.div initial="hidden" animate="visible" className="space-y-8 p-4 md:p-6 lg:p-8">
             {/* Header */}
             <div className="flex items-center justify-between">
                 <div>
@@ -131,7 +131,7 @@ export default function AdminDashboard() {
             </div>
 
             {/* KPI Cards — 2x2 grid */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
                 {kpis.map((kpi, i) => (
                     <motion.div key={i} variants={cardAnim} custom={i}>
                         <Card className="hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300">
@@ -169,7 +169,7 @@ export default function AdminDashboard() {
                 {/* Card 1: Live Ward Map */}
                 <motion.div variants={cardAnim} custom={4}>
                     <Card padding="none" className="overflow-hidden border border-border shadow-sm hover:shadow-lg transition-shadow duration-300 h-full">
-                        <CardContent className="p-4 border-b border-border flex items-center justify-between bg-surface/50">
+                        <CardContent className="p-6 border-b border-border flex items-center justify-between bg-surface/50">
                             <h2 className="text-lg font-semibold text-fg">{t("admin.wardMap")} (Live)</h2>
                             <Link href="/admin/map">
                                 <Button variant="ghost" size="sm" rightIcon={<ArrowRight className="h-4 w-4" />}>
@@ -201,7 +201,7 @@ export default function AdminDashboard() {
                 {/* Card 2: Complaints Over Time — Bar Chart */}
                 <motion.div variants={cardAnim} custom={5}>
                     <Card className="border border-border shadow-sm hover:shadow-lg transition-shadow duration-300 h-full">
-                        <CardContent className="p-5">
+                        <CardContent className="p-6">
                             <h2 className="text-lg font-semibold text-fg mb-4">{t("admin.complaintsOverTime")}</h2>
                             <div className="w-full">
                                 {chartData && <LazyBarChart data={chartData.complaintsOverTime} />}
@@ -213,7 +213,7 @@ export default function AdminDashboard() {
                 {/* Card 3: By Department — Pie Chart */}
                 <motion.div variants={cardAnim} custom={6}>
                     <Card className="border border-border shadow-sm hover:shadow-lg transition-shadow duration-300 h-full">
-                        <CardContent className="p-5">
+                        <CardContent className="p-6">
                             <h2 className="text-lg font-semibold text-fg mb-4">{t("admin.byDepartment")}</h2>
                             <div className="flex flex-col items-center w-full">
                                 {chartData && <LazyPieChart data={chartData.byDepartment} />}
@@ -236,11 +236,11 @@ export default function AdminDashboard() {
                 {/* Card 4: Resolution by Ward */}
                 <motion.div variants={cardAnim} custom={7}>
                     <Card className="border border-border shadow-sm hover:shadow-lg transition-shadow duration-300 h-full">
-                        <CardContent>
+                        <CardContent className="p-6">
                             <h2 className="text-lg font-semibold text-fg mb-4">{t("admin.resolutionByWard")}</h2>
-                            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                            <div className="grid grid-cols-2 sm:grid-cols-3 gap-6">
                                 {chartData?.resolutionByWard.map((ward) => (
-                                    <div key={ward.ward} className="text-center p-4 rounded-xl bg-surface-muted hover:bg-surface-muted/70 transition-colors">
+                                    <div key={ward.ward} className="text-center p-6 rounded-xl bg-surface-muted hover:bg-surface-muted/70 transition-colors">
                                         <p className="text-2xl font-bold" style={{ color: ward.rate >= 90 ? "#10B981" : ward.rate >= 80 ? "#F59E0B" : "#EF4444" }}>
                                             {ward.rate}%
                                         </p>

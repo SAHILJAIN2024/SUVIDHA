@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { Mail, Lock, Eye, EyeOff, ArrowRight, Globe, Smartphone } from "lucide-react";
+import { Mail, Lock, Eye, EyeOff, ArrowRight, Globe, Smartphone, Shield } from "lucide-react";
 import { Button, Input } from "@/components/ui";
 import { useAuthStore } from "@/store/auth.store";
 
@@ -30,27 +30,27 @@ export default function LoginPage() {
 
     try {
       const res = await fetch(
-  `http://localhost:5000/api/auth/login`,
-  {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email, password }),
-  }
-);
+        `http://localhost:5000/api/auth/login`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, password }),
+        }
+      );
 
-const data = await res.json();
-console.log("Login response:", data);
-if (!res.ok) {
-  throw new Error(data.message);
-}
+      const data = await res.json();
+      console.log("Login response:", data);
+      if (!res.ok) {
+        throw new Error(data.message);
+      }
 
 
       login(data.user, data.token);
-router.push(
-  data.user.role === "admin"
-    ? "/admin/dashboard"
-    : "/citizen/dashboard"
-);
+      router.push(
+        data.user.role === "admin"
+          ? "/admin/dashboard"
+          : "/citizen/dashboard"
+      );
 
     } catch (err) {
       console.error("Login error:", err);
@@ -63,8 +63,29 @@ router.push(
   return (
     <div className="min-h-screen flex flex-col lg:flex-row overflow-x-hidden">
       {/* Left Panel — Branding */}
-      <div className="hidden lg:flex lg:w-1/2 relative bg-gradient-to-br from-primary-600 via-primary-700 to-primary-900 text-white overflow-hidden">
-        {/* Branding graphics omitted for brevity */}
+      <div className="hidden lg:flex lg:w-1/2 relative bg-gradient-to-br from-primary-700 via-primary-800 to-primary-950 text-white overflow-hidden">
+        <div className="absolute inset-0">
+          <div className="absolute top-1/4 left-10 w-64 h-64 bg-accent-400/10 rounded-full blur-[80px]" />
+          <div className="absolute bottom-1/4 right-10 w-48 h-48 bg-primary-400/15 rounded-full blur-[60px]" />
+        </div>
+        <div className="relative flex flex-col justify-center items-center text-center px-16 w-full z-10">
+          <Link href="/" className="flex items-center justify-center gap-3 mb-12">
+            <div className="w-12 h-12 rounded-2xl bg-white/20 backdrop-blur flex items-center justify-center text-2xl font-bold">
+              S
+            </div>
+            <span className="text-2xl font-bold">SUVIDHA</span>
+          </Link>
+          <h1 className="text-4xl font-bold leading-tight mb-4">
+            Welcome back to<br />SUVIDHA
+          </h1>
+          <p className="text-lg text-white/70 max-w-md mb-8 mx-auto">
+            Sign in to access civic services, file complaints, pay utility bills, and stay connected with your city.
+          </p>
+          <div className="flex items-center justify-center gap-3 text-white/60 text-sm">
+            <Shield className="h-5 w-5" />
+            Your data is encrypted and securely stored
+          </div>
+        </div>
       </div>
 
       {/* Right Panel — Form */}
@@ -75,6 +96,13 @@ router.push(
           transition={{ duration: 0.5 }}
           className="w-full max-w-sm sm:max-w-md"
         >
+          <Link href="/" className="flex lg:hidden items-center gap-3 mb-8">
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-primary-500 to-primary-700 text-white font-bold text-lg flex items-center justify-center">
+              S
+            </div>
+            <span className="font-bold text-xl text-fg">SUVIDHA</span>
+          </Link>
+
           <h2 className="text-xl sm:text-2xl font-bold text-fg mb-1 sm:mb-2">Sign In</h2>
 
           {error && (
@@ -86,28 +114,32 @@ router.push(
           <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5">
             <Input
               label="Email Address"
+              placeholder="Enter your email"
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              leftIcon={<Mail className="h-4 w-4" />}
+              // leftIcon={<Mail className="h-5 w-5" />}
               required
+              className="pl-12"
             />
             <Input
               label="Password"
+              placeholder="Enter your password"
               type={showPassword ? "text" : "password"}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              leftIcon={<Lock className="h-4 w-4" />}
+              // leftIcon={<Lock className="h-5 w-5" />}
               rightIcon={
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="hover:text-fg transition-colors"
+                  className="hover:text-primary-500 transition-colors p-1"
                 >
-                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  {/* {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />} */}
                 </button>
               }
               required
+            // className="pl-12 pr-12"
             />
             <Button
               type="submit"
@@ -119,6 +151,13 @@ router.push(
               Sign In
             </Button>
           </form>
+
+          <p className="mt-8 text-center text-sm text-fg-secondary">
+            Don't have an account?{" "}
+            <Link href="/auth/register" className="text-primary-600 font-medium hover:text-primary-700">
+              Register now
+            </Link>
+          </p>
         </motion.div>
       </div>
     </div>
