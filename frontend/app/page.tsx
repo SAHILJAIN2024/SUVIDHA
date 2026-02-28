@@ -163,11 +163,11 @@ function QuickServiceCard({ service, isAuthenticated }: { service: typeof quickS
       <motion.div
         whileHover={{ y: -4, scale: 1.02 }}
         whileTap={{ scale: 0.98 }}
-        className="w-full group flex flex-col items-center text-center gap-2 sm:gap-4 p-5 sm:p-6 lg:p-8 rounded-2xl sm:rounded-3xl bg-surface border border-border/60 hover:border-transparent hover:shadow-xl hover:shadow-primary-500/10 transition-all duration-300 cursor-pointer"
+        className="w-full group flex flex-col items-center text-center gap-2 sm:gap-4 p-5 sm:p-6 lg:p-8 rounded-2xl sm:rounded-3xl bg-surface border border-border/60 hover:border-transparent hover:shadow-xl hover:shadow-primary-500/10 transition-all duration-300 cursor-pointer m-5"
         onClick={handleClick}
       >
         <div
-          className="w-12 h-12 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl flex items-center justify-center text-white transition-transform duration-500 group-hover:scale-110 group-hover:rotate-6 mx-auto text-lg sm:text-2xl mt-2"
+          className="w-12 h-12 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl flex items-center justify-center text-white transition-transform duration-500 group-hover:scale-110 group-hover:rotate-6 mx-auto text-lg sm:text-2xl m-2.5"
           style={{ backgroundColor: service.color, boxShadow: `0 8px 20px -5px ${service.color}50` }}
         >
           {service.icon}
@@ -438,7 +438,7 @@ export default function LandingPage() {
       <div className="h-6 sm:h-8 lg:h-12" />
 
       {/* ── Quick Services ───────────────────────────────── */}
-      <section id="services" className="w-full flex justify-center py-12 sm:py-20 relative p-2.5">
+      <section id="services" className="w-full flex justify-center py-12 sm:py-20 relative p-5">
         <div className="w-full max-w-7xl px-4 sm:px-6 lg:px-8">
           <RevealSection>
             <div className="text-center mb-8 sm:mb-12 flex flex-col items-center">

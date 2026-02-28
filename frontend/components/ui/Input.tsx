@@ -9,14 +9,15 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
     hint?: string;
     leftIcon?: React.ReactNode;
     rightIcon?: React.ReactNode;
+    containerClassName?: string;
 }
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
-    ({ className, label, error, hint, leftIcon, rightIcon, id, ...props }, ref) => {
+    ({ className, label, error, hint, leftIcon, rightIcon, id, containerClassName, ...props }, ref) => {
         const inputId = id || label?.toLowerCase().replace(/\s+/g, "-");
 
         return (
-            <div className="w-full">
+            <div className={cn("w-full", containerClassName)}>
                 {label && (
                     <label
                         htmlFor={inputId}

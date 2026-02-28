@@ -266,6 +266,8 @@ export default function RegisterPage() {
                                     onChange={(e) => updateField("name", e.target.value)}
                                     leftIcon={<User className="h-4 w-4" />}
                                     error={errors.name}
+                                    className="pl-10"
+                                    containerClassName="my-5"
                                 />
                                 <Input
                                     label="Email Address"
@@ -275,6 +277,8 @@ export default function RegisterPage() {
                                     onChange={(e) => updateField("email", e.target.value)}
                                     leftIcon={<Mail className="h-4 w-4" />}
                                     error={errors.email}
+                                    className="pl-10"
+                                    containerClassName="my-5"
                                 />
                                 <Input
                                     label="Phone Number"
@@ -284,6 +288,8 @@ export default function RegisterPage() {
                                     onChange={(e) => updateField("phone", e.target.value)}
                                     leftIcon={<Phone className="h-4 w-4" />}
                                     error={errors.phone}
+                                    className="pl-10"
+                                    containerClassName="my-5"
                                 />
                                 <Input
                                     label="Date of Birth"
@@ -292,6 +298,8 @@ export default function RegisterPage() {
                                     onChange={(e) => updateField("dob", e.target.value)}
                                     leftIcon={<Calendar className="h-4 w-4" />}
                                     error={errors.dob}
+                                    className="pl-10"
+                                    containerClassName="my-5"
                                 />
                                 <div className="w-full">
                                     <label className="block text-sm font-medium text-fg mb-1.5">Gender</label>
