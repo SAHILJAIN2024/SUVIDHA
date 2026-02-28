@@ -73,8 +73,8 @@ export default function ComplaintsPage() {
           return;
         }
 
-        const data = await getMyComplaints();
-        setComplaints(data);
+        const res = await getMyComplaints();
+        setComplaints(res.data || []);
       } catch (err) {
         console.error(err);
         setError("Failed to load complaints");
@@ -89,13 +89,13 @@ export default function ComplaintsPage() {
   /* ------------------ VOTE ------------------ */
   const handleVote = async (id: string) => {
     try {
-      const updated = await voteComplaint(id);
-      if (!updated) return;
+      const res = await voteComplaint(id);
+      if (!res?.success) return;
 
       setComplaints((prev) =>
         prev.map((c) =>
           c.id === id
-            ? { ...c, votes: updated.votes, hasVoted: true }
+            ? { ...c, votes: res.votes, hasVoted: true }
             : c
         )
       );
