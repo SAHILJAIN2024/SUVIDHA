@@ -21,11 +21,10 @@ import {
 import { Card, CardContent, Button, Badge, StatusBadge } from "@/components/ui";
 import { Input, Select } from "@/components/ui";
 import {
-  getMyComplaints,
-  voteComplaint,
+  getMyComplaints
 } from "@/services/complaint.service";
 import { Complaint } from "@/types";
-import { useGSAP } from "@/hooks/useGSAP";
+
 
 const ITEMS_PER_PAGE = 5;
 
@@ -55,10 +54,7 @@ export default function ComplaintsPage() {
   const [deptFilter, setDeptFilter] = useState("all");
   const [page, setPage] = useState(1);
 
-  const gsapRef = useGSAP<HTMLDivElement>(".gsap-item", {
-    y: 14,
-    stagger: 0.04,
-  });
+ 
 
   /* ------------------ AUTH + FETCH ------------------ */
   useEffect(() => {
@@ -88,21 +84,7 @@ export default function ComplaintsPage() {
 
   /* ------------------ VOTE ------------------ */
   const handleVote = async (id: string) => {
-    try {
-      const updated = await voteComplaint(id);
-      if (!updated) return;
-
-      setComplaints((prev) =>
-        prev.map((c) =>
-          c.id === id
-            ? { ...c, votes: updated.votes, hasVoted: true }
-            : c
-        )
-      );
-    } catch (err) {
-      console.error("Vote failed:", err);
-    }
-  };
+      
 
   /* ------------------ FILTER ------------------ */
   const filtered = useMemo(() => {
@@ -156,7 +138,7 @@ export default function ComplaintsPage() {
 
   /* ------------------ UI ------------------ */
   return (
-    <div ref={gsapRef} className="space-y-6">
+    <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-2xl font-bold">My Complaints</h1>
@@ -280,4 +262,5 @@ export default function ComplaintsPage() {
       )}
     </div>
   );
+  }
 }
