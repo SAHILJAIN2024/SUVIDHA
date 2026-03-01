@@ -1,49 +1,37 @@
 "use client";
-
-import React, { useEffect, useMemo, useState } from "react";
-import Link from "next/link";
+import CreateComplaintForm from "@/components/newComplain";
+import React, { useEffect, useMemo, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { motion } from "framer-motion";
 import {
-  Plus,
   Search,
-  ChevronUp,
-  ArrowUpRight,
-  Zap,
-  Droplets,
-  Route,
-  Recycle,
   ChevronLeft,
   ChevronRight,
   AlertCircle,
 } from "lucide-react";
 
-import { Card, CardContent, Button, Badge, StatusBadge } from "@/components/ui";
+import { Card, CardContent, Button, Badge } from "@/components/ui";
 import { Input, Select } from "@/components/ui";
-import {
-  getMyComplaints
-} from "@/services/complaint.service";
-import { Complaint } from "@/types";
-
+import { useAuthStore } from "@/store/auth.store";
 
 const ITEMS_PER_PAGE = 5;
 
-const deptIcons: Record<string, React.ReactNode> = {
-  electricity: <Zap className="h-4 w-4" />,
-  water: <Droplets className="h-4 w-4" />,
-  roads: <Route className="h-4 w-4" />,
-  sanitation: <Recycle className="h-4 w-4" />,
-};
-
-const deptColors: Record<string, string> = {
-  electricity: "#F59E0B",
-  water: "#3B82F6",
-  roads: "#8B5CF6",
-  sanitation: "#10B981",
-};
+interface Complaint {
+  id: number;
+  ticket_id: string;
+  category: string;
+  complaint_type: string;
+  subject: string;
+  description: string;
+  location: string;
+  status: string;
+  priority: string;
+  created_at: string;
+  authority_name?: string;
+}
 
 export default function ComplaintsPage() {
   const router = useRouter();
+  const { token } = useAuthStore();
 
   const [complaints, setComplaints] = useState<Complaint[]>([]);
   const [loading, setLoading] = useState(true);
@@ -51,61 +39,66 @@ export default function ComplaintsPage() {
 
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
-  const [deptFilter, setDeptFilter] = useState("all");
+  const [categoryFilter, setCategoryFilter] = useState("all");
   const [page, setPage] = useState(1);
 
- 
+  /* ---------------- FETCH COMPLAINTS ---------------- */
+  const fetchComplaints = useCallback(async () => {
+    try {
+      if (!token) return;
 
-  /* ------------------ AUTH + FETCH ------------------ */
-  useEffect(() => {
-    const init = async () => {
-      try {
-        const authRes = await fetch("/api/auth/me", {
-          credentials: "include",
-        });
+      setLoading(true);
+      setError(null);
 
-        if (!authRes.ok) {
-          router.replace("/auth/login");
-          return;
-        }
+      const res = await fetch("https://suvidha-qxz1.onrender.com/api/complaints", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
-        const res = await getMyComplaints();
-        setComplaints(res.data || []);
-      } catch (err) {
-        console.error(err);
-        setError("Failed to load complaints");
-      } finally {
-        setLoading(false);
+      if (!res.ok) {
+        throw new Error("Failed to fetch complaints");
       }
-    };
 
-    init();
-  }, [router]);
+      const data = await res.json();
 
-  /* ------------------ VOTE ------------------ */
-  const handleVote = async (id: string) => {
-      
+      if (!data.success) {
+        throw new Error("Backend returned failure");
+      }
 
-  /* ------------------ FILTER ------------------ */
+      setComplaints(data.data);
+    } catch (err) {
+      console.error(err);
+      setError("Unable to load complaints. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  }, [token]);
+
+  useEffect(() => {
+    fetchComplaints();
+  }, [fetchComplaints]);
+
+  /* ---------------- FILTER LOGIC ---------------- */
   const filtered = useMemo(() => {
     return complaints.filter((c) => {
       const matchSearch =
-        c.title.toLowerCase().includes(search.toLowerCase()) ||
-        c.id.toLowerCase().includes(search.toLowerCase());
+        c.subject.toLowerCase().includes(search.toLowerCase()) ||
+        c.ticket_id.toLowerCase().includes(search.toLowerCase());
+
+      const matchCategory =
+        categoryFilter === "all" || c.category === categoryFilter;
 
       const matchStatus =
         statusFilter === "all" || c.status === statusFilter;
 
-      const matchDept =
-        deptFilter === "all" || c.department === deptFilter;
-
-      return matchSearch && matchStatus && matchDept;
+      return matchSearch && matchCategory && matchStatus;
     });
-  }, [complaints, search, statusFilter, deptFilter]);
+  }, [complaints, search, statusFilter, categoryFilter]);
 
   useEffect(() => {
     setPage(1);
-  }, [search, statusFilter, deptFilter]);
+  }, [search, statusFilter, categoryFilter]);
 
   const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
   const paginated = filtered.slice(
@@ -113,7 +106,7 @@ export default function ComplaintsPage() {
     page * ITEMS_PER_PAGE
   );
 
-  /* ------------------ STATES ------------------ */
+  /* ---------------- LOADING ---------------- */
   if (loading) {
     return (
       <div className="space-y-4">
@@ -127,18 +120,23 @@ export default function ComplaintsPage() {
     );
   }
 
+  /* ---------------- ERROR ---------------- */
   if (error) {
     return (
       <div className="text-center py-16">
         <AlertCircle className="h-10 w-10 text-danger-500 mx-auto mb-3" />
         <p>{error}</p>
+        <Button onClick={fetchComplaints} className="mt-4">
+          Retry
+        </Button>
       </div>
     );
   }
 
-  /* ------------------ UI ------------------ */
+  /* ---------------- UI ---------------- */
   return (
     <div className="space-y-6">
+      {/* Header */}
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-2xl font-bold">My Complaints</h1>
@@ -147,19 +145,16 @@ export default function ComplaintsPage() {
           </p>
         </div>
 
-        <Link href="/citizen/complaints/new">
-          <Button leftIcon={<Plus className="h-4 w-4" />}>
-            New Complaint
-          </Button>
-        </Link>
+        {/* Pass refresh function to auto update after new complaint */}
+        <CreateComplaintForm />
       </div>
 
       {/* Filters */}
       <Card padding="sm">
         <CardContent>
-          <div className="flex gap-3">
+          <div className="flex gap-3 flex-wrap">
             <Input
-              placeholder="Search..."
+              placeholder="Search by subject or ticket ID..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               leftIcon={<Search className="h-4 w-4" />}
@@ -171,7 +166,7 @@ export default function ComplaintsPage() {
               options={[
                 { value: "all", label: "All Status" },
                 { value: "pending", label: "Pending" },
-                { value: "in-progress", label: "In Progress" },
+                { value: "in_progress", label: "In Progress" },
                 { value: "resolved", label: "Resolved" },
                 { value: "rejected", label: "Rejected" },
                 { value: "escalated", label: "Escalated" },
@@ -179,14 +174,17 @@ export default function ComplaintsPage() {
             />
 
             <Select
-              value={deptFilter}
-              onChange={(e) => setDeptFilter(e.target.value)}
+              value={categoryFilter}
+              onChange={(e) => setCategoryFilter(e.target.value)}
               options={[
-                { value: "all", label: "All Departments" },
-                { value: "electricity", label: "Electricity" },
-                { value: "water", label: "Water" },
-                { value: "roads", label: "Roads" },
-                { value: "sanitation", label: "Sanitation" },
+                { value: "all", label: "All Categories" },
+                { value: "street_light", label: "Street Light" },
+                { value: "pothole", label: "Pothole" },
+                { value: "broken_road", label: "Broken Road" },
+                { value: "drainage", label: "Drainage" },
+                { value: "garbage", label: "Garbage" },
+                { value: "water_leakage", label: "Water Leakage" },
+                { value: "other", label: "Other" },
               ]}
             />
           </div>
@@ -196,61 +194,67 @@ export default function ComplaintsPage() {
       {/* List */}
       <div className="space-y-3">
         {paginated.map((complaint) => (
-          <Card key={complaint.id}>
+          <Card
+            key={complaint.id}
+            className="hover:shadow-md transition cursor-pointer"
+            onClick={() =>
+              router.push(`/citizen/complaints/${complaint.id}`)
+            }
+          >
             <CardContent className="flex justify-between items-center">
               <div>
                 <h3 className="font-semibold">
-                  {complaint.title}
+                  {complaint.subject}
                 </h3>
+
                 <p className="text-sm text-muted">
-                  {complaint.description}
+                  Ticket: {complaint.ticket_id}
                 </p>
 
-                <div className="flex gap-2 mt-2">
-                  <StatusBadge
-                    status={complaint.status}
-                    size="sm"
-                  />
-                  <Badge size="sm">{complaint.ward}</Badge>
+                <div className="flex gap-2 mt-2 flex-wrap">
+                  <Badge size="sm">{complaint.category}</Badge>
+
+                  {complaint.priority && (
+                    <Badge size="sm" variant="outline">
+                      {complaint.priority}
+                    </Badge>
+                  )}
+
+                  
                 </div>
+
+                {complaint.authority_name && (
+                  <p className="text-xs mt-1 text-muted">
+                    Assigned to: {complaint.authority_name}
+                  </p>
+                )}
               </div>
 
-              <button
-                onClick={() =>
-                  !complaint.hasVoted &&
-                  handleVote(complaint.id)
-                }
-                disabled={complaint.hasVoted}
-                className="flex flex-col items-center"
-              >
-                <ChevronUp className="h-4 w-4" />
-                <span>{complaint.votes}</span>
-              </button>
+              <span className="text-xs text-muted">
+                {new Date(
+                  complaint.created_at
+                ).toLocaleDateString()}
+              </span>
             </CardContent>
           </Card>
         ))}
+
+        {paginated.length === 0 && (
+          <div className="text-center py-12 text-muted">
+            No complaints found
+          </div>
+        )}
       </div>
 
       {/* Pagination */}
       {totalPages > 1 && (
-        <div className="flex gap-2">
+        <div className="flex gap-2 justify-center">
           <Button
             onClick={() => setPage(page - 1)}
             disabled={page === 1}
           >
             <ChevronLeft />
           </Button>
-
-          {Array.from({ length: totalPages }).map(
-            (_, i) => (
-              <Button
-                key={i}
-                onClick={() => setPage(i + 1)}
-              >
-                {i + 1}
-              </Button>
-            )
-          )}
 
           <Button
             onClick={() => setPage(page + 1)}
@@ -262,5 +266,4 @@ export default function ComplaintsPage() {
       )}
     </div>
   );
-  }
 }

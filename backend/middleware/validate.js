@@ -48,10 +48,7 @@ const complaintValidation = [
   body('category').isIn(['street_light', 'pothole', 'broken_road', 'drainage', 'garbage', 'water_leakage', 'other']).withMessage('Invalid category'),
   body('complaint_type').optional().isIn(['personal', 'global']),
   body('subject').trim().notEmpty().isLength({ max: 200 }).withMessage('Subject required (max 200 chars)'),
-  body('description').optional().trim().isLength({ max: 2000 }),
   body('location').optional().trim().isLength({ max: 500 }),
-  body('latitude').optional().isDecimal(),
-  body('longitude').optional().isDecimal(),
   handleValidationErrors,
 ];
 // --- Payment Validations ---
