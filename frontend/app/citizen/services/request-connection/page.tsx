@@ -81,7 +81,7 @@ export default function RequestConnectionPage() {
     }
 
     return (
-        <div className="max-w-2xl mx-auto space-y-6 p-4 sm:p-0">
+        <div className="max-w-2xl mx-auto space-y-6">
             <div className="flex items-start gap-3 flex-wrap">
                 <button onClick={() => (step > 0 ? setStep(step - 1) : router.back())} className="p-2 rounded-lg text-fg-muted hover:text-fg hover:bg-surface-muted transition-colors">
                     <ArrowLeft className="h-5 w-5" />

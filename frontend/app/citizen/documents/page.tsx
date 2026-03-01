@@ -113,7 +113,7 @@ export default function DocumentVerificationPage() {
     /* ── Loading State ── */
     if (loading) {
         return (
-            <div className="max-w-2xl mx-auto space-y-6 p-4 md:p-6 lg:p-8">
+            <div className="space-y-6">
                 <div className="h-9 w-56 bg-surface-muted rounded-lg animate-pulse" />
                 <div className="grid grid-cols-3 gap-3">
                     {[...Array(3)].map((_, i) => <div key={i} className="h-24 rounded-2xl sm:rounded-3xl bg-surface border border-border/40 animate-pulse" />)}
@@ -127,7 +127,7 @@ export default function DocumentVerificationPage() {
     /* ── Error State ── */
     if (error) {
         return (
-            <div className="max-w-2xl mx-auto text-center py-20 p-4 md:p-6 lg:p-8">
+            <div className="text-center py-20">
                 <div className="w-16 h-16 rounded-2xl bg-danger-50 dark:bg-danger-900/20 flex items-center justify-center mx-auto mb-4">
                     <AlertCircle className="h-8 w-8 text-danger-500" />
                 </div>
@@ -140,7 +140,7 @@ export default function DocumentVerificationPage() {
 
     /* ── Main Render ── */
     return (
-        <motion.div initial="hidden" animate="visible" variants={stagger} className="max-w-2xl mx-auto space-y-8 p-4 md:p-6 lg:p-8 relative">
+        <motion.div initial="hidden" animate="visible" variants={stagger} className="relative w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-10 space-y-6 sm:space-y-8 overflow-hidden">
             {/* ── Decorative Background Blobs ── */}
             <div className="absolute top-10 left-1/4 w-[400px] h-[400px] bg-primary-300/15 rounded-full blur-[100px] -z-10 pointer-events-none" />
             <div className="absolute bottom-10 right-1/4 w-[300px] h-[300px] bg-accent-300/10 rounded-full blur-[80px] -z-10 pointer-events-none" />
@@ -196,8 +196,8 @@ export default function DocumentVerificationPage() {
                             </p>
                         </div>
                         <span className={`px-3 py-1 rounded-full text-xs font-bold border shrink-0 inline-flex items-center gap-1.5 ${user?.aadhaarVerified
-                                ? "bg-emerald-50 text-emerald-700 border-emerald-200"
-                                : "bg-amber-50 text-amber-700 border-amber-200"
+                            ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                            : "bg-amber-50 text-amber-700 border-amber-200"
                             }`}>
                             <span className="w-1.5 h-1.5 rounded-full bg-current" />
                             {user?.aadhaarVerified ? "Verified" : "Pending"}

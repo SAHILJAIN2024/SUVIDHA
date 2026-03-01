@@ -153,154 +153,135 @@ export default function UserDashboard() {
   ];
 
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.5 }}
-      className="min-h-screen bg-bg selection:bg-primary-500/30 relative overflow-hidden"
-    >
-      {/* ── Decorative Background Blobs ── */}
-      <div className="absolute top-10 left-1/4 w-[400px] h-[400px] bg-primary-300/15 rounded-full blur-[100px] -z-10 pointer-events-none" />
-      <div className="absolute bottom-10 right-1/4 w-[300px] h-[300px] bg-accent-300/10 rounded-full blur-[80px] -z-10 pointer-events-none" />
+    <div className="w-full max-w-7xl px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-10 space-y-6 sm:space-y-8">
 
-      <div className="max-w-5xl mx-auto p-6 sm:p-8 md:p-12 space-y-8">
-
-        {/* ── Page Header ── */}
-        <motion.div variants={cardAnim} custom={0} initial="hidden" animate="visible" className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
-          <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-fg">
-              Welcome,{" "}
-              <span className="bg-gradient-to-r from-primary-600 via-primary-500 to-accent-500 bg-clip-text text-transparent">
-                {user?.email}
-              </span>
-            </h1>
-            <p className="text-fg-secondary mt-1 text-base">
-              Here&apos;s an overview of your civic activity.
-            </p>
-          </div>
-          <Link href="/citizen/complaints/new" className="shrink-0">
-            <Button
-              variant="primary"
-              size="sm"
-              rightIcon={<ArrowRight className="h-4 w-4" />}
-              className="shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all"
-            >
-              File New Complaint
-            </Button>
-          </Link>
-        </motion.div>
-
-        {/* ── Stats Row ── */}
-        <motion.div variants={stagger} initial="hidden" animate="visible" className="grid grid-cols-2 sm:grid-cols-3 gap-4 sm:gap-6">
-          {statsData.map((stat, i) => (
-            <motion.div
-              key={stat.label}
-              variants={cardAnim}
-              custom={i + 1}
-              whileHover={{ y: -4, scale: 1.02 }}
-              className="rounded-2xl sm:rounded-3xl bg-bg shadow-sm border border-border/40 hover:border-primary-500/30 transition-all duration-300 p-6 flex flex-col items-center text-center"
-            >
-              <div className="text-3xl sm:text-4xl font-extrabold bg-gradient-to-r from-primary-600 to-primary-400 bg-clip-text text-transparent mb-2">
-                {stat.value}
-              </div>
-              <p className="text-sm text-fg-secondary font-semibold uppercase tracking-wider">
-                {stat.label}
-              </p>
-            </motion.div>
-          ))}
-        </motion.div>
-
-        {/* ── Complaints Card ── */}
-        <motion.div variants={cardAnim} custom={4} initial="hidden" animate="visible">
-          <div className="bg-surface p-6 sm:p-8 md:p-10 rounded-2xl sm:rounded-3xl border border-border/60 shadow-sm hover:shadow-lg transition-shadow duration-300">
-
-            {/* Card Header */}
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl sm:text-2xl font-bold text-fg">
-                My <span className="text-primary-600">Complaints</span>
-              </h2>
-            </div>
-
-            {/* Content */}
-            {loading ? (
-              /* Skeleton Loader */
-              <div className="space-y-4">
-                {[...Array(3)].map((_, i) => (
-                  <div key={i} className="h-20 rounded-2xl bg-surface-muted animate-pulse border border-border/40" />
-                ))}
-              </div>
-            ) : error ? (
-              /* Error State */
-              <div className="text-center py-12">
-                <div className="w-16 h-16 rounded-2xl bg-danger-50 flex items-center justify-center mx-auto mb-4">
-                  <AlertCircle className="h-8 w-8 text-danger-500" />
-                </div>
-                <p className="text-lg font-semibold text-fg mb-1">Something went wrong</p>
-                <p className="text-sm text-fg-secondary mb-4">{error}</p>
-                <Button variant="outline" size="sm" onClick={fetchDashboard}>Retry</Button>
-              </div>
-            ) : complaints.length === 0 ? (
-              /* Empty State */
-              <div className="flex flex-col items-center justify-center py-16 text-center">
-                <div className="w-16 h-16 rounded-2xl bg-primary-50 dark:bg-primary-900/20 flex items-center justify-center text-primary-600 mb-4">
-                  <FileText className="h-8 w-8" />
-                </div>
-                <p className="text-lg font-semibold text-fg mb-1">No complaints yet</p>
-                <p className="text-sm text-fg-secondary">File your first complaint to get started.</p>
-              </div>
-            ) : (
-              /* Complaint Rows */
-              <motion.div variants={stagger} initial="hidden" animate="visible" className="space-y-4">
-                {complaints.slice(0, 5).map((complaint, i) => (
-                  <motion.div
-                    key={complaint.id}
-                    variants={cardAnim}
-                    custom={i}
-                    whileHover={{ y: -2 }}
-                  >
-                    <div
-                      className="group border border-border/60 p-5 sm:p-6 rounded-2xl hover:shadow-xl hover:shadow-primary-500/10 hover:-translate-y-0.5 hover:border-primary-200 transition-all duration-300 bg-bg flex flex-col md:flex-row md:items-center justify-between gap-4 cursor-pointer"
-                      onClick={() => router.push(`/citizen/complaints/${complaint.id}`)}
-                    >
-                      {/* Title + Meta */}
-                      <div className="flex-1 min-w-0">
-                        <h3 className="font-bold text-fg text-base truncate">{complaint.subject}</h3>
-                        <div className="flex gap-2 mt-1.5 flex-wrap text-xs text-fg-muted">
-                          <span>#{complaint.ticket_id}</span>
-                          <span>•</span>
-                          <span>{complaint.category}</span>
-                          {complaint.priority && (
-                            <>
-                              <span>•</span>
-                              <span>{complaint.priority}</span>
-                            </>
-                          )}
-                        </div>
-                      </div>
-
-                      {/* Right: Status + Date + Arrow */}
-                      <div className="flex flex-wrap items-center gap-2 sm:gap-3 shrink-0">
-                        <span className={`px-3 py-1 rounded-full text-xs font-bold border inline-flex items-center gap-1.5 ${statusStyles[complaint.status] || "bg-surface-muted text-fg-secondary border-border"}`}>
-                          <span className="w-1.5 h-1.5 rounded-full bg-current" />
-                          {complaint.status.replace("_", " ")}
-                        </span>
-
-                        <p className="text-xs text-fg-muted font-medium whitespace-nowrap inline-flex items-center">
-                          <Clock className="h-3 w-3 mr-1 inline" />
-                          {new Date(complaint.created_at).toLocaleDateString()}
-                        </p>
-
-                        <ChevronRight className="h-4 w-4 text-fg-muted group-hover:text-primary-600 transition-colors shrink-0 hidden md:block" />
-                      </div>
-                    </div>
-                  </motion.div>
-                ))}
-              </motion.div>
-            )}
-          </div>
-        </motion.div>
-
+      {/* ── Page Header ── */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-fg tracking-tight">
+            Welcome,{" "}
+            <span className="bg-gradient-to-r from-primary-600 via-primary-500 to-accent-500 bg-clip-text text-transparent">
+              {user?.name || user?.email?.split('@')[0]}
+            </span>
+          </h1>
+          <p className="text-fg-secondary mt-1 text-sm bg-surface-muted inline-block px-2 py-0.5 rounded-md border border-border/40">
+            {user?.email}
+          </p>
+          <p className="text-fg-secondary mt-2 text-sm sm:text-base">
+            Here's an overview of your civic activity.
+          </p>
+        </div>
+        <Link href="/citizen/complaints/new" className="shrink-0 w-full sm:w-auto">
+          <Button
+            variant="primary"
+            rightIcon={<ArrowRight className="h-4 w-4" />}
+            className="shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all w-full sm:w-auto"
+          >
+            File New Complaint
+          </Button>
+        </Link>
       </div>
-    </motion.div>
+
+      {/* ── Stats Row ── FULL WIDTH */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-6">
+        {statsData.map((stat, i) => (
+          <motion.div
+            key={stat.label}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: i * 0.1 }}
+            className="rounded-2xl sm:rounded-3xl bg-surface border border-border/60 hover:shadow-xl hover:shadow-primary-500/10 hover:-translate-y-0.5 transition-all duration-300 p-4 sm:p-6 lg:p-8 flex flex-col items-center text-center"
+          >
+            <div className="text-3xl sm:text-4xl lg:text-5xl font-extrabold bg-gradient-to-r from-primary-600 to-primary-400 bg-clip-text text-transparent mb-1 sm:mb-2">
+              {stat.value}
+            </div>
+            <p className="text-xs sm:text-sm text-fg-secondary font-semibold uppercase tracking-wider">
+              {stat.label}
+            </p>
+          </motion.div>
+        ))}
+      </div>
+
+      {/* ── My Complaints ── FULL WIDTH */}
+      <div className="rounded-2xl sm:rounded-3xl bg-surface border border-border/60 overflow-hidden shadow-sm">
+        <div className="px-5 sm:px-6 py-4 sm:py-5 border-b border-border/50 flex items-center justify-between bg-surface-muted/30">
+          <h2 className="text-lg sm:text-xl font-bold text-fg">
+            My <span className="text-primary-600">Complaints</span>
+          </h2>
+          <Button variant="outline" size="sm" className="hidden sm:flex text-xs h-8" onClick={() => router.push('/citizen/complaints')}>
+            View All
+          </Button>
+        </div>
+
+        <div className="divide-y divide-border/50">
+          {loading ? (
+            <div className="p-6 space-y-4">
+              {[...Array(3)].map((_, i) => (
+                <div key={i} className="h-16 rounded-xl bg-surface-muted animate-pulse border border-border/40" />
+              ))}
+            </div>
+          ) : error ? (
+            <div className="text-center py-12">
+              <div className="w-12 h-12 rounded-full bg-danger-50 flex items-center justify-center mx-auto mb-3">
+                <AlertCircle className="h-6 w-6 text-danger-500" />
+              </div>
+              <p className="text-sm font-semibold text-fg mb-1">Something went wrong</p>
+              <p className="text-xs text-fg-secondary mb-4">{error}</p>
+              <Button variant="outline" size="sm" onClick={fetchDashboard}>Retry</Button>
+            </div>
+          ) : complaints.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-16 text-center px-4">
+              <div className="w-16 h-16 rounded-2xl bg-primary-50 dark:bg-primary-900/20 flex items-center justify-center text-primary-600 mb-4">
+                <FileText className="h-8 w-8" />
+              </div>
+              <p className="text-base font-semibold text-fg mb-1">No complaints yet</p>
+              <p className="text-sm text-fg-secondary">File your first complaint to get started.</p>
+            </div>
+          ) : (
+            <div className="flex flex-col">
+              {complaints.slice(0, 5).map((complaint) => (
+                <div
+                  key={complaint.id}
+                  onClick={() => router.push(`/citizen/complaints/${complaint.id}`)}
+                  className="group flex flex-col md:flex-row md:items-center justify-between gap-4 p-4 sm:p-5 lg:p-6 hover:bg-surface-muted transition-colors cursor-pointer"
+                >
+                  {/* Info */}
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-bold text-fg text-sm sm:text-base group-hover:text-primary-600 transition-colors truncate">
+                      {complaint.subject}
+                    </h3>
+                    <div className="flex flex-wrap items-center gap-2 mt-1.5 text-xs text-fg-muted font-medium">
+                      <span className="bg-surface-sunken px-2 py-0.5 rounded text-[10px] uppercase tracking-wider text-fg-secondary border border-border/40">{complaint.ticket_id}</span>
+                      <span>•</span>
+                      <span>{complaint.category}</span>
+                      {complaint.priority && (
+                        <>
+                          <span>•</span>
+                          <span className={complaint.priority === 'High' ? 'text-danger-500 font-bold' : ''}>{complaint.priority}</span>
+                        </>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Actions & Status */}
+                  <div className="flex flex-wrap items-center gap-3 md:gap-4 shrink-0 mt-2 md:mt-0">
+                    <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold border inline-flex items-center gap-1.5 uppercase tracking-wider ${statusStyles[complaint.status] || "bg-surface-muted text-fg-secondary border-border"}`}>
+                      <span className="w-1.5 h-1.5 rounded-full bg-current" />
+                      {complaint.status.replace("_", " ")}
+                    </span>
+                    <div className="flex items-center gap-1 text-xs text-fg-muted font-medium min-w-[80px] justify-end">
+                      <Clock className="h-3 w-3" />
+                      {new Date(complaint.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
+                    </div>
+                    <ChevronRight className="h-4 w-4 text-fg-muted/50 group-hover:text-primary-600 group-hover:translate-x-0.5 transition-all shrink-0 hidden md:block" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+
+    </div>
   );
 }

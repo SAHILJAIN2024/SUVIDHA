@@ -130,7 +130,7 @@ export default function ProfilePage() {
             initial="hidden"
             animate="visible"
             variants={stagger}
-            className="max-w-2xl mx-auto space-y-8 p-4 md:p-6 lg:p-8 relative"
+            className="relative w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-10 space-y-6 sm:space-y-8 overflow-hidden"
         >
             {/* ── Decorative Background Blobs ── */}
             <div className="absolute top-10 left-1/4 w-[400px] h-[400px] bg-primary-300/15 rounded-full blur-[100px] -z-10 pointer-events-none" />

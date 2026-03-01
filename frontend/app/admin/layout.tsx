@@ -61,7 +61,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     return (
         <AuthGuard allowedRoles={["admin-electricity", "admin-water", "admin", "admin-sanitation", "super-admin"]}>
             {/* Changed to flex-col for top-to-bottom layout */}
-            <div className="min-h-screen bg-bg flex flex-col">
+            <div className="min-h-screen w-full bg-bg flex flex-col">
 
                 {/* ── Top Navigation Bar ────── */}
                 <header className="sticky top-0 z-40 bg-surface/95 backdrop-blur-xl border-b border-border/60 shadow-sm">
@@ -69,7 +69,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
                         {/* Left: Brand & Mobile Menu Button */}
                         <div className="flex items-center gap-4">
-                            <button onClick={() => setMobileOpen(true)} className="lg:hidden p-2 -ml-2 rounded-xl text-fg-muted hover:text-fg hover:bg-surface-muted transition-colors">
+                            <button onClick={() => setMobileOpen(true)} className="md:hidden p-2 -ml-2 rounded-xl text-fg-muted hover:text-fg hover:bg-surface-muted transition-colors">
                                 <Menu className="h-5 w-5" />
                             </button>
 
@@ -85,7 +85,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                         </div>
 
                         {/* Left: Desktop Navigation */}
-                        <nav className="hidden lg:flex items-center gap-1 mx-4 flex-1">
+                        <nav className="hidden md:flex items-center gap-4 lg:gap-1 mx-2 lg:mx-4 flex-1 overflow-x-auto scrollbar-none">
                             {navItems.map((item) => {
                                 const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
                                 return (
@@ -210,8 +210,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 </AnimatePresence>
 
                 {/* ── Main Content Area ────── */}
-                <main className="flex-1 overflow-x-hidden overflow-y-auto bg-bg">
-                    <div className="max-w-[1400px] mx-auto w-full">
+                <main className="flex-1 w-0 min-w-0 overflow-x-hidden bg-bg">
+                    <div className="w-full max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
                         {children}
                     </div>
                 </main>

@@ -94,12 +94,12 @@ const stats = [
 ];
 
 const galleryImages = [
-  "https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?auto=format&fit=crop&w=600&q=80",
-  "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=600&q=80",
-  "https://images.unsplash.com/photo-1449844908441-8829872d2607?auto=format&fit=crop&w=600&q=80",
-  "https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?auto=format&fit=crop&w=600&q=80",
-  "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=600&q=80",
-  "https://images.unsplash.com/photo-1506905925200-84384a8dd1bd?auto=format&fit=crop&w=600&q=80",
+  "/images/gallery/1.jpg", // Power lines
+  "/images/gallery/2.jpg", // Gas/Industrial
+  "/images/gallery/3.jpg", // Indian Municipal Worker
+  "/images/gallery/4.jpg", // Water Dam / Reservoir
+  "/images/gallery/5.jpg", // Electricity Poles
+  "/images/gallery/6.jpg", // Indian City Street / Infrastructure
 ];
 
 /* ═══════════════════════════════════════════════════════════
