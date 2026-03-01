@@ -75,6 +75,25 @@ const kpiIcons: Record<string, React.ReactNode> = {
     ThumbsUp: <ThumbsUp className="h-5 w-5" />,
 };
 
+const kpiGradients: Record<string, string> = {
+    FileText: "from-blue-500 to-indigo-600",
+    CheckCircle: "from-emerald-500 to-teal-600",
+    Clock: "from-amber-500 to-orange-600",
+    ThumbsUp: "from-violet-500 to-purple-600",
+};
+
+const kpiShadows: Record<string, string> = {
+    FileText: "shadow-blue-500/30",
+    CheckCircle: "shadow-emerald-500/30",
+    Clock: "shadow-amber-500/30",
+    ThumbsUp: "shadow-violet-500/30",
+};
+
+const stagger = {
+    hidden: {},
+    visible: { transition: { staggerChildren: 0.08 } },
+};
+
 const cardAnim = {
     hidden: { opacity: 0, y: 24, scale: 0.97 },
     visible: (i: number) => ({
@@ -98,10 +117,10 @@ export default function AdminDashboard() {
         return (
             <div className="space-y-6">
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                    {[...Array(4)].map((_, i) => (<div key={i} className="h-28 rounded-2xl bg-surface border border-border animate-pulse" />))}
+                    {[...Array(4)].map((_, i) => (<div key={i} className="h-28 rounded-2xl bg-surface border border-border/60 animate-pulse" />))}
                 </div>
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    {[...Array(4)].map((_, i) => (<div key={i} className="h-80 rounded-2xl bg-surface border border-border animate-pulse" />))}
+                    {[...Array(4)].map((_, i) => (<div key={i} className="h-80 rounded-2xl bg-surface border border-border/60 animate-pulse" />))}
                 </div>
             </div>
         );
@@ -118,42 +137,60 @@ export default function AdminDashboard() {
     }
 
     return (
-        <motion.div initial="hidden" animate="visible" className="space-y-8 p-4 md:p-6 lg:p-8">
+        <motion.div initial="hidden" animate="visible" variants={stagger} className="space-y-8 p-4 md:p-6 lg:p-8 relative">
+            {/* Decorative background blob */}
+            <div className="absolute top-0 right-0 w-64 h-64 bg-primary-300/10 rounded-full blur-[80px] -z-10 pointer-events-none" />
+
             {/* Header */}
-            <div className="flex items-center justify-between">
+            <motion.div variants={cardAnim} custom={0} className="flex items-center justify-between">
                 <div>
-                    <h1 className="text-2xl font-bold text-fg">{t("admin.dashboard")}</h1>
-                    <p className="text-fg-secondary mt-1">{t("dashboard.overview")}</p>
+                    <h1 className="text-2xl sm:text-3xl font-bold text-fg">
+                        {t("admin.dashboard").split(" ")[0]}{" "}
+                        <span className="text-primary-600">{t("admin.dashboard").split(" ").slice(1).join(" ") || "Dashboard"}</span>
+                    </h1>
+                    <p className="text-fg-secondary mt-1 text-sm">{t("dashboard.overview")}</p>
                 </div>
-                <Button variant="outline" size="sm" rightIcon={<ArrowRight className="h-4 w-4" />}>
+                <Button
+                    variant="primary"
+                    size="sm"
+                    rightIcon={<ArrowRight className="h-4 w-4" />}
+                    className="shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all"
+                >
                     {t("admin.exportReport")}
                 </Button>
-            </div>
+            </motion.div>
 
             {/* KPI Cards — 2x2 grid */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
                 {kpis.map((kpi, i) => (
-                    <motion.div key={i} variants={cardAnim} custom={i}>
-                        <Card className="hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300">
-                            <CardContent>
+                    <motion.div key={i} variants={cardAnim} custom={i + 1} whileHover={{ y: -4, scale: 1.01 }}>
+                        <Card className="rounded-2xl sm:rounded-3xl border border-border/60 hover:shadow-xl hover:shadow-primary-500/10 transition-all duration-300">
+                            <CardContent className="p-5 sm:p-6">
                                 <div className="flex items-start justify-between">
                                     <div>
-                                        <p className="text-xs text-fg-secondary uppercase tracking-wider">{kpi.label}</p>
-                                        <p className="text-2xl font-bold text-fg mt-1">{kpi.value}</p>
-                                        <div className="flex items-center gap-1 mt-1">
+                                        <p className="text-xs text-fg-secondary uppercase tracking-wider font-semibold">{kpi.label}</p>
+                                        <p className="text-2xl sm:text-3xl font-extrabold mt-1 bg-gradient-to-r from-primary-600 to-primary-400 bg-clip-text text-transparent">
+                                            {kpi.value}
+                                        </p>
+                                        <div className="flex items-center gap-1.5 mt-2">
                                             {kpi.trend === "up" ? (
-                                                <TrendingUp className="h-3 w-3 text-success-500" />
+                                                <TrendingUp className="h-3.5 w-3.5 text-success-500" />
                                             ) : kpi.trend === "down" ? (
-                                                <TrendingDown className="h-3 w-3 text-danger-500" />
+                                                <TrendingDown className="h-3.5 w-3.5 text-danger-500" />
                                             ) : (
-                                                <Minus className="h-3 w-3 text-fg-muted" />
+                                                <Minus className="h-3.5 w-3.5 text-fg-muted" />
                                             )}
-                                            <span className={`text-xs font-medium ${kpi.trend === "up" ? "text-success-500" : kpi.trend === "down" ? "text-danger-500" : "text-fg-muted"}`}>
+                                            <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${kpi.trend === "up"
+                                                    ? "bg-success-50 text-success-600"
+                                                    : kpi.trend === "down"
+                                                        ? "bg-danger-50 text-danger-600"
+                                                        : "bg-surface-muted text-fg-muted"
+                                                }`}>
                                                 {kpi.change > 0 ? "+" : ""}{kpi.change}%
                                             </span>
                                         </div>
                                     </div>
-                                    <div className="w-10 h-10 rounded-xl bg-primary-50 dark:bg-primary-900/20 flex items-center justify-center text-primary-600">
+                                    <div className={`w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br ${kpiGradients[kpi.icon] || "from-primary-500 to-primary-600"} flex items-center justify-center text-white shadow-lg ${kpiShadows[kpi.icon] || "shadow-primary-500/30"}`}>
                                         {kpiIcons[kpi.icon] || <FileText className="h-5 w-5" />}
                                     </div>
                                 </div>
@@ -167,12 +204,14 @@ export default function AdminDashboard() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
                 {/* Card 1: Live Ward Map */}
-                <motion.div variants={cardAnim} custom={4}>
-                    <Card padding="none" className="overflow-hidden border border-border shadow-sm hover:shadow-lg transition-shadow duration-300 h-full">
-                        <CardContent className="p-6 border-b border-border flex items-center justify-between bg-surface/50">
-                            <h2 className="text-lg font-semibold text-fg">{t("admin.wardMap")} (Live)</h2>
+                <motion.div variants={cardAnim} custom={5} whileHover={{ y: -4, scale: 1.01 }}>
+                    <Card padding="none" className="overflow-hidden rounded-2xl sm:rounded-3xl border border-border/60 hover:shadow-xl hover:shadow-primary-500/10 transition-all duration-300 h-full">
+                        <CardContent className="p-5 sm:p-6 border-b border-border/60 flex items-center justify-between bg-surface/50">
+                            <h2 className="text-lg font-bold text-fg">
+                                {t("admin.wardMap")} <span className="text-primary-600">(Live)</span>
+                            </h2>
                             <Link href="/admin/map">
-                                <Button variant="ghost" size="sm" rightIcon={<ArrowRight className="h-4 w-4" />}>
+                                <Button variant="ghost" size="sm" rightIcon={<ArrowRight className="h-4 w-4" />} className="hover:bg-primary-50 hover:text-primary-600 transition-all">
                                     {t("common.viewAll")}
                                 </Button>
                             </Link>
@@ -199,10 +238,13 @@ export default function AdminDashboard() {
                 </motion.div>
 
                 {/* Card 2: Complaints Over Time — Bar Chart */}
-                <motion.div variants={cardAnim} custom={5}>
-                    <Card className="border border-border shadow-sm hover:shadow-lg transition-shadow duration-300 h-full">
-                        <CardContent className="p-6">
-                            <h2 className="text-lg font-semibold text-fg mb-4">{t("admin.complaintsOverTime")}</h2>
+                <motion.div variants={cardAnim} custom={6} whileHover={{ y: -4, scale: 1.01 }}>
+                    <Card className="rounded-2xl sm:rounded-3xl border border-border/60 hover:shadow-xl hover:shadow-primary-500/10 transition-all duration-300 h-full">
+                        <CardContent className="p-5 sm:p-6">
+                            <h2 className="text-lg font-bold text-fg mb-5">
+                                {t("admin.complaintsOverTime").split(" ")[0]}{" "}
+                                <span className="text-primary-600">{t("admin.complaintsOverTime").split(" ").slice(1).join(" ")}</span>
+                            </h2>
                             <div className="w-full">
                                 {chartData && <LazyBarChart data={chartData.complaintsOverTime} />}
                             </div>
@@ -211,10 +253,13 @@ export default function AdminDashboard() {
                 </motion.div>
 
                 {/* Card 3: By Department — Pie Chart */}
-                <motion.div variants={cardAnim} custom={6}>
-                    <Card className="border border-border shadow-sm hover:shadow-lg transition-shadow duration-300 h-full">
-                        <CardContent className="p-6">
-                            <h2 className="text-lg font-semibold text-fg mb-4">{t("admin.byDepartment")}</h2>
+                <motion.div variants={cardAnim} custom={7} whileHover={{ y: -4, scale: 1.01 }}>
+                    <Card className="rounded-2xl sm:rounded-3xl border border-border/60 hover:shadow-xl hover:shadow-primary-500/10 transition-all duration-300 h-full">
+                        <CardContent className="p-5 sm:p-6">
+                            <h2 className="text-lg font-bold text-fg mb-5">
+                                {t("admin.byDepartment").split(" ")[0]}{" "}
+                                <span className="text-primary-600">{t("admin.byDepartment").split(" ").slice(1).join(" ")}</span>
+                            </h2>
                             <div className="flex flex-col items-center w-full">
                                 {chartData && <LazyPieChart data={chartData.byDepartment} />}
                                 <div className="space-y-3 mt-4 w-full px-2">
@@ -224,7 +269,7 @@ export default function AdminDashboard() {
                                                 <div className="w-3.5 h-3.5 rounded-full shadow-sm" style={{ backgroundColor: dept.color }} />
                                                 <span className="text-fg-secondary tracking-tight font-medium">{dept.name}</span>
                                             </div>
-                                            <span className="font-semibold text-fg">{dept.value}</span>
+                                            <span className="font-bold text-fg">{dept.value}</span>
                                         </div>
                                     ))}
                                 </div>
@@ -234,17 +279,28 @@ export default function AdminDashboard() {
                 </motion.div>
 
                 {/* Card 4: Resolution by Ward */}
-                <motion.div variants={cardAnim} custom={7}>
-                    <Card className="border border-border shadow-sm hover:shadow-lg transition-shadow duration-300 h-full">
-                        <CardContent className="p-6">
-                            <h2 className="text-lg font-semibold text-fg mb-4">{t("admin.resolutionByWard")}</h2>
-                            <div className="grid grid-cols-2 sm:grid-cols-3 gap-6">
+                <motion.div variants={cardAnim} custom={8} whileHover={{ y: -4, scale: 1.01 }}>
+                    <Card className="rounded-2xl sm:rounded-3xl border border-border/60 hover:shadow-xl hover:shadow-primary-500/10 transition-all duration-300 h-full">
+                        <CardContent className="p-5 sm:p-6">
+                            <h2 className="text-lg font-bold text-fg mb-5">
+                                {t("admin.resolutionByWard").split(" ")[0]}{" "}
+                                <span className="text-primary-600">{t("admin.resolutionByWard").split(" ").slice(1).join(" ")}</span>
+                            </h2>
+                            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
                                 {chartData?.resolutionByWard.map((ward) => (
-                                    <div key={ward.ward} className="text-center p-6 rounded-xl bg-surface-muted hover:bg-surface-muted/70 transition-colors">
-                                        <p className="text-2xl font-bold" style={{ color: ward.rate >= 90 ? "#10B981" : ward.rate >= 80 ? "#F59E0B" : "#EF4444" }}>
+                                    <div
+                                        key={ward.ward}
+                                        className="text-center p-5 rounded-2xl bg-surface-muted/50 border border-border/40 hover:border-primary-500/30 hover:shadow-md transition-all duration-300"
+                                    >
+                                        <span className={`inline-block px-3 py-1 rounded-full text-lg sm:text-xl font-extrabold ${ward.rate >= 90
+                                                ? "bg-emerald-50 text-emerald-600"
+                                                : ward.rate >= 80
+                                                    ? "bg-amber-50 text-amber-600"
+                                                    : "bg-red-50 text-red-600"
+                                            }`}>
                                             {ward.rate}%
-                                        </p>
-                                        <p className="text-xs text-fg-secondary mt-1">{ward.ward}</p>
+                                        </span>
+                                        <p className="text-xs text-fg-secondary mt-2 font-semibold uppercase tracking-wider">{ward.ward}</p>
                                     </div>
                                 ))}
                             </div>

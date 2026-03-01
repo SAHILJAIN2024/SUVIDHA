@@ -7,13 +7,44 @@ import {
   ChevronLeft,
   ChevronRight,
   AlertCircle,
+  SlidersHorizontal,
+  FileText,
+  Clock,
 } from "lucide-react";
 
 import { Card, CardContent, Button, Badge } from "@/components/ui";
 import { Input, Select } from "@/components/ui";
 import { useAuthStore } from "@/store/auth.store";
+import { motion } from "framer-motion";
 
+/* ═══════════════════════════════════════════════════════════
+   Animation Variants
+   ═══════════════════════════════════════════════════════════ */
+const stagger = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.08 } },
+};
+
+const cardAnim = {
+  hidden: { opacity: 0, y: 24, scale: 0.97 },
+  visible: (i: number) => ({
+    opacity: 1, y: 0, scale: 1,
+    transition: { delay: i * 0.08, duration: 0.5, ease: [0.22, 1, 0.36, 1] as const },
+  }),
+};
+
+/* ═══════════════════════════════════════════════════════════
+   Style Maps
+   ═══════════════════════════════════════════════════════════ */
 const ITEMS_PER_PAGE = 5;
+
+const statusStyles: Record<string, string> = {
+  resolved: "bg-emerald-50 text-emerald-700 border-emerald-200",
+  pending: "bg-amber-50 text-amber-700 border-amber-200",
+  in_progress: "bg-blue-50 text-blue-700 border-blue-200",
+  rejected: "bg-rose-50 text-rose-700 border-rose-200",
+  escalated: "bg-purple-50 text-purple-700 border-purple-200",
+};
 
 interface Complaint {
   id: number;
@@ -106,15 +137,21 @@ export default function ComplaintsPage() {
     page * ITEMS_PER_PAGE
   );
 
+  const hasActiveFilters = search !== "" || statusFilter !== "all" || categoryFilter !== "all";
+
   /* ---------------- LOADING ---------------- */
   if (loading) {
     return (
-      <div className="space-y-4">
+      <div className="space-y-6 p-4 md:p-6 lg:p-8">
+        <div className="flex justify-between items-center">
+          <div className="space-y-2">
+            <div className="h-8 w-48 bg-surface-muted rounded-lg animate-pulse" />
+            <div className="h-4 w-32 bg-surface-muted rounded-lg animate-pulse" />
+          </div>
+        </div>
+        <div className="h-20 rounded-2xl sm:rounded-3xl bg-surface border border-border/40 animate-pulse" />
         {[...Array(4)].map((_, i) => (
-          <div
-            key={i}
-            className="h-24 rounded-2xl bg-surface border border-border animate-pulse"
-          />
+          <div key={i} className="h-24 rounded-2xl sm:rounded-3xl bg-surface border border-border/40 animate-pulse" />
         ))}
       </div>
     );
@@ -123,147 +160,201 @@ export default function ComplaintsPage() {
   /* ---------------- ERROR ---------------- */
   if (error) {
     return (
-      <div className="text-center py-16">
-        <AlertCircle className="h-10 w-10 text-danger-500 mx-auto mb-3" />
-        <p>{error}</p>
-        <Button onClick={fetchComplaints} className="mt-4">
-          Retry
-        </Button>
+      <div className="text-center py-20 p-4 md:p-6 lg:p-8">
+        <div className="w-16 h-16 rounded-2xl bg-danger-50 dark:bg-danger-900/20 flex items-center justify-center mx-auto mb-4">
+          <AlertCircle className="h-8 w-8 text-danger-500" />
+        </div>
+        <p className="text-lg font-semibold text-fg mb-1">Something went wrong</p>
+        <p className="text-sm text-fg-secondary mb-4">{error}</p>
+        <Button variant="outline" size="sm" className="hover:bg-primary-50 hover:border-primary-200 transition-all" onClick={fetchComplaints}>Retry</Button>
       </div>
     );
   }
 
   /* ---------------- UI ---------------- */
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex justify-between items-center">
+    <motion.div initial="hidden" animate="visible" variants={stagger} className="space-y-8 p-4 md:p-6 lg:p-8 relative">
+      {/* ── Decorative Background Blobs ── */}
+      <div className="absolute top-10 left-1/4 w-[400px] h-[400px] bg-primary-300/15 rounded-full blur-[100px] -z-10 pointer-events-none" />
+      <div className="absolute bottom-10 right-1/4 w-[300px] h-[300px] bg-accent-300/10 rounded-full blur-[80px] -z-10 pointer-events-none" />
+
+      {/* ── Header ── */}
+      <motion.div variants={cardAnim} custom={0} className="flex justify-between items-start gap-4">
         <div>
-          <h1 className="text-2xl font-bold">My Complaints</h1>
-          <p className="text-fg-secondary">
-            {complaints.length} complaints total
+          <h1 className="text-2xl sm:text-3xl font-bold text-fg">
+            My <span className="text-primary-600">Complaints</span>
+          </h1>
+          <p className="text-fg-secondary text-sm mt-1">
+            {complaints.length} complaint{complaints.length !== 1 ? "s" : ""} total
           </p>
         </div>
-
-        {/* Pass refresh function to auto update after new complaint */}
         <CreateComplaintForm />
-      </div>
+      </motion.div>
 
-      {/* Filters */}
-      <Card padding="sm">
-        <CardContent>
-          <div className="flex gap-3 flex-wrap">
-            <Input
-              placeholder="Search by subject or ticket ID..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              leftIcon={<Search className="h-4 w-4" />}
-            />
-
-            <Select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              options={[
-                { value: "all", label: "All Status" },
-                { value: "pending", label: "Pending" },
-                { value: "in_progress", label: "In Progress" },
-                { value: "resolved", label: "Resolved" },
-                { value: "rejected", label: "Rejected" },
-                { value: "escalated", label: "Escalated" },
-              ]}
-            />
-
-            <Select
-              value={categoryFilter}
-              onChange={(e) => setCategoryFilter(e.target.value)}
-              options={[
-                { value: "all", label: "All Categories" },
-                { value: "street_light", label: "Street Light" },
-                { value: "pothole", label: "Pothole" },
-                { value: "broken_road", label: "Broken Road" },
-                { value: "drainage", label: "Drainage" },
-                { value: "garbage", label: "Garbage" },
-                { value: "water_leakage", label: "Water Leakage" },
-                { value: "other", label: "Other" },
-              ]}
-            />
+      {/* ── Filters ── */}
+      <motion.div variants={cardAnim} custom={1}>
+        <div className="rounded-2xl sm:rounded-3xl bg-surface border border-border/60 overflow-hidden">
+          {/* Filter Header Strip */}
+          <div className="flex items-center gap-3 px-5 py-3 border-b border-border/60 bg-surface/50">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center text-white shadow-md shadow-primary-500/30">
+              <SlidersHorizontal className="h-4 w-4" />
+            </div>
+            <span className="text-sm font-bold text-fg uppercase tracking-wider">Filters</span>
           </div>
-        </CardContent>
-      </Card>
+          <div className="p-4 sm:p-5">
+            <div className="flex flex-col sm:flex-row gap-3">
+              <Input
+                placeholder="Search by subject or ticket ID..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                leftIcon={<Search className="h-4 w-4" />}
+              />
 
-      {/* List */}
-      <div className="space-y-3">
-        {paginated.map((complaint) => (
-          <Card
+              <Select
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+                options={[
+                  { value: "all", label: "All Status" },
+                  { value: "pending", label: "Pending" },
+                  { value: "in_progress", label: "In Progress" },
+                  { value: "resolved", label: "Resolved" },
+                  { value: "rejected", label: "Rejected" },
+                  { value: "escalated", label: "Escalated" },
+                ]}
+              />
+
+              <Select
+                value={categoryFilter}
+                onChange={(e) => setCategoryFilter(e.target.value)}
+                options={[
+                  { value: "all", label: "All Categories" },
+                  { value: "street_light", label: "Street Light" },
+                  { value: "pothole", label: "Pothole" },
+                  { value: "broken_road", label: "Broken Road" },
+                  { value: "drainage", label: "Drainage" },
+                  { value: "garbage", label: "Garbage" },
+                  { value: "water_leakage", label: "Water Leakage" },
+                  { value: "other", label: "Other" },
+                ]}
+              />
+            </div>
+          </div>
+        </div>
+      </motion.div>
+
+      {/* ── Complaint List ── */}
+      <motion.div variants={stagger} initial="hidden" animate="visible" className="space-y-4">
+        {paginated.map((complaint, i) => (
+          <motion.div
             key={complaint.id}
-            className="hover:shadow-md transition cursor-pointer"
-            onClick={() =>
-              router.push(`/citizen/complaints/${complaint.id}`)
-            }
+            variants={cardAnim}
+            custom={i}
+            whileHover={{ y: -2 }}
           >
-            <CardContent className="flex justify-between items-center">
-              <div>
-                <h3 className="font-semibold">
-                  {complaint.subject}
-                </h3>
-
-                <p className="text-sm text-muted">
-                  Ticket: {complaint.ticket_id}
-                </p>
-
-                <div className="flex gap-2 mt-2 flex-wrap">
-                  <Badge size="sm">{complaint.category}</Badge>
-
-                  {complaint.priority && (
-                    <Badge size="sm" variant="outline">
-                      {complaint.priority}
-                    </Badge>
-                  )}
-
-                  
+            <div
+              className="group rounded-2xl sm:rounded-3xl bg-surface border border-border/60 hover:border-primary-200 hover:shadow-xl hover:shadow-primary-500/10 transition-all duration-300 p-5 sm:p-6 cursor-pointer"
+              onClick={() => router.push(`/citizen/complaints/${complaint.id}`)}
+            >
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                {/* Left: Title + Meta */}
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-bold text-fg text-base truncate">{complaint.subject}</h3>
+                  <div className="flex flex-wrap gap-2 mt-1.5 text-xs text-fg-muted">
+                    <span>#{complaint.ticket_id}</span>
+                    <span>•</span>
+                    <span>{complaint.category}</span>
+                    {complaint.priority && (
+                      <>
+                        <span>•</span>
+                        <span>{complaint.priority}</span>
+                      </>
+                    )}
+                    {complaint.authority_name && (
+                      <>
+                        <span>•</span>
+                        <span>Assigned: {complaint.authority_name}</span>
+                      </>
+                    )}
+                  </div>
                 </div>
 
-                {complaint.authority_name && (
-                  <p className="text-xs mt-1 text-muted">
-                    Assigned to: {complaint.authority_name}
+                {/* Right: Status + Date */}
+                <div className="flex flex-wrap items-center gap-2 sm:gap-3 shrink-0">
+                  <span className={`px-3 py-1 rounded-full text-xs font-bold border inline-flex items-center gap-1.5 ${statusStyles[complaint.status] || "bg-surface-muted text-fg-secondary border-border"}`}>
+                    <span className="w-1.5 h-1.5 rounded-full bg-current" />
+                    {complaint.status.replace("_", " ")}
+                  </span>
+                  <p className="text-xs text-fg-muted font-medium whitespace-nowrap inline-flex items-center">
+                    <Clock className="h-3 w-3 mr-1 inline" />
+                    {new Date(complaint.created_at).toLocaleDateString()}
                   </p>
-                )}
+                  <ChevronRight className="h-4 w-4 text-fg-muted group-hover:text-primary-600 transition-colors hidden md:block" />
+                </div>
               </div>
-
-              <span className="text-xs text-muted">
-                {new Date(
-                  complaint.created_at
-                ).toLocaleDateString()}
-              </span>
-            </CardContent>
-          </Card>
+            </div>
+          </motion.div>
         ))}
+      </motion.div>
 
-        {paginated.length === 0 && (
-          <div className="text-center py-12 text-muted">
-            No complaints found
+      {/* ── Empty State ── */}
+      {paginated.length === 0 && !loading && (
+        <motion.div variants={cardAnim} custom={0} initial="hidden" animate="visible">
+          <div className="flex flex-col items-center justify-center py-16 text-center">
+            <div className="w-16 h-16 rounded-2xl bg-primary-50 dark:bg-primary-900/20 flex items-center justify-center text-primary-600 mb-4">
+              <FileText className="h-8 w-8" />
+            </div>
+            <p className="text-lg font-semibold text-fg mb-1">
+              {hasActiveFilters ? "No matching complaints" : "No complaints yet"}
+            </p>
+            <p className="text-sm text-fg-secondary max-w-xs">
+              {hasActiveFilters
+                ? "Try adjusting your search or filter criteria."
+                : "File your first complaint to get started."
+              }
+            </p>
           </div>
-        )}
-      </div>
+        </motion.div>
+      )}
 
-      {/* Pagination */}
+      {/* ── Pagination ── */}
       {totalPages > 1 && (
-        <div className="flex gap-2 justify-center">
+        <motion.div variants={cardAnim} custom={paginated.length + 1} className="flex items-center justify-center gap-2">
           <Button
+            variant="outline"
+            size="sm"
+            className="rounded-xl hover:bg-primary-50 hover:border-primary-200 transition-all disabled:opacity-40"
             onClick={() => setPage(page - 1)}
             disabled={page === 1}
           >
-            <ChevronLeft />
+            <ChevronLeft className="h-4 w-4" />
           </Button>
 
+          {Array.from({ length: totalPages }).map((_, i) => (
+            <Button
+              key={i}
+              variant={page === i + 1 ? "primary" : "outline"}
+              size="sm"
+              className={`rounded-xl min-w-[36px] transition-all ${page === i + 1
+                ? "shadow-md shadow-primary-500/25"
+                : "hover:bg-primary-50 hover:border-primary-200"
+                }`}
+              onClick={() => setPage(i + 1)}
+            >
+              {i + 1}
+            </Button>
+          ))}
+
           <Button
+            variant="outline"
+            size="sm"
+            className="rounded-xl hover:bg-primary-50 hover:border-primary-200 transition-all disabled:opacity-40"
             onClick={() => setPage(page + 1)}
             disabled={page === totalPages}
           >
-            <ChevronRight />
+            <ChevronRight className="h-4 w-4" />
           </Button>
-        </div>
+        </motion.div>
       )}
-    </div>
+    </motion.div>
   );
 }
