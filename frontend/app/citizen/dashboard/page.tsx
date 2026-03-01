@@ -52,7 +52,7 @@ export default function UserDashboard() {
       setError(null);
 
       const res = await fetch(
-        "http://localhost:5000/api/complaints",
+        "https://suvidha-qxz1.onrender.com/api/complaints",
         {
           headers: {
             Authorization: `Bearer ${token}`,

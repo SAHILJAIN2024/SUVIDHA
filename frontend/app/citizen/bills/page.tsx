@@ -72,7 +72,7 @@ export default function BillsPage() {
 
       // 1️⃣ Create Order
       const orderRes = await fetch(
-        "http://localhost:5000/api/payments/create-order",
+        "https://suvidha-qxz1.onrender.com/api/payments/create-order",
         {
           method: "POST",
           headers: {
@@ -111,7 +111,7 @@ export default function BillsPage() {
         handler: async function (response: any) {
           // 3️⃣ Verify Payment
           const verifyRes = await fetch(
-            "http://localhost:5000/api/payments/verify",
+            "https://suvidha-qxz1.onrender.com/api/payments/verify",
             {
               method: "POST",
               headers: {

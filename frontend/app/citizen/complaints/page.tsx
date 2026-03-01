@@ -50,7 +50,7 @@ export default function ComplaintsPage() {
       setLoading(true);
       setError(null);
 
-      const res = await fetch("http://localhost:5000/api/complaints", {
+      const res = await fetch("https://suvidha-qxz1.onrender.com/api/complaints", {
         headers: {
           Authorization: `Bearer ${token}`,
         },

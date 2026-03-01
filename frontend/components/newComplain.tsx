@@ -41,7 +41,7 @@ export default function CreateComplaintForm() {
       setIsLoading(true);
       setError(null);
 
-      const res = await fetch("http://localhost:5000/api/complaints", {
+      const res = await fetch("https://suvidha-qxz1.onrender.com/api/complaints", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
