@@ -19,6 +19,7 @@ import { Input, Select } from "@/components/ui";
 import { motion } from "framer-motion";
 
 import { Complaint } from "@/types";
+import { getPublicComplaints } from "@/services/complaint.service";
 
 const ITEMS_PER_PAGE = 5;
 
@@ -53,12 +54,8 @@ export default function GlobalFeedPage() {
   useEffect(() => {
     const fetchGlobal = async () => {
       try {
-        // 🔌 BACKEND: replace with your actual public complaints endpoint
-        // e.g. /api/complaints?scope=global  or  /api/complaints/public
-        const res = await fetch("/api/complaints/public");
-        if (!res.ok) throw new Error(`Server error: ${res.status}`);
-        const data = await res.json();
-        setComplaints(data.complaints ?? data ?? []);
+        const res = await getPublicComplaints();
+        setComplaints(res?.data || []);
       } catch (err: any) {
         console.error("[GlobalFeed] fetch error:", err);
         setError(err?.message || "Could not load public complaints.");
@@ -239,8 +236,8 @@ export default function GlobalFeedPage() {
                     onClick={() => !complaint.hasVoted && handleVote(complaint.id)}
                     disabled={complaint.hasVoted}
                     className={`flex flex-col items-center gap-1 px-3 py-2.5 rounded-xl border transition-all duration-200 shrink-0 min-w-[44px] min-h-[44px] justify-center ${complaint.hasVoted
-                        ? "bg-primary-50 border-primary-200 text-primary-600 cursor-default"
-                        : "bg-surface-muted border-border/60 text-fg-muted hover:bg-primary-50 hover:border-primary-200 hover:text-primary-600 cursor-pointer"
+                      ? "bg-primary-50 border-primary-200 text-primary-600 cursor-default"
+                      : "bg-surface-muted border-border/60 text-fg-muted hover:bg-primary-50 hover:border-primary-200 hover:text-primary-600 cursor-pointer"
                       }`}
                   >
                     <ChevronUp className="h-4 w-4" />

@@ -85,7 +85,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                         </div>
 
                         {/* Left: Desktop Navigation */}
-                        <nav className="hidden md:flex items-center gap-0.5 lg:gap-1 mx-2 lg:mx-4 flex-1 overflow-x-auto scrollbar-none">
+                        <nav className="hidden md:flex items-center gap-4 lg:gap-1 mx-2 lg:mx-4 flex-1 overflow-x-auto scrollbar-none">
                             {navItems.map((item) => {
                                 const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
                                 return (
