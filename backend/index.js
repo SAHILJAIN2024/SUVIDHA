@@ -9,10 +9,21 @@ const { sanitizeInputs } = require('./middleware/sanitize');
 dotenv.config();
 const app = express();
 
+const allowedOrigins = [
+  "http://localhost:3000",           // Dev frontend
+  "https://suvidha-jade.vercel.app" // Production frontend
+];
 // ── Security Middleware ──
+
 app.use(securityHeaders);                        // Helmet security headers
 app.use(cors({
-  origin: process.env.CORS_ORIGIN || 'http://localhost:3000',
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true,
