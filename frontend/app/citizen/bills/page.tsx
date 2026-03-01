@@ -206,7 +206,7 @@ export default function BillsPage() {
 
     /* ---------------- UI ---------------- */
     return (
-        <motion.div initial="hidden" animate="visible" variants={stagger} className="space-y-8 p-4 md:p-6 lg:p-8 relative">
+        <motion.div initial="hidden" animate="visible" variants={stagger} className="relative space-y-8 overflow-hidden">
             {/* ── Decorative Background Blobs ── */}
             <div className="absolute top-10 left-1/4 w-[400px] h-[400px] bg-primary-300/15 rounded-full blur-[100px] -z-10 pointer-events-none" />
             <div className="absolute bottom-10 right-1/4 w-[300px] h-[300px] bg-accent-300/10 rounded-full blur-[80px] -z-10 pointer-events-none" />

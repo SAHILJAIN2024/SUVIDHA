@@ -157,13 +157,12 @@ export default function UserDashboard() {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
-      className="min-h-screen bg-bg selection:bg-primary-500/30 relative overflow-hidden"
+      className="relative overflow-hidden space-y-8"
     >
       {/* ── Decorative Background Blobs ── */}
       <div className="absolute top-10 left-1/4 w-[400px] h-[400px] bg-primary-300/15 rounded-full blur-[100px] -z-10 pointer-events-none" />
       <div className="absolute bottom-10 right-1/4 w-[300px] h-[300px] bg-accent-300/10 rounded-full blur-[80px] -z-10 pointer-events-none" />
-
-      <div className="max-w-5xl mx-auto p-6 sm:p-8 md:p-12 space-y-8">
+      <div className="space-y-8">
 
         {/* ── Page Header ── */}
         <motion.div variants={cardAnim} custom={0} initial="hidden" animate="visible" className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">

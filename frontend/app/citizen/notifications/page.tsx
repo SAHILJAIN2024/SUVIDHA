@@ -144,7 +144,7 @@ export default function NotificationsPage() {
     /* ── Loading State ── */
     if (loading) {
         return (
-            <div className="max-w-2xl mx-auto space-y-6 p-4 md:p-6 lg:p-8">
+            <div className="space-y-6">
                 <div className="flex justify-between items-center">
                     <div className="space-y-2">
                         <div className="h-8 w-48 bg-surface-muted rounded-lg animate-pulse" />
@@ -163,7 +163,7 @@ export default function NotificationsPage() {
     /* ── Error State ── */
     if (error) {
         return (
-            <div className="max-w-2xl mx-auto text-center py-20 p-4 md:p-6 lg:p-8">
+            <div className="text-center py-20">
                 <div className="w-16 h-16 rounded-2xl bg-danger-50 dark:bg-danger-900/20 flex items-center justify-center mx-auto mb-4">
                     <AlertCircle className="h-8 w-8 text-danger-500" />
                 </div>
@@ -176,7 +176,7 @@ export default function NotificationsPage() {
 
     /* ── Main Render ── */
     return (
-        <motion.div initial="hidden" animate="visible" variants={stagger} className="max-w-2xl mx-auto space-y-8 p-4 md:p-6 lg:p-8 relative">
+        <motion.div initial="hidden" animate="visible" variants={stagger} className="relative space-y-8 overflow-hidden">
             {/* ── Decorative Background Blobs ── */}
             <div className="absolute top-10 left-1/4 w-[400px] h-[400px] bg-primary-300/15 rounded-full blur-[100px] -z-10 pointer-events-none" />
             <div className="absolute bottom-10 right-1/4 w-[300px] h-[300px] bg-accent-300/10 rounded-full blur-[80px] -z-10 pointer-events-none" />

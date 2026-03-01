@@ -56,7 +56,7 @@ export default function CitizenLayout({ children }: { children: React.ReactNode 
 
     return (
         <AuthGuard allowedRoles={["user"]}>
-            <div className="min-h-screen bg-bg flex flex-col">
+            <div className="min-h-screen w-full bg-bg flex flex-col">
 
                 {/* ── Top Navigation Bar ────── */}
                 <header className="sticky top-0 z-40 bg-surface/95 backdrop-blur-xl border-b border-border shadow-sm">
@@ -64,7 +64,7 @@ export default function CitizenLayout({ children }: { children: React.ReactNode 
 
                         {/* Left: Brand + Mobile Menu Button */}
                         <div className="flex items-center gap-4">
-                            <button onClick={() => setMobileOpen(true)} className="lg:hidden p-2 -ml-2 rounded-lg text-fg-muted hover:text-fg hover:bg-surface-muted transition-colors">
+                            <button onClick={() => setMobileOpen(true)} className="md:hidden p-2 -ml-2 rounded-lg text-fg-muted hover:text-fg hover:bg-surface-muted transition-colors">
                                 <Menu className="h-5 w-5" />
                             </button>
 
@@ -79,8 +79,8 @@ export default function CitizenLayout({ children }: { children: React.ReactNode 
                             </Link>
                         </div>
 
-                        {/* Left-aligned Desktop Navigation */}
-                        <nav className="hidden lg:flex items-center gap-1 mx-4 flex-1">
+                        {/* Desktop Navigation — visible md+, scrollable if needed */}
+                        <nav className="hidden md:flex items-center gap-0.5 lg:gap-1 mx-2 lg:mx-4 flex-1 overflow-x-auto scrollbar-none">
                             {navItems.map((item) => {
                                 const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
                                 return (
@@ -88,13 +88,13 @@ export default function CitizenLayout({ children }: { children: React.ReactNode 
                                         key={item.href}
                                         href={item.href}
                                         className={cn(
-                                            "flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200",
+                                            "flex items-center gap-1.5 px-2.5 lg:px-3 py-2 rounded-xl text-xs lg:text-sm font-medium transition-all duration-200 whitespace-nowrap shrink-0",
                                             isActive
                                                 ? "bg-primary-50 text-primary-700 dark:bg-primary-900/20 dark:text-primary-300"
                                                 : "text-fg-secondary hover:text-fg hover:bg-surface-muted"
                                         )}
                                     >
-                                        <item.icon className={cn("h-4 w-4 shrink-0", isActive && "text-primary-600")} />
+                                        <item.icon className={cn("h-3.5 w-3.5 lg:h-4 lg:w-4 shrink-0", isActive && "text-primary-600")} />
                                         <span>{t(item.id)}</span>
                                     </Link>
                                 );
@@ -103,7 +103,7 @@ export default function CitizenLayout({ children }: { children: React.ReactNode 
 
                         {/* Right: Actions & Profile */}
                         <div className="flex items-center gap-2 sm:gap-4 shrink-0">
-                            <div className="hidden lg:flex items-center gap-2 pr-4 border-r border-border">
+                            <div className="hidden md:flex items-center gap-2 pr-4 border-r border-border">
                                 <LanguageSelector />
                                 <button
                                     onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
@@ -185,8 +185,8 @@ export default function CitizenLayout({ children }: { children: React.ReactNode 
                 </AnimatePresence>
 
                 {/* ── Main Content Area ────── */}
-                <main className="flex-1 overflow-x-hidden overflow-y-auto bg-surface-muted/30">
-                    <div className="max-w-[1400px] mx-auto w-full p-4 sm:p-6 lg:p-8">
+                <main className="flex-1 w-full overflow-x-hidden bg-surface-muted/30">
+                    <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-10">
                         {children}
                     </div>
                 </main>
