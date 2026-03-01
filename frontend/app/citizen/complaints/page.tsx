@@ -179,7 +179,7 @@ export default function ComplaintsPage() {
       <div className="absolute bottom-10 right-1/4 w-[300px] h-[300px] bg-accent-300/10 rounded-full blur-[80px] -z-10 pointer-events-none" />
 
       {/* ── Header ── */}
-      <motion.div variants={cardAnim} custom={0} className="flex justify-between items-start gap-4">
+      <motion.div variants={cardAnim} custom={0} className="flex justify-between items-start gap-4 flex-wrap gap-y-3">
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold text-fg">
             My <span className="text-primary-600">Complaints</span>
@@ -318,7 +318,7 @@ export default function ComplaintsPage() {
 
       {/* ── Pagination ── */}
       {totalPages > 1 && (
-        <motion.div variants={cardAnim} custom={paginated.length + 1} className="flex items-center justify-center gap-2">
+        <motion.div variants={cardAnim} custom={paginated.length + 1} className="flex flex-wrap items-center justify-center gap-2">
           <Button
             variant="outline"
             size="sm"

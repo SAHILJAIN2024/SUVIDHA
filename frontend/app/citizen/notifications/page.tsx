@@ -182,7 +182,7 @@ export default function NotificationsPage() {
             <div className="absolute bottom-10 right-1/4 w-[300px] h-[300px] bg-accent-300/10 rounded-full blur-[80px] -z-10 pointer-events-none" />
 
             {/* ── Header ── */}
-            <motion.div variants={cardAnim} custom={0} className="flex items-start justify-between gap-4">
+            <motion.div variants={cardAnim} custom={0} className="flex items-start justify-between gap-4 flex-wrap gap-y-3">
                 <div>
                     <h1 className="text-2xl sm:text-3xl font-bold text-fg">
                         My <span className="text-primary-600">Notifications</span>
@@ -206,33 +206,35 @@ export default function NotificationsPage() {
 
             {/* ── Filter Tabs ── */}
             <motion.div variants={cardAnim} custom={1}>
-                <div className="flex gap-1 p-1.5 bg-surface-muted/50 rounded-2xl border border-border/40 w-fit">
-                    <button
-                        onClick={() => setFilter("all")}
-                        className={`px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 flex items-center gap-2 ${filter === "all"
+                <div className="max-w-full overflow-x-auto">
+                    <div className="flex gap-1 p-1.5 bg-surface-muted/50 rounded-2xl border border-border/40 w-fit">
+                        <button
+                            onClick={() => setFilter("all")}
+                            className={`px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 flex items-center gap-2 ${filter === "all"
                                 ? "bg-surface shadow-sm border border-border/60 text-fg"
                                 : "text-fg-secondary hover:text-fg"
-                            }`}
-                    >
-                        All
-                        <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${filter === "all" ? "bg-primary-100 text-primary-700" : "bg-surface-muted text-fg-muted"
-                            }`}>
-                            {notifications.length}
-                        </span>
-                    </button>
-                    <button
-                        onClick={() => setFilter("unread")}
-                        className={`px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 flex items-center gap-2 ${filter === "unread"
+                                }`}
+                        >
+                            All
+                            <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${filter === "all" ? "bg-primary-100 text-primary-700" : "bg-surface-muted text-fg-muted"
+                                }`}>
+                                {notifications.length}
+                            </span>
+                        </button>
+                        <button
+                            onClick={() => setFilter("unread")}
+                            className={`px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 flex items-center gap-2 ${filter === "unread"
                                 ? "bg-surface shadow-sm border border-border/60 text-fg"
                                 : "text-fg-secondary hover:text-fg"
-                            }`}
-                    >
-                        Unread
-                        <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${filter === "unread" ? "bg-amber-100 text-amber-700" : "bg-surface-muted text-fg-muted"
-                            }`}>
-                            {unreadCount}
-                        </span>
-                    </button>
+                                }`}
+                        >
+                            Unread
+                            <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${filter === "unread" ? "bg-amber-100 text-amber-700" : "bg-surface-muted text-fg-muted"
+                                }`}>
+                                {unreadCount}
+                            </span>
+                        </button>
+                    </div>
                 </div>
             </motion.div>
 
@@ -244,8 +246,8 @@ export default function NotificationsPage() {
                         return (
                             <motion.div key={notif._id} variants={cardAnim} custom={i} whileHover={{ y: -2 }}>
                                 <div className={`group rounded-2xl sm:rounded-3xl bg-surface border transition-all duration-300 p-5 sm:p-6 ${!notif.read
-                                        ? "border-primary-200 bg-primary-50/20 hover:shadow-xl hover:shadow-primary-500/10"
-                                        : "border-border/60 hover:border-primary-200 hover:shadow-xl hover:shadow-primary-500/10"
+                                    ? "border-primary-200 bg-primary-50/20 hover:shadow-xl hover:shadow-primary-500/10"
+                                    : "border-border/60 hover:border-primary-200 hover:shadow-xl hover:shadow-primary-500/10"
                                     }`}>
                                     <div className="flex items-start gap-4">
                                         {/* Type Icon */}
@@ -303,7 +305,7 @@ export default function NotificationsPage() {
                                             <Button
                                                 variant="ghost"
                                                 size="icon"
-                                                className="h-8 w-8 rounded-xl hover:bg-rose-50 hover:text-rose-600 transition-all"
+                                                className="h-9 w-9 rounded-xl hover:bg-rose-50 hover:text-rose-600 transition-all"
                                                 onClick={() => handleDelete(notif._id)}
                                                 title="Delete"
                                             >

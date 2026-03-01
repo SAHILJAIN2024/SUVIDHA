@@ -113,6 +113,43 @@ export default function AdminDashboard() {
     const [error, setError] = useState<string | null>(null);
     const { t } = useI18nStore();
 
+    useEffect(() => {
+        const loadDashboard = async () => {
+            try {
+                setLoading(true);
+                setError(null);
+
+                // ── 🔌 BACKEND: Replace this block with real API calls when ready ──
+                // const res = await fetch("/api/admin/dashboard", {
+                //   headers: { Authorization: `Bearer ${token}` }
+                // });
+                // const data = await res.json();
+                // setKpis(data.kpis); setChartData(data.charts);
+
+                // ── 🎭 MOCK: Remove when backend is connected ──
+                await new Promise((r) => setTimeout(r, 600));
+                setKpis([
+                    { label: "Total Complaints", value: "0", change: 0, trend: "stable", icon: "FileText" },
+                    { label: "Resolved", value: "0", change: 0, trend: "stable", icon: "CheckCircle" },
+                    { label: "Pending", value: "0", change: 0, trend: "stable", icon: "Clock" },
+                    { label: "Satisfaction", value: "—", change: 0, trend: "stable", icon: "ThumbsUp" },
+                ]);
+                setChartData({
+                    complaintsOverTime: [],
+                    byDepartment: [],
+                    resolutionByWard: [],
+                });
+            } catch (err: any) {
+                console.error("Dashboard load error:", err);
+                setError(err.message || "Failed to load dashboard data");
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        loadDashboard();
+    }, []);
+
     if (loading) {
         return (
             <div className="space-y-6">
@@ -181,10 +218,10 @@ export default function AdminDashboard() {
                                                 <Minus className="h-3.5 w-3.5 text-fg-muted" />
                                             )}
                                             <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${kpi.trend === "up"
-                                                    ? "bg-success-50 text-success-600"
-                                                    : kpi.trend === "down"
-                                                        ? "bg-danger-50 text-danger-600"
-                                                        : "bg-surface-muted text-fg-muted"
+                                                ? "bg-success-50 text-success-600"
+                                                : kpi.trend === "down"
+                                                    ? "bg-danger-50 text-danger-600"
+                                                    : "bg-surface-muted text-fg-muted"
                                                 }`}>
                                                 {kpi.change > 0 ? "+" : ""}{kpi.change}%
                                             </span>
@@ -293,10 +330,10 @@ export default function AdminDashboard() {
                                         className="text-center p-5 rounded-2xl bg-surface-muted/50 border border-border/40 hover:border-primary-500/30 hover:shadow-md transition-all duration-300"
                                     >
                                         <span className={`inline-block px-3 py-1 rounded-full text-lg sm:text-xl font-extrabold ${ward.rate >= 90
-                                                ? "bg-emerald-50 text-emerald-600"
-                                                : ward.rate >= 80
-                                                    ? "bg-amber-50 text-amber-600"
-                                                    : "bg-red-50 text-red-600"
+                                            ? "bg-emerald-50 text-emerald-600"
+                                            : ward.rate >= 80
+                                                ? "bg-amber-50 text-amber-600"
+                                                : "bg-red-50 text-red-600"
                                             }`}>
                                             {ward.rate}%
                                         </span>
