@@ -133,7 +133,7 @@ export default function GlobalFeedPage() {
 
   /* ------------------ UI ------------------ */
   return (
-    <motion.div initial="hidden" animate="visible" variants={stagger} className="relative space-y-8 overflow-hidden">
+    <motion.div initial="hidden" animate="visible" variants={stagger} className="relative w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-10 space-y-6 sm:space-y-8 overflow-hidden">
       {/* Background blobs */}
       <div className="absolute top-0 left-1/4 w-[400px] h-[400px] bg-primary-300/15 rounded-full blur-[100px] -z-10 pointer-events-none" />
       <div className="absolute bottom-0 right-1/4 w-[300px] h-[300px] bg-accent-300/10 rounded-full blur-[80px] -z-10 pointer-events-none" />
