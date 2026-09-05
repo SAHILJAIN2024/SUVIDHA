@@ -16,7 +16,6 @@ import {
     PhoneCall,
 } from "lucide-react";
 import { Card, CardContent, Button, Badge, Input } from "@/components/ui";
-import { useAuthStore } from "@/store/auth.store";
 
 /* ═══════════════════════════════════════════════════════════
    Animation Variants
@@ -59,7 +58,7 @@ interface Profile {
 }
 
 export default function ProfilePage() {
-    const { token } = useAuthStore();
+    // const { token } = useAuthStore();
 
     const [profile, setProfile] = useState<Profile | null>(null);
     const [loading, setLoading] = useState(true);
@@ -71,7 +70,7 @@ export default function ProfilePage() {
             try {
                 const res = await fetch("https://suvidha-qxz1.onrender.com/api/auth/profile", {
                     headers: {
-                        Authorization: `Bearer ${token}`,
+                        
                     },
                 });
 
@@ -87,8 +86,8 @@ export default function ProfilePage() {
             }
         };
 
-        if (token) fetchProfile();
-    }, [token]);
+       
+    }, []);
 
     /* ---------------- UPDATE PROFILE ---------------- */
     const handleUpdate = async () => {
@@ -99,7 +98,7 @@ export default function ProfilePage() {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
-                    Authorization: `Bearer ${token}`,
+                    
                 },
                 body: JSON.stringify({
                     name: profile.name,

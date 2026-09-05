@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState } from "react";
-import { AuthGuard } from "@/components/AuthGuard";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
@@ -20,17 +19,17 @@ import {
     Moon,
     ShieldCheck,
     Globe,
+    BookOpen,
 } from "lucide-react";
 import { cn } from "@/utils/cn";
-import { useAuthStore } from "@/store/auth.store";
 import { useUIStore } from "@/store/ui.store";
 import { useI18nStore } from "@/store/i18n.store";
 import { LanguageSelector } from "@/components/LanguageSelector";
+import { div } from "framer-motion/m";
 
 const navItems = [
     { href: "/citizen/dashboard", id: "nav.dashboard", icon: LayoutDashboard, label: "Dashboard" },
-    { href: "/citizen/complaints", id: "nav.complaints", icon: FileText, label: "Complaints" },
-    { href: "/citizen/complaints/global", id: "nav.globalFeed", icon: Globe, label: "Global Feed" },
+    { href: "/state/assam", id: "State", icon: BookOpen, label: "State" },
     { href: "/citizen/bills", id: "nav.billPayments", icon: CreditCard, label: "Bills" },
     { href: "/citizen/services", id: "nav.services", icon: Briefcase, label: "Services" },
     { href: "/citizen/documents", id: "nav.documents", icon: ShieldCheck, label: "Documents" },
@@ -41,24 +40,16 @@ const navItems = [
 export default function CitizenLayout({ children }: { children: React.ReactNode }) {
     const pathname = usePathname();
     const router = useRouter();
-    const { user, logout } = useAuthStore();
     const { theme, setTheme } = useUIStore();
     const [mobileOpen, setMobileOpen] = useState(false);
     const { t } = useI18nStore();
 
-    const handleLogout = () => {
-        logout();
-        router.push("/");
-    };
-
-    const displayName = user?.name || "Citizen";
-    const displayEmail = user?.email || "citizen@suvidha.gov";
+   
+    const displayName = "Citizen";
     const initial = displayName.charAt(0).toUpperCase();
 
     return (
-        <AuthGuard allowedRoles={["user"]}>
-            {/* FIX: Removed overflow-x-hidden from here. It forces overflow-y to auto and clips dropdowns! */}
-            <div className="min-h-screen w-full bg-bg flex flex-col">
+        <div className="min-h-screen w-full bg-bg flex flex-col">
 
                 {/* ════════════════════════════════════
                     TOP NAVIGATION BAR
@@ -149,17 +140,11 @@ export default function CitizenLayout({ children }: { children: React.ReactNode 
                             {/* Profile info (desktop) */}
                             <div className="hidden lg:block text-right mr-1 leading-none">
                                 <p className="text-xs font-semibold text-fg truncate max-w-[120px]">{displayName}</p>
-                                <p className="text-[10px] text-fg-muted mt-0.5 truncate max-w-[120px]">{displayEmail}</p>
+                                <p className="text-[10px] text-fg-muted mt-0.5 truncate max-w-[120px]">citizen@suvidha.gov</p>
                             </div>
 
                             {/* Avatar / Logout */}
-                            <button
-                                onClick={handleLogout}
-                                title={t("nav.signOut")}
-                                className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center text-white text-xs font-extrabold hover:scale-105 hover:shadow-md hover:shadow-primary-500/30 transition-all shrink-0"
-                            >
-                                {initial}
-                            </button>
+                            
                         </div>
                     </div>
                 </header>
@@ -264,18 +249,10 @@ export default function CitizenLayout({ children }: { children: React.ReactNode 
                                         </div>
                                         <div className="min-w-0 leading-none">
                                             <p className="text-xs font-semibold text-fg truncate">{displayName}</p>
-                                            <p className="text-[10px] text-fg-muted mt-0.5 truncate">{displayEmail}</p>
+                                            <p className="text-[10px] text-fg-muted mt-0.5 truncate">citizen@gmail.com</p>
                                         </div>
                                     </div>
-                                    <button
-                                        onClick={handleLogout}
-                                        className="flex items-center gap-3 w-full px-3 py-3 rounded-xl text-sm font-semibold text-danger-500 hover:bg-danger-50 dark:hover:bg-danger-500/10 transition-all"
-                                    >
-                                        <div className="w-8 h-8 rounded-xl flex items-center justify-center bg-danger-50 dark:bg-danger-500/10 shrink-0">
-                                            <LogOut className="h-4 w-4" />
-                                        </div>
-                                        {t("nav.signOut")}
-                                    </button>
+                                    
                                 </div>
                             </motion.aside>
                         </>
@@ -296,7 +273,6 @@ export default function CitizenLayout({ children }: { children: React.ReactNode 
                     </div>
                 </main>
 
-            </div>
-        </AuthGuard>
+        </div>
     );
 }

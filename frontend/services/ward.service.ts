@@ -1,4 +1,3 @@
-import { authFetch } from "./authFetch";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
 
@@ -44,8 +43,9 @@ export interface QuickAction {
 
 export const getWardData = async (): Promise<WardData[]> => {
     try {
-        const data = await authFetch(`${API_BASE}/wards/stats`);
-        return data.data;
+        const data = await fetch(`${API_BASE}/wards/stats`);
+        const jsonData = await data.json();
+        return jsonData.data;
     } catch (error) {
         return [
             { ward: "Ward 1", rate: "92%", resolved: 450, total: 489 },
@@ -57,8 +57,9 @@ export const getWardData = async (): Promise<WardData[]> => {
 
 export const getWardContacts = async (): Promise<WardContact[]> => {
     try {
-        const data = await authFetch(`${API_BASE}/wards/contacts`);
-        return data.data;
+        const data = await fetch(`${API_BASE}/wards/contacts`);
+        const jsonData = await data.json();
+        return jsonData.data;
     } catch (error) {
         return [
             { ward: "Ward 1", designation: "Ward Officer", officer: "Rajesh Kumar", phone: "9876543210", email: "rajesh.k@city.gov" },
@@ -69,8 +70,9 @@ export const getWardContacts = async (): Promise<WardContact[]> => {
 
 export const getWardMapMarkers = async (): Promise<WardMapMarker[]> => {
     try {
-        const data = await authFetch(`${API_BASE}/wards/markers`);
-        return data.data;
+        const data = await fetch(`${API_BASE}/wards/markers`);
+        const jsonData = await data.json();
+        return jsonData.data;
     } catch (error) {
         return [
             { lat: 28.6139, lng: 77.2090, label: "Ward 1", complaints: 12, status: "Critical" },
@@ -81,8 +83,9 @@ export const getWardMapMarkers = async (): Promise<WardMapMarker[]> => {
 
 export const getDepartments = async (): Promise<DepartmentInfo[]> => {
     try {
-        const data = await authFetch(`${API_BASE}/departments`);
-        return data.data;
+        const data = await fetch(`${API_BASE}/departments`);
+        const jsonData = await data.json();
+        return jsonData.data;
     } catch (error) {
         return [
             { 
@@ -101,8 +104,9 @@ export const getDepartments = async (): Promise<DepartmentInfo[]> => {
 
 export const getQuickActions = async (): Promise<QuickAction[]> => {
     try {
-        const data = await authFetch(`${API_BASE}/quick-actions`);
-        return data.data;
+        const data = await fetch(`${API_BASE}/quick-actions`);
+        const jsonData = await data.json();
+        return jsonData.data;
     } catch (error) {
         return [
             { id: "1", label: "New Complaint", icon: "FileText", href: "/citizen/complaints/new", color: "bg-primary-500" },

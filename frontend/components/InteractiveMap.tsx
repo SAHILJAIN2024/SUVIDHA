@@ -3,6 +3,8 @@
 import React, { useEffect } from "react";
 import { MapContainer, TileLayer, Marker, Popup, Circle, useMap } from "react-leaflet";
 import L from "leaflet";
+// Leaflet ships this stylesheet without TypeScript declarations.
+// @ts-expect-error -- CSS is loaded for its side effects.
 import "leaflet/dist/leaflet.css";
 
 // Fix for default marker icons in Leaflet with Next.js
@@ -28,7 +30,9 @@ interface MapProps {
 
 function ChangeView({ center }: { center: [number, number] }) {
     const map = useMap();
-    map.setView(center);
+    useEffect(() => {
+        map.setView(center);
+    }, [map, center]);
     return null;
 }
 
@@ -46,24 +50,25 @@ export default function InteractiveMap({ center, markers, onMarkerClick }: MapPr
             />
             <ChangeView center={center} />
             {markers.map((marker, idx) => (
-                <Marker
-                    key={idx}
-                    position={[marker.lat, marker.lng]}
-                    eventHandlers={{
-                        click: () => onMarkerClick?.(marker.label),
-                    }}
-                >
-                    <Popup>
-                        <div className="p-1">
-                            <h3 className="font-bold text-sm mb-1">{marker.label}</h3>
-                            <p className="text-xs text-slate-600 mb-1">{marker.complaints} active complaints</p>
-                            <div className="flex items-center gap-1.5 mt-2">
-                                <span className={`w-2 h-2 rounded-full ${marker.status === 'high' ? 'bg-red-500' : marker.status === 'medium' ? 'bg-amber-500' : 'bg-green-500'}`} />
-                                <span className="text-[10px] uppercase font-bold text-slate-500">{marker.status} Priority Area</span>
+                <React.Fragment key={idx}>
+                    <Marker
+                        position={[marker.lat, marker.lng]}
+                        eventHandlers={{
+                            click: () => onMarkerClick?.(marker.label),
+                        }}
+                    >
+                        <Popup>
+                            <div className="p-1">
+                                <h3 className="font-bold text-sm mb-1">{marker.label}</h3>
+                                <p className="text-xs text-slate-600 mb-1">{marker.complaints} active complaints</p>
+                                <div className="flex items-center gap-1.5 mt-2">
+                                    <span className={`w-2 h-2 rounded-full ${marker.status === 'high' ? 'bg-red-500' : marker.status === 'medium' ? 'bg-amber-500' : 'bg-green-500'}`} />
+                                    <span className="text-[10px] uppercase font-bold text-slate-500">{marker.status} Priority Area</span>
+                                </div>
                             </div>
-                        </div>
-                    </Popup>
-                    {/* Simulated Geofencing Circle */}
+                        </Popup>
+                    </Marker>
+                    {/* Simulated Geofencing Circle - MUST be sibling of Marker, not child */}
                     <Circle
                         center={[marker.lat, marker.lng]}
                         radius={500}
@@ -74,7 +79,7 @@ export default function InteractiveMap({ center, markers, onMarkerClick }: MapPr
                             weight: 1
                         }}
                     />
-                </Marker>
+                </React.Fragment>
             ))}
         </MapContainer>
     );

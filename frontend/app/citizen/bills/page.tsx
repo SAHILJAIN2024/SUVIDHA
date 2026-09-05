@@ -18,7 +18,7 @@ import {
 import { Card, CardContent, Button, Badge } from "@/components/ui";
 import { Modal } from "@/components/ui";
 import { Bill } from "@/types";
-import { useAuthStore } from "@/store/auth.store";
+
 
 /* ═══════════════════════════════════════════════════════════
    Animation Variants
@@ -98,7 +98,6 @@ const loadRazorpay = () => {
    Page Component
    ═══════════════════════════════════════════════════════════ */
 export default function BillsPage() {
-    const { token } = useAuthStore();
 
     const [bills, setBills] = useState<Bill[]>([]);
     const [loading, setLoading] = useState(false);
@@ -110,10 +109,7 @@ export default function BillsPage() {
     /* ---------------- PAYMENT HANDLER ---------------- */
     const handlePay = async (bill: Bill) => {
         try {
-            if (!token) {
-                alert("Authentication required");
-                return;
-            }
+            
 
             setPaying(true);
 
@@ -124,7 +120,7 @@ export default function BillsPage() {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
-                        Authorization: `Bearer ${token}`,
+                        
                     },
                     body: JSON.stringify({
                         amount: bill.amount,
@@ -163,7 +159,7 @@ export default function BillsPage() {
                             method: "POST",
                             headers: {
                                 "Content-Type": "application/json",
-                                Authorization: `Bearer ${token}`,
+                                
                             },
                             body: JSON.stringify(response),
                         }

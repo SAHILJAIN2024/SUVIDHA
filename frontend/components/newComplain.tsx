@@ -4,11 +4,11 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { AlertCircle, Loader2 } from "lucide-react";
 import { Card, CardContent, Button, Input, Select } from "@/components/ui";
-import { useAuthStore } from "@/store/auth.store";
+
 
 export default function CreateComplaintForm() {
   const router = useRouter();
-  const { token } = useAuthStore();
+  
 
   const [formData, setFormData] = useState({
     category: "",
@@ -32,10 +32,7 @@ export default function CreateComplaintForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!token) {
-      setError("You must be logged in.");
-      return;
-    }
+    
 
     try {
       setIsLoading(true);
@@ -45,7 +42,6 @@ export default function CreateComplaintForm() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify(formData),
       });

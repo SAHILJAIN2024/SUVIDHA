@@ -1,4 +1,3 @@
-import { authFetch } from "./authFetch";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
 
@@ -16,8 +15,9 @@ export interface NotificationItem {
 
 export const getNotifications = async (): Promise<NotificationItem[]> => {
     try {
-        const data = await authFetch(`${API_BASE}/notifications`);
-        return data.data.map((item: any) => ({
+        const data = await fetch(`${API_BASE}/notifications`);
+        const jsonData = await data.json();
+        return jsonData.data.map((item: any) => ({
             ...item,
             timestamp: item.timestamp || item.createdAt
         }));
@@ -42,7 +42,7 @@ export const getNotifications = async (): Promise<NotificationItem[]> => {
 
 export const markNotificationRead = async (id: string): Promise<boolean> => {
     try {
-        await authFetch(`${API_BASE}/notifications/${id}/read`, { method: "PUT" });
+        await fetch(`${API_BASE}/notifications/${id}/read`, { method: "PUT" });
         return true;
     } catch (error) {
         return false;
@@ -51,7 +51,7 @@ export const markNotificationRead = async (id: string): Promise<boolean> => {
 
 export const markAllNotificationsRead = async (): Promise<boolean> => {
     try {
-        await authFetch(`${API_BASE}/notifications/read-all`, { method: "PUT" });
+        await fetch(`${API_BASE}/notifications/read-all`, { method: "PUT" });
         return true;
     } catch (error) {
         return false;
@@ -60,7 +60,7 @@ export const markAllNotificationsRead = async (): Promise<boolean> => {
 
 export const deleteNotification = async (id: string): Promise<boolean> => {
     try {
-        await authFetch(`${API_BASE}/notifications/${id}`, { method: "DELETE" });
+        await fetch(`${API_BASE}/notifications/${id}`, { method: "DELETE" });
         return true;
     } catch (error) {
         return false;

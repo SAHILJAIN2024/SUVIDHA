@@ -9,7 +9,6 @@ import {
     WifiOff, ChevronRight,
 } from "lucide-react";
 import { Card, CardContent, Button } from "@/components/ui";
-import { useAuthStore } from "@/store/auth.store";
 
 /* ────────────────────────────────────────────────────
    Animation Variants
@@ -106,7 +105,7 @@ const helpLinks = [
    Page Component
 ────────────────────────────────────────────────────── */
 export default function ServicesPage() {
-    const { user } = useAuthStore();
+    //const { user } = useAuthStore();
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 

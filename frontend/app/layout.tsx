@@ -1,6 +1,9 @@
 import type { Metadata, Viewport } from "next";
-import { Inter, JetBrains_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
+
+import Providers from "./Providers";
+import { WalletProvider } from "../components/WalletContext";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -42,15 +45,29 @@ export const viewport: Viewport = {
   ],
 };
 
+const geistSans = Geist({
+  variable: "--font-geist-sans",
+  subsets: ["latin"],
+});
+
+const geistMono = Geist_Mono({
+  variable: "--font-geist-mono",
+  subsets: ["latin"],
+});
+
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
-    <html lang="en" suppressHydrationWarning className="w-full h-full">
-      <body className={`${inter.variable} ${jetbrainsMono.variable} antialiased overflow-x-hidden w-full min-h-full flex flex-col`}>
-        {children}
+    <html lang="en">
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-black text-white`}
+      >
+        <WalletProvider>
+          <Providers>{children}</Providers>
+        </WalletProvider>
       </body>
     </html>
   );

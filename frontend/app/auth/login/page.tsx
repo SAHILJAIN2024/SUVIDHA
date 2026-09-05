@@ -6,11 +6,9 @@ import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { Mail, Lock, Eye, EyeOff, ArrowRight, Globe, Smartphone, Shield } from "lucide-react";
 import { Button, Input } from "@/components/ui";
-import { useAuthStore } from "@/store/auth.store";
 
 export default function LoginPage() {
   const router = useRouter();
-  const login = useAuthStore((state) => state.login);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -45,12 +43,7 @@ export default function LoginPage() {
       }
 
 
-      login(data.user, data.token);
-      router.push(
-        data.user.role === "admin"
-          ? "/admin/dashboard"
-          : "/citizen/dashboard"
-      );
+      
 
     } catch (err) {
       console.error("Login error:", err);
@@ -142,14 +135,17 @@ export default function LoginPage() {
             // className="pl-12 pr-12"
             />
             <Button
-              type="submit"
-              size="lg"
-              className="w-full text-sm sm:text-base"
-              isLoading={isLoading}
-              rightIcon={<ArrowRight className="h-3 w-3 sm:h-4 sm:w-4" />}
-            >
-              Sign In
-            </Button>
+  type="button"
+  size="lg"
+  className="w-full text-sm sm:text-base"
+  isLoading={isLoading}
+  rightIcon={<ArrowRight className="h-3 w-3 sm:h-4 sm:w-4" />}
+  onClick={() => {
+    window.location.href = "/citizen/dashboard";
+  }}
+>
+  Sign In
+</Button>
           </form>
 
           <p className="mt-8 text-center text-sm text-fg-secondary">

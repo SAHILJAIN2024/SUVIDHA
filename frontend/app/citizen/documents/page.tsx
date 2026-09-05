@@ -4,7 +4,6 @@ import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Upload, FileText, CheckCircle, XCircle, Clock, Shield, Eye, Trash2, AlertCircle, ChevronRight } from "lucide-react";
 import { Card, CardContent, Button, Badge } from "@/components/ui";
-import { useAuthStore } from "@/store/auth.store";
 import { getCitizenDocuments, uploadDocument, deleteDocument, CDocumentItem } from "@/services/document.service";
 
 /* ═══════════════════════════════════════════════════════════
@@ -72,7 +71,7 @@ const statsData = [
    Page Component
    ═══════════════════════════════════════════════════════════ */
 export default function DocumentVerificationPage() {
-    const { user } = useAuthStore();
+    // const { user } = useAuthStore();
     const [documents, setDocuments] = useState<CDocumentItem[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -192,15 +191,15 @@ export default function DocumentVerificationPage() {
                         <div className="flex-1">
                             <p className="font-bold text-white text-base sm:text-lg">Aadhaar Verification</p>
                             <p className="text-sm text-white/60 mt-0.5">
-                                {user?.aadhaarVerified ? "Your identity has been verified via Aadhaar" : "Aadhaar not yet verified"}
+                                "Your identity has been verified via Aadhaar" : "Aadhaar not yet verified"
                             </p>
                         </div>
-                        <span className={`px-3 py-1 rounded-full text-xs font-bold border shrink-0 inline-flex items-center gap-1.5 ${user?.aadhaarVerified
+                        <span className={`px-3 py-1 rounded-full text-xs font-bold border shrink-0 inline-flex items-center gap-1.5 
                             ? "bg-emerald-50 text-emerald-700 border-emerald-200"
                             : "bg-amber-50 text-amber-700 border-amber-200"
                             }`}>
                             <span className="w-1.5 h-1.5 rounded-full bg-current" />
-                            {user?.aadhaarVerified ? "Verified" : "Pending"}
+                            "Verified" : "Pending"
                         </span>
                     </div>
                 </div>
